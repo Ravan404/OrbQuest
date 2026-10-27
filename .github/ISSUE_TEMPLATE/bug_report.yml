@@ -1,0 +1,34 @@
+name: Bug report
+description: Something does not work as it should
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you did, what you expected, and what happened instead.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: Shown next to the name at the top of the window, and on the About page.
+      placeholder: 1.2.26
+    validations:
+      required: true
+  - type: dropdown
+    id: how
+    attributes:
+      label: How do you run it
+      options:
+        - OrbQuest.exe (Windows package)
+        - npm run dev / npm start
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: For the Windows package, attach `%LOCALAPPDATA%\OrbQuest\startup.log` and `backend.log` if they say anything useful.
+      render: text

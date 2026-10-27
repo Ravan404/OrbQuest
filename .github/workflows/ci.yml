@@ -1,0 +1,81 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: ${{ matrix.os }} / Node ${{ matrix.node }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        node: [22, 24]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type-check (tsc --noEmit)
+        run: npm run typecheck
+
+      - name: Tests (node:test, offline)
+        run: npm test
+
+      - name: Production build (vite + esbuild server bundle)
+        run: npm run build
+
+      - name: Verify the production bundle (versions, offline quest database, static guard)
+        run: npm run verify:dist
+
+  placeholder:
+    name: Placeholder builds from source
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup MinGW-w64
+        id: msys2
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          install: mingw-w64-x86_64-gcc
+
+      - name: Build placeholder_runtime.exe from placeholder_runtime.c
+        shell: pwsh
+        run: |
+          $env:PATH = "${{ steps.msys2.outputs.msys2-location }}\mingw64\bin;$env:PATH"
+          cmd /c scripts\build-placeholder.bat
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Check the result is a 64-bit Windows GUI program
+        shell: pwsh
+        run: |
+          $bytes = [IO.File]::ReadAllBytes((Join-Path $PWD 'build/placeholder_runtime.exe'))
+          if ($bytes[0] -ne 0x4D -or $bytes[1] -ne 0x5A) { throw 'Not a PE file' }
+          $pe = [BitConverter]::ToInt32($bytes, 0x3C)
+          $machine = [BitConverter]::ToUInt16($bytes, $pe + 4)
+          $subsystem = [BitConverter]::ToUInt16($bytes, $pe + 24 + 68)
+          if ($machine -ne 0x8664) { throw "Expected x64, got machine 0x$($machine.ToString('X'))" }
+          if ($subsystem -ne 2) { throw "Expected the Windows GUI subsystem, got $subsystem" }
+          Write-Host "build/placeholder_runtime.exe: $($bytes.Length) bytes, x64, GUI subsystem"

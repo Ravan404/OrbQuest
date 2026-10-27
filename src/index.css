@@ -1,0 +1,164 @@
+@import "tailwindcss";
+
+/*
+ * Two themes, black and white. The light values are the default; the dark
+ * ones apply when Windows is set to dark and the app follows the system, or
+ * when the user picks Dark. <html data-theme="light|dark"> pins one.
+ *
+ * Components use the Tailwind names below (bg-surface, text-muted,
+ * border-line, bg-primary ...), never raw colours.
+ */
+:root {
+  color-scheme: light;
+  --c-page: #fafafa;
+  --c-surface: #ffffff;
+  --c-sunken: #f2f2f2;
+  --c-hover: #ececec;
+  --c-line: #e3e3e3;
+  --c-line-strong: #cfcfcf;
+  --c-text: #111111;
+  --c-muted: #5c5c5c;
+  --c-faint: #8c8c8c;
+  --c-primary: #111111;
+  --c-primary-hover: #333333;
+  --c-on-primary: #ffffff;
+  --c-run: #15803d;
+  --c-danger: #c62828;
+  --c-wait: #1d4ed8;
+  --c-shadow: rgba(0, 0, 0, 0.12);
+}
+
+/* The dark values appear twice: for a pinned Dark and for a system in dark mode. */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --c-page: #0d0d0d;
+  --c-surface: #161616;
+  --c-sunken: #1d1d1d;
+  --c-hover: #262626;
+  --c-line: #262626;
+  --c-line-strong: #383838;
+  --c-text: #f0f0f0;
+  --c-muted: #a6a6a6;
+  --c-faint: #6e6e6e;
+  --c-primary: #f0f0f0;
+  --c-primary-hover: #d4d4d4;
+  --c-on-primary: #0d0d0d;
+  --c-run: #4ade80;
+  --c-danger: #f87171;
+  --c-wait: #7aa7ff;
+  --c-shadow: rgba(0, 0, 0, 0.6);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --c-page: #0d0d0d;
+    --c-surface: #161616;
+    --c-sunken: #1d1d1d;
+    --c-hover: #262626;
+    --c-line: #262626;
+    --c-line-strong: #383838;
+    --c-text: #f0f0f0;
+    --c-muted: #a6a6a6;
+    --c-faint: #6e6e6e;
+    --c-primary: #f0f0f0;
+    --c-primary-hover: #d4d4d4;
+    --c-on-primary: #0d0d0d;
+    --c-run: #4ade80;
+    --c-danger: #f87171;
+    --c-wait: #7aa7ff;
+    --c-shadow: rgba(0, 0, 0, 0.6);
+  }
+}
+
+@theme inline {
+  --color-page: var(--c-page);
+  --color-surface: var(--c-surface);
+  --color-sunken: var(--c-sunken);
+  --color-hover: var(--c-hover);
+  --color-line: var(--c-line);
+  --color-line-strong: var(--c-line-strong);
+  --color-text: var(--c-text);
+  --color-muted: var(--c-muted);
+  --color-faint: var(--c-faint);
+  --color-primary: var(--c-primary);
+  --color-primary-hover: var(--c-primary-hover);
+  --color-on-primary: var(--c-on-primary);
+  --color-run: var(--c-run);
+  --color-danger: var(--c-danger);
+  --color-wait: var(--c-wait);
+
+  --font-sans: "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: "Cascadia Mono", "Cascadia Code", Consolas, ui-monospace, monospace;
+
+  --shadow-pop: 0 8px 24px var(--c-shadow);
+}
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    background-color: var(--c-page);
+    color: var(--c-text);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    -webkit-font-smoothing: antialiased;
+    user-select: none;
+  }
+
+  input,
+  textarea,
+  pre {
+    user-select: text;
+  }
+
+  button:not(:disabled) {
+    cursor: pointer;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--c-primary);
+    outline-offset: 2px;
+  }
+
+  input[type="checkbox"] {
+    accent-color: var(--c-primary);
+  }
+}
+
+@utility tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+@keyframes enter {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@utility animate-enter {
+  animation: enter 0.12s ease-out;
+}
+
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--c-line-strong);
+  border: 3px solid transparent;
+  border-radius: 8px;
+  background-clip: padding-box;
+}

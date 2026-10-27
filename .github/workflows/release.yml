@@ -1,0 +1,68 @@
+name: Release
+
+# Push a tag such as v1.3.0 (after `npm run bump-version -- 1.3.0`) to build the
+# Windows package and attach it to a draft GitHub release. Review the draft
+# and publish it by hand.
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  windows-package:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+
+      - name: Check the tag matches the app version
+        if: startsWith(github.ref, 'refs/tags/v')
+        shell: pwsh
+        run: |
+          $version = (Get-Content package.json -Raw | ConvertFrom-Json).version
+          if ("v$version" -ne '${{ github.ref_name }}') {
+            throw "Tag ${{ github.ref_name }} does not match package.json version $version. Run npm run bump-version -- <version> first."
+          }
+
+      - name: Build dist\OrbQuest.exe
+        shell: cmd
+        run: .\build_windows_exe.bat
+
+      - name: Checksum
+        shell: pwsh
+        run: |
+          $hash = (Get-FileHash dist\OrbQuest.exe -Algorithm SHA256).Hash.ToLower()
+          "$hash  OrbQuest.exe" | Out-File -Encoding ascii dist\OrbQuest.exe.sha256
+          Get-Content dist\OrbQuest.exe.sha256
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: OrbQuest-windows
+          path: |
+            dist/OrbQuest.exe
+            dist/OrbQuest.exe.sha256
+
+      - name: Create draft release
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: pwsh
+        run: |
+          gh release create '${{ github.ref_name }}' dist/OrbQuest.exe dist/OrbQuest.exe.sha256 `
+            --draft --title 'OrbQuest ${{ github.ref_name }}' `
+            --notes 'See [CHANGELOG.md](https://github.com/${{ github.repository }}/blob/${{ github.ref_name }}/CHANGELOG.md) for what changed. Check the download against OrbQuest.exe.sha256.'
