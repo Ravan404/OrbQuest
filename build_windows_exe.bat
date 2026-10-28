@@ -4,7 +4,7 @@ color 0b
 
 echo ========================================================
 echo   OrbQuest - Native Windows Desktop Packager
-echo   Version: 1.2.26
+echo   Version: 1.3.0
 echo ========================================================
 echo.
 

@@ -22,7 +22,7 @@ SERVER_LOG = None
 
 # Application metadata
 APP_NAME = "OrbQuest"
-APP_VERSION = "1.2.26"
+APP_VERSION = "1.3.0"
 # The window title starts with this; single_instance.focus_existing_window
 # looks for it.
 WINDOW_TITLE_PREFIX = f"{APP_NAME} v"
