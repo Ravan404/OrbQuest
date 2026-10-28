@@ -50,7 +50,7 @@ jobs:
           Get-Content dist\OrbQuest.exe.sha256
 
       - name: Upload build artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: OrbQuest-windows
           path: |
