@@ -1,0 +1,983 @@
+{
+  "generatedAt": "2026-10-27T17:18:26.521Z",
+  "version": "1.3.0",
+  "checkedThrough": "2026-10-27T01:36:04.000Z",
+  "entries": [
+    {
+      "gameName": "2XKO",
+      "executableName": "Lion-Win64-Shipping.exe",
+      "folderPath": "2XKO\\Live\\Lion\\Binaries\\Win64",
+      "confidence": "medium",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1szuf4r/exe_paths_for_yall_questers/",
+      "source": "reddit",
+      "postTitle": "exe paths for yall questers :]"
+    },
+    {
+      "gameName": "AION 2",
+      "executableName": "AION2.exe",
+      "folderPath": "steamapps\\common\\AION 2",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1wyf4de/aion_2_quest/",
+      "confidence": "verified",
+      "source": "reddit",
+      "notes": "Reddit post contains the simulated Steam manifest quest template.",
+      "questMethod": "steam-manifest",
+      "steamAppId": 3393110,
+      "manifestFileName": "appmanifest_3393110.acf",
+      "manifestContent": "\"AppState\"\n{\n    \"appid\"     \"3393110\"\n    \"name\"      \"AION 2\"\n    \"StateFlags\"        \"4\"\n    \"installdir\"        \"AION 2\"\n}",
+      "postTitle": "AION 2 Quest"
+    },
+    {
+      "gameName": "Albion Online",
+      "executableName": "Albion-Online.exe",
+      "folderPath": "..\\game",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1vu2kqj/albion_online_dragonfire_quest/",
+      "confidence": "medium",
+      "source": "reddit",
+      "postTitle": "Albion Online: Dragonfire Quest",
+      "aliases": [
+        "Albion Online: Dragonfire"
+      ]
+    },
+    {
+      "gameName": "Aniimo",
+      "executableName": "Aniimo.exe",
+      "folderPath": "..\\Aniimo",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1wi269u/aniimo_quest/",
+      "confidence": "medium",
+      "source": "reddit",
+      "postTitle": "Aniimo Quest"
+    },
+    {
+      "gameName": "Apex Legends",
+      "executableName": "r5apex.exe",
+      "folderPath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Apex Legends",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1wno05q/apex_legends_quest/",
+      "confidence": "medium",
+      "source": "reddit",
+      "postTitle": "APEX LEGENDS QUEST"
+    },
+    {
+      "gameName": "ARC Raiders",
+      "executableName": "PioneerGame.exe",
+      "folderPath": "common\\Arc Raiders",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1poer2j/arc_raiders_ends_december_23rd_2025_700_orbs/",
+      "confidence": "medium",
+      "source": "reddit",
+      "postTitle": "Arc Raiders - Ends December 23rd, 2025 (700 Orbs)"
+    },
+    {
+      "gameName": "Arena Breakout: Infinite",
+      "executableName": "UAGame.exe",
+      "folderPath": "Steam\\steamapps\\common\\ABInfinite\\Binaries\\Win64",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1sw0y1p/arena_breakout_infinite/",
+      "confidence": "medium",
+      "source": "reddit",
+      "postTitle": "Arena Breakout Infinite"
+    },
+    {
+      "gameName": "Arknights: Endfield",
+      "executableName": "Endfield.exe",
+      "folderPath": "Arknights Endfield\\EndField Game",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1rs5qu0/arknights_endfield_quest_ends_march_23rd_2026_700/",
+      "confidence": "medium",
+      "source": "reddit",
+      "postTitle": "Arknights Endfield Quest - Ends March 23rd, 2026 (700 orbs) [Discord Quest Completer setup explained]"
+    },
+    {
+      "gameName": "Assassin's Creed Black Flag Resynced",
+      "executableName": "ACBlackFlag.exe",
+      "folderPath": "steamapps\\common\\Assassin's Creed Black Flag Resynced",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1veom5z/assassins_creed_black_flag_resynced_quest/",
+      "confidence": "verified",
+      "source": "reddit",
+      "notes": "Reddit post contains the simulated Steam manifest quest template.",
+      "questMethod": "steam-manifest",
+      "steamAppId": 3751950,
+      "manifestFileName": "appmanifest_3751950.acf",
+      "manifestContent": "\"AppState\"\n{\n    \"appid\"     \"3751950\"\n    \"name\"      \"Assassin's Creed Black Flag Resynced\"\n    \"StateFlags\"        \"4\"\n    \"installdir\"        \"Assassin's Creed Black Flag Resynced\"\n}",
+      "postTitle": "Assassin's Creed Black Flag Resynced Quest"
+    },
+    {
+      "gameName": "Battlefield 6",
+      "executableName": "bf6.exe",
+      "folderPath": "..\\Battlefield 6",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1v2pc2q/battlefield_6_quest/",
+      "confidence": "medium",
+      "source": "reddit",
+      "postTitle": "Battlefield 6 Quest"
+    },
+    {
+      "gameName": "Blue Protocol: Star Resonance",
+      "executableName": "BPSR_STEAM.exe",
+      "folderPath": "bpsr",
+      "confidence": "medium",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1qer5b4/blue_pro_and_torchlight_inf/",
+      "source": "reddit",
+      "postTitle": "blue pro and torchlight inf"
+    },
+    {
+      "gameName": "Blue Protocol: Star Resonance",
+      "executableName": "bpsr.exe",
+      "folderPath": "Win64",
+      "confidence": "medium",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1szuf4r/exe_paths_for_yall_questers/",
+      "source": "reddit",
+      "postTitle": "exe paths for yall questers :]"
+    },
+    {
+      "gameName": "Call of Duty",
+      "executableName": "cod.exe",
+      "folderPath": "..\\Call of Duty HQ",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1vuo58p/call_of_duty_modern_warfare_4_quest/",
+      "confidence": "medium",
+      "source": "reddit",
+      "postTitle": "Call of Duty: Modern Warfare 4 Quest",
+      "aliases": [
+        "Call of Duty: Modern Warfare 4"
+      ]
+    },
+    {
+      "gameName": "Call of Duty",
+      "executableName": "cod26-cod.exe",
+      "folderPath": "..\\Call of Duty Modern Warfare IV",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1x7p4hd/call_of_duty_modern_warfare_4_quest/",
+      "confidence": "medium",
+      "source": "reddit",
+      "postTitle": "Call of Duty Modern Warfare 4 Quest",
+      "aliases": [
+        "Call of Duty Modern Warfare 4"
+      ]
+    },
+    {
+      "gameName": "Call of Duty",
+      "executableName": "sp26-cod.exe",
+      "folderPath": "Call of Duty Modern Warfare 4",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1xda4aa/call_of_duty_modern_warfare_4_quest/",
+      "confidence": "medium",
+      "source": "reddit",
+      "postTitle": "Call of Duty Modern Warfare 4 Quest.",
+      "aliases": [
+        "Call of Duty Modern Warfare 4"
+      ]
+    },
+    {
+      "gameName": "Clive Barker's Hellraiser: Revival",
+      "executableName": "hellraiser-win64-shipping.exe",
+      "folderPath": "..\\win64",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1wsxf2c/clive_barkers_hellraiser_revival/",
+      "confidence": "medium",
+      "source": "reddit",
+      "postTitle": "Clive Barker's Hellraiser: Revival"
+    },
+    {
+      "gameName": "Comet AI Browser",
+      "executableName": "comet.exe",
+      "folderPath": "Perplexity\\Comet\\Application",
+      "confidence": "medium",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1szuf4r/exe_paths_for_yall_questers/",
+      "source": "reddit",
+      "postTitle": "exe paths for yall questers :]"
+    },
+    {
+      "gameName": "Deadzone Rogue 2",
+      "executableName": "deadzone2steam.exe",
+      "folderPath": "..\\Win64",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1x1r4b1/deadzone_rogue_2_quest/",
+      "confidence": "medium",
+      "source": "reddit",
+      "postTitle": "Deadzone Rogue 2 Quest"
+    },
+    {
+      "gameName": "Delta Force",
+      "executableName": "DeltaForceClient-Win64-Shipping.exe",
+      "folderPath": "common\\Delta Force\\Game\\DeltaForce\\Binaries\\Win64",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1qv1w5w/delta_force_orbs_questt/",
+      "confidence": "medium",
+      "source": "reddit",
+      "postTitle": "Delta Force Orbs Questt"
+    },
+    {
+      "gameName": "Destiny 2",
+      "executableName": "destiny2.exe",
+      "folderPath": "common\\Destiny 2",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1pekhy5/destiny_2_ends_december_14th_2025/",
+      "confidence": "medium",
+      "source": "reddit",
+      "postTitle": "Destiny 2 - Ends December 14th, 2025"
+    },
+    {
+      "gameName": "Dragon Age: The Veilguard",
+      "executableName": "DragonAgeTheVeilguard.exe",
+      "folderPath": "..\\Dragon Age The Veilguard",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1vuoerw/dragon_age_the_veilguard_quest/",
+      "confidence": "medium",
+      "source": "reddit",
+      "postTitle": "Dragon Age: The Veilguard Quest",
+      "notes": "If it is not detected, name the executable \"Dragon Age The Veilguard.exe\" (with spaces) instead."
+    },
+    {
+      "gameName": "Dragon's Dogma 2",
+      "executableName": "DD2.exe",
+      "folderPath": "..\\Dragons Dogma 2",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1w4wky5/dragons_dogma_2_quest/",
+      "confidence": "medium",
+      "source": "reddit",
+      "postTitle": "Dragon's Dogma 2 Quest"
+    },
+    {
+      "gameName": "Dragonheir: Silent Gods",
+      "executableName": "Dragonheir.exe",
+      "folderPath": "Dragonheir Silent Gods",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1wh71j1/dragonheir_chaos_revelry_quest/",
+      "confidence": "medium",
+      "source": "reddit",
+      "postTitle": "Dragonheir: Chaos Revelry Quest",
+      "aliases": [
+        "Dragonheir: Chaos Revelry"
+      ]
+    },
+    {
+      "gameName": "Duet Night Abyss",
+      "executableName": "EM-Win64-Shipping.exe",
+      "folderPath": "..\\Duet Night Abyss",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1tuwt7i/duet_night_abyss_quest/",
+      "confidence": "medium",
+      "source": "reddit",
+      "postTitle": "Duet Night Abyss Quest"
+    },
+    {
+      "gameName": "EA SPORTS FC 26",
+      "executableName": "FC26.exe",
+      "folderPath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\EA SPORTS FC 26",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1txa4h2/fc26_filepath_for_discord_quest_completer/",
+      "confidence": "medium",
+      "source": "reddit",
+      "postTitle": "FC26 Filepath for Discord Quest Completer",
+      "aliases": [
+        "FC26"
+      ]
+    },
+    {
+      "gameName": "EA SPORTS FC 27",
+      "executableName": "fc27.exe",
+      "folderPath": "steamapps\\common\\EA SPORTS FC 27",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1wq2m86/ea_sports_fc_27_quest/",
+      "confidence": "verified",
+      "source": "reddit",
+      "notes": "Reddit post contains the simulated Steam manifest quest template.",
+      "questMethod": "steam-manifest",
+      "steamAppId": 4080220,
+      "manifestFileName": "appmanifest_4080220.acf",
+      "manifestContent": "\"AppState\"\n{\n    \"appid\"     \"4080220\"\n    \"name\"      \"EA SPORTS FC™ 27\"\n    \"StateFlags\"        \"4\"\n    \"installdir\"        \"EA SPORTS FC 27\"\n}",
+      "postTitle": "EA SPORTS FC™ 27 Quest"
+    },
+    {
+      "gameName": "EMPULSE",
+      "executableName": "OrionClient-Win64-Shipping.exe",
+      "folderPath": "EMPULSE Demo\\Orion\\Binaries\\Win64",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1u7l8i7/empulse_location/",
+      "confidence": "medium",
+      "source": "reddit",
+      "postTitle": "EMPULSE Location"
+    },
+    {
+      "gameName": "Enginefall",
+      "executableName": "ColtraneClient-Win64-Shipping.exe",
+      "folderPath": "Enginefall Demo\\Coltrane\\Binaries\\Win64",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1u6s185/enginefall_demo_quest_folder_structure_and_exe/",
+      "confidence": "medium",
+      "source": "reddit",
+      "postTitle": "Enginefall Demo Quest Folder Structure and EXE Location:",
+      "notes": "Start the demo download on Steam and pause it, then put the executable into the folder Steam created (Manage > Browse local files)."
+    },
+    {
+      "gameName": "Escape the Backrooms",
+      "executableName": "Backrooms-Win64-Shipping.exe",
+      "folderPath": "EscapeTheBackrooms\\Binaries\\Win64",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1txs9kk/escape_the_backrooms_file_directory/",
+      "confidence": "medium",
+      "source": "reddit",
+      "postTitle": "Escape the Backrooms File Directory"
+    },
+    {
+      "gameName": "EVE Online",
+      "executableName": "exefile.exe",
+      "folderPath": "..\\Eve Online",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1v872bg/eve_online_quest/",
+      "confidence": "medium",
+      "source": "reddit",
+      "postTitle": "EVE Online Quest"
+    },
+    {
+      "gameName": "Fallout 4",
+      "executableName": "Fallout4.exe",
+      "folderPath": "common\\Fallout 4",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1pq6ls6/fallout_series_ends_december_28th_2025_700_orbs/",
+      "confidence": "medium",
+      "source": "reddit",
+      "postTitle": "Fallout Series - Ends December 28th, 2025 (700 Orbs)",
+      "aliases": [
+        "Fallout Series"
+      ]
+    },
+    {
+      "gameName": "Fallout 76",
+      "executableName": "Fallout76.exe",
+      "folderPath": "Fallout76",
+      "confidence": "medium",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1szuf4r/exe_paths_for_yall_questers/",
+      "source": "reddit",
+      "postTitle": "exe paths for yall questers :]"
+    },
+    {
+      "gameName": "Firefox",
+      "executableName": "firefox.exe",
+      "folderPath": "Mozilla Firefox",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1xcrbme/firefox_quest/",
+      "confidence": "medium",
+      "source": "reddit",
+      "postTitle": "Firefox Quest"
+    },
+    {
+      "gameName": "Fortnite",
+      "executableName": "FortniteClient-Win64-Shipping.exe",
+      "folderPath": "common\\Win64",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1sn8luy/fortnite_quest/",
+      "confidence": "medium",
+      "source": "reddit",
+      "postTitle": "Fortnite Quest"
+    },
+    {
+      "gameName": "Forza Horizon 6",
+      "executableName": "forzahorizon6.exe",
+      "folderPath": "Forza Horizon 6\\Content",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1tvjx2c/help_for_forza_horizon_6_quest/",
+      "confidence": "experimental",
+      "source": "reddit",
+      "postTitle": "help for forza horizon 6 quest",
+      "notes": "Unconfirmed: the Reddit poster reported that this path did not complete the quest."
+    },
+    {
+      "gameName": "GearUP",
+      "executableName": "Gearup_ball.exe",
+      "folderPath": "GearUP",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1uldset/gearup_quest/",
+      "confidence": "medium",
+      "source": "reddit",
+      "postTitle": "GearUP Quest",
+      "notes": "Any folder name works: the executable only has to sit inside one folder (..\\Gearup_ball.exe)."
+    },
+    {
+      "gameName": "Genshin Impact",
+      "executableName": "GenshinImpact.exe",
+      "folderPath": "Genshin Impact\\Genshin Impact game",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1sz5xam/genshin_impact_song_of_the_welkin_moon_luna_vi/",
+      "confidence": "medium",
+      "source": "reddit",
+      "postTitle": "Genshin Impact: SONG OF THE WELKIN MOON \"LUNA VI\"",
+      "aliases": [
+        "Genshin Impact: SONG OF THE WELKIN MOON \"LUNA VI\""
+      ]
+    },
+    {
+      "gameName": "Goals",
+      "executableName": "Goals.exe",
+      "folderPath": "Steam\\steamapps\\common\\GOALS\\Game\\Binaries\\Win64",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1u8h6u9/goals_quest/",
+      "confidence": "medium",
+      "source": "reddit",
+      "postTitle": "Goals Quest"
+    },
+    {
+      "gameName": "GODDESS OF VICTORY: NIKKE",
+      "executableName": "nikke.exe",
+      "folderPath": "NIKKE\\NIKKE\\Game",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1strwp7/goddess_of_victory_nikke_quest/",
+      "confidence": "medium",
+      "source": "reddit",
+      "postTitle": "GODDESS OF VICTORY: NIKKE Quest",
+      "aliases": [
+        "NIKKE"
+      ]
+    },
+    {
+      "gameName": "Gravebound",
+      "executableName": "Gravebound.exe",
+      "folderPath": "Gravebound",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1wng51l/gravebound_discord_quest/",
+      "confidence": "medium",
+      "source": "reddit",
+      "postTitle": "Gravebound Discord Quest"
+    },
+    {
+      "gameName": "Grounded 2",
+      "executableName": "Grounded2-WinGRTS-Shipping.exe",
+      "folderPath": "WinGRTS",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1qu7zil/grounded_2_orb_quest/",
+      "confidence": "medium",
+      "source": "reddit",
+      "postTitle": "Grounded 2 Orb quest"
+    },
+    {
+      "gameName": "Helldivers 2",
+      "executableName": "helldivers2.exe",
+      "folderPath": "..\\Helldivers 2\\bin",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1vtppw6/helldivers_2_quest/",
+      "confidence": "medium",
+      "source": "reddit",
+      "postTitle": "Helldivers 2 Quest"
+    },
+    {
+      "gameName": "Highguard",
+      "executableName": "HighguardClient-Win64-Shipping.exe",
+      "folderPath": "common\\Highguard\\Binaries\\Win64",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1qnqmab/highguard_launch_quest_700_orbs_ends_0202/",
+      "confidence": "medium",
+      "source": "reddit",
+      "postTitle": "Highguard Launch Quest - 700 Orbs (Ends 02/02)"
+    },
+    {
+      "gameName": "Honkai: Star Rail",
+      "executableName": "StarRail.exe",
+      "folderPath": "common\\Games",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1sshhhn/honkai_star_rail_quest/",
+      "confidence": "medium",
+      "source": "reddit",
+      "postTitle": "Honkai: Star Rail Quest"
+    },
+    {
+      "gameName": "Hunt: Showdown 1896",
+      "executableName": "HuntGame.exe",
+      "folderPath": "win_x64",
+      "confidence": "medium",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1szuf4r/exe_paths_for_yall_questers/",
+      "source": "reddit",
+      "postTitle": "exe paths for yall questers :]"
+    },
+    {
+      "gameName": "John Carpenter's Toxic Commando",
+      "executableName": "John Carpenter's Toxic Commando.exe",
+      "folderPath": "SteamLibrary\\steamapps\\common\\John Carpenter's Toxic Commando Demo\\client_pc\\root\\bin\\pc",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1rhvwn9/method_for_completing_the_quests_for_marathon_and/",
+      "confidence": "medium",
+      "source": "reddit",
+      "postTitle": "Method for completing the quests for \"Marathon\" and \"Toxic Commando\"",
+      "notes": "Steam-only quest: put appmanifest_3065800.acf and appmanifest_4354730.acf into SteamLibrary\\steamapps (copy any existing .acf file and rename it), then restart Discord before running the executable.",
+      "aliases": [
+        "John Carpenter's Toxic Commando Demo"
+      ]
+    },
+    {
+      "gameName": "League of Legends",
+      "executableName": "League of Legends.exe",
+      "folderPath": "..\\Game",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1va54mq/league_of_legends_quest/",
+      "confidence": "medium",
+      "source": "reddit",
+      "postTitle": "League of Legends Quest"
+    },
+    {
+      "gameName": "Marathon",
+      "executableName": "Marathon.exe",
+      "folderPath": "SteamLibrary\\steamapps\\common\\Marathon Server Slam",
+      "confidence": "medium",
+      "notes": "Steam-only quest: put appmanifest_3065800.acf and appmanifest_4354730.acf into SteamLibrary\\steamapps (copy any existing .acf file and rename it), then restart Discord before running the executable.",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1rhvwn9/method_for_completing_the_quests_for_marathon_and/",
+      "source": "reddit",
+      "postTitle": "Method for completing the quests for \"Marathon\" and \"Toxic Commando\""
+    },
+    {
+      "gameName": "March of Giants",
+      "executableName": "TheLineClient-Win64-Shipping.exe",
+      "folderPath": "..\\win64",
+      "confidence": "medium",
+      "notes": "For the March of Giants Playtest quest. If it does not work right away, close Discord completely and restart it before starting the executable.",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1x02eas/march_of_giants_playtest/",
+      "source": "reddit",
+      "postTitle": "March of Giants Playtest"
+    },
+    {
+      "gameName": "March of Giants",
+      "executableName": "TheLineClient.exe",
+      "folderPath": "..\\March of Giants",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1x03q7o/march_of_giants_quest/",
+      "confidence": "medium",
+      "source": "reddit",
+      "postTitle": "March of Giants Quest"
+    },
+    {
+      "gameName": "Marvel Rivals",
+      "executableName": "Marvel-Win64-Shipping.exe",
+      "folderPath": "common\\MarvelRivals\\MarvelGame\\Marvel\\Binaries\\Win64",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1qewbcb/marvel_rivals_deadpool_quest/",
+      "confidence": "medium",
+      "source": "reddit",
+      "postTitle": "Marvel Rivals Deadpool Quest",
+      "aliases": [
+        "Marvel Rivals Deadpool"
+      ]
+    },
+    {
+      "gameName": "MARVEL SNAP",
+      "executableName": "snap.exe",
+      "folderPath": "..\\marvel snap",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1vy6jpe/marvel_snap_x_draft_mode_quest/",
+      "confidence": "medium",
+      "source": "reddit",
+      "postTitle": "MARVEL SNAP x Draft Mode Quest",
+      "aliases": [
+        "MARVEL SNAP x Draft Mode"
+      ]
+    },
+    {
+      "gameName": "MARVEL Tōkon: Fighting Souls",
+      "executableName": "MTFSSteam-Win64-Shipping.exe",
+      "folderPath": "steamapps\\common\\MTFS",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1vr6vli/marvel_tokon_fightings_souls_quest/",
+      "confidence": "verified",
+      "source": "reddit",
+      "notes": "Reddit post contains the simulated Steam manifest quest template.",
+      "questMethod": "steam-manifest",
+      "steamAppId": 3787240,
+      "manifestFileName": "appmanifest_3787240.acf",
+      "manifestContent": "\"AppState\"\n{\n    \"appid\"     \"3787240\"\n    \"name\"      \"MARVEL Tōkon: Fighting Souls\"\n    \"StateFlags\"        \"4\"\n    \"installdir\"        \"MTFS\"\n}",
+      "postTitle": "Marvel Tokon Fightings Souls Quest",
+      "aliases": [
+        "Marvel Tokon Fightings Souls",
+        "MTFS"
+      ]
+    },
+    {
+      "gameName": "Monster Hunter Stories",
+      "executableName": "MHST.exe",
+      "folderPath": "Monster Hunter Stories",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1wa7p56/capcom_tgs_deals_quest/",
+      "confidence": "medium",
+      "source": "reddit",
+      "postTitle": "Capcom TGS Deals Quest",
+      "notes": "For the Capcom TGS Deals quest. Street Fighter 6 works as well (..\\Street Fighter 6\\StreetFighter6.exe).",
+      "aliases": [
+        "Capcom TGS Deals"
+      ]
+    },
+    {
+      "gameName": "Nekome",
+      "executableName": "nekomedemo.exe",
+      "folderPath": "Win64",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1xb1d9l/nekome_quest/",
+      "confidence": "medium",
+      "source": "reddit",
+      "postTitle": "Nekome Quest"
+    },
+    {
+      "gameName": "Neverness to Everness",
+      "executableName": "HTGame.exe",
+      "folderPath": "Neverness To Everness\\Client\\WindowsNoEditor\\HT\\Binaries\\Win64",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1sz5ycn/nte_launch_drift/",
+      "confidence": "medium",
+      "source": "reddit",
+      "postTitle": "NTE LAUNCH DRIFT"
+    },
+    {
+      "gameName": "Old School RuneScape",
+      "executableName": "osclient.exe",
+      "folderPath": "bin\\win64",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1ugd5em/oldschool_runescape_quest/",
+      "confidence": "medium",
+      "source": "reddit",
+      "postTitle": "OldSchool RuneScape Quest"
+    },
+    {
+      "gameName": "Once Human",
+      "executableName": "ONCE_HUMAN.exe",
+      "folderPath": "common\\Once Human",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1qk7mbk/once_human_quest_700_orbs_ends_129/",
+      "confidence": "medium",
+      "source": "reddit",
+      "postTitle": "Once Human Quest (700 orbs, ends 1/29)"
+    },
+    {
+      "gameName": "Onimusha: Way of the Sword",
+      "executableName": "OnimushaWotS_Demo.exe",
+      "folderPath": "..\\OnimushaWotS_Demo",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1w7bdyw/onimusha_way_of_the_sword_demo/",
+      "confidence": "medium",
+      "source": "reddit",
+      "postTitle": "Onimusha: Way of the Sword Demo"
+    },
+    {
+      "gameName": "Opera GX",
+      "executableName": "opera.exe",
+      "folderPath": "Opera GX",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1rab9ft/opera_gx_quest_ends_march_6th_2026_700_orbs/",
+      "confidence": "medium",
+      "source": "reddit",
+      "postTitle": "Opera GX Quest - Ends March 6th, 2026 (700 orbs)"
+    },
+    {
+      "gameName": "Path of Exile 2",
+      "executableName": "PathOfExile_x64Steam.exe",
+      "folderPath": "..\\Path of Exile 2",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1trbavz/path_of_exile_2_quest/",
+      "confidence": "medium",
+      "source": "reddit",
+      "postTitle": "Path of Exile 2 Quest"
+    },
+    {
+      "gameName": "Path of Exile 2",
+      "executableName": "pathofexile.exe",
+      "folderPath": "Grinding Gear Games\\Path of Exile 2",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1tsc57y/path_of_exile_2_quest/",
+      "confidence": "medium",
+      "source": "reddit",
+      "postTitle": "Path of Exile 2 Quest"
+    },
+    {
+      "gameName": "PRAGMATA",
+      "executableName": "PRAGMATA_SKETCHBOOK.exe",
+      "folderPath": "common\\PRAGMATA SKETCHBOOK",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1pl30fl/pragmata_ends_december_17th_2025_700_orbs/",
+      "confidence": "medium",
+      "source": "reddit",
+      "postTitle": "PRAGMATA - Ends December 17th, 2025 (700 Orbs)"
+    },
+    {
+      "gameName": "PUBG: BATTLEGROUNDS",
+      "executableName": "TslGame.exe",
+      "folderPath": "Win64",
+      "confidence": "medium",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1szuf4r/exe_paths_for_yall_questers/",
+      "source": "reddit",
+      "postTitle": "exe paths for yall questers :]"
+    },
+    {
+      "gameName": "Ragnarok: The New World",
+      "executableName": "game.exe",
+      "folderPath": "roworld",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1vilvt9/ragnarok_the_new_world_quest/",
+      "confidence": "medium",
+      "source": "reddit",
+      "postTitle": "Ragnarok: The New World Quest"
+    },
+    {
+      "gameName": "RAID: Shadow Legends",
+      "executableName": "Raid.exe",
+      "folderPath": "build",
+      "confidence": "medium",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1szuf4r/exe_paths_for_yall_questers/",
+      "source": "reddit",
+      "postTitle": "exe paths for yall questers :]"
+    },
+    {
+      "gameName": "Resident Evil",
+      "executableName": "re0hd.exe",
+      "folderPath": "..\\Resident Evil 0",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1xduds5/resident_evil_quest/",
+      "confidence": "medium",
+      "source": "reddit",
+      "postTitle": "Resident Evil Quest"
+    },
+    {
+      "gameName": "Resident Evil",
+      "executableName": "re9.exe",
+      "folderPath": "Not found",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1xeay4q/resident_evil_quest/",
+      "confidence": "experimental",
+      "source": "reddit",
+      "postTitle": "Resident Evil Quest"
+    },
+    {
+      "gameName": "Resident Evil 2",
+      "executableName": "re2.exe",
+      "folderPath": "steamapps\\common\\RESIDENT EVIL 2  BIOHAZARD RE2",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1xc344m/resident_evil_quest/",
+      "confidence": "verified",
+      "source": "reddit",
+      "notes": "Reddit post contains the simulated Steam manifest quest template.",
+      "questMethod": "steam-manifest",
+      "steamAppId": 883710,
+      "manifestFileName": "appmanifest_883710.acf",
+      "manifestContent": "\"AppState\"\n{\n    \"appid\"     \"883710\"\n    \"name\"      \"Resident Evil 2\"\n    \"StateFlags\"        \"4\"\n    \"installdir\"        \"RESIDENT EVIL 2  BIOHAZARD RE2\"\n}",
+      "postTitle": "Resident Evil Quest",
+      "aliases": [
+        "Resident Evil",
+        "RESIDENT EVIL 2 BIOHAZARD RE2"
+      ]
+    },
+    {
+      "gameName": "Resident Evil Sale",
+      "executableName": "re3.exe",
+      "folderPath": "..\\common\\RE3",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1xcpfoh/resident_evil_sale_quest/",
+      "confidence": "medium",
+      "source": "reddit",
+      "postTitle": "Resident Evil Sale Quest"
+    },
+    {
+      "gameName": "Resident Evil Village",
+      "executableName": "re8.exe",
+      "folderPath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Resident Evil Village BIOHAZARD VILLAGE",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1wd0j3v/resident_evil_village_quest/",
+      "confidence": "medium",
+      "source": "reddit",
+      "postTitle": "Resident Evil Village Quest"
+    },
+    {
+      "gameName": "Risk of Rain 2",
+      "executableName": "risk of rain 2.exe",
+      "folderPath": "..\\risk of rain 2",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1x0wsuu/ror2_hallowed_concepts_quest/",
+      "confidence": "medium",
+      "source": "reddit",
+      "postTitle": "ROR2 Hallowed Concepts Quest",
+      "aliases": [
+        "ROR2 Hallowed Concepts"
+      ]
+    },
+    {
+      "gameName": "Roblox",
+      "executableName": "RobloxPlayerBeta.exe",
+      "folderPath": "..\\Roblox\\Versions\\version-xxxxxxxx",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1tgyz0m/roblox_fisch_quest/",
+      "confidence": "medium",
+      "source": "reddit",
+      "postTitle": "Roblox Fisch Quest",
+      "aliases": [
+        "Roblox Fisch"
+      ]
+    },
+    {
+      "gameName": "Rune Dice",
+      "executableName": "Rune Dice.exe",
+      "folderPath": "..\\Rune Dice",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1tiu7ag/rune_dise_quest/",
+      "confidence": "medium",
+      "source": "reddit",
+      "postTitle": "Rune Dise Quest",
+      "aliases": [
+        "Rune Dise"
+      ]
+    },
+    {
+      "gameName": "RuneScape",
+      "executableName": "runescape.exe",
+      "folderPath": "..\\win64",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1v027ld/runescape_quest/",
+      "confidence": "medium",
+      "source": "reddit",
+      "postTitle": "Runescape Quest"
+    },
+    {
+      "gameName": "Shift At Midnight",
+      "executableName": "ShiftAtMidnight.exe",
+      "folderPath": "..\\Shift At Midnight Demo",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1v3oh81/shift_at_midnight_quest/",
+      "confidence": "medium",
+      "source": "reddit",
+      "postTitle": "Shift At Midnight Quest",
+      "notes": "Start downloading the demo on Steam (about 5-15%) so Steam creates the folder and the identification files Discord checks."
+    },
+    {
+      "gameName": "skate.",
+      "executableName": "skate.exe",
+      "folderPath": "Steam\\steamapps\\common\\skate",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1sm1p7z/skate_quest/",
+      "confidence": "medium",
+      "source": "reddit",
+      "postTitle": "skate. Quest"
+    },
+    {
+      "gameName": "STALZONE",
+      "executableName": "stalcraftw.exe",
+      "folderPath": "..\\bin",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1uz6s1f/stalzone_quest/",
+      "confidence": "medium",
+      "source": "reddit",
+      "postTitle": "STALZONE Quest"
+    },
+    {
+      "gameName": "Storm Lancers",
+      "executableName": "StormLancersDemo.exe",
+      "folderPath": "Storm Lancers Demo",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1pd8g2m/storm_lancers_demo_8th_december_2025/",
+      "confidence": "medium",
+      "source": "reddit",
+      "postTitle": "Storm Lancers Demo - 8th December 2025"
+    },
+    {
+      "gameName": "Street Fighter 6",
+      "executableName": "StreetFighter6.exe",
+      "folderPath": "..\\Street Fighter 6",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1wa252x/capcom_tgs_deals_quest/",
+      "confidence": "medium",
+      "source": "reddit",
+      "postTitle": "Capcom TGS Deals Quest",
+      "notes": "For the Capcom TGS Deals quest. Monster Hunter Stories works as well (..\\Monster Hunter Stories\\MHST.exe).",
+      "aliases": [
+        "Capcom TGS Deals"
+      ]
+    },
+    {
+      "gameName": "Summoners War",
+      "executableName": "SummonersWar.exe",
+      "folderPath": "steamapps\\common\\Summoners War",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1qrlxgf/summoners_war/",
+      "confidence": "medium",
+      "source": "reddit",
+      "postTitle": "Summoners War"
+    },
+    {
+      "gameName": "Terminull Brigade",
+      "executableName": "Rouge-Win64-Shipping.exe",
+      "folderPath": "common\\TerminullBrigade\\Project Rogueteers\\Rogueteers\\Binaries\\Win64",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1pgbxpg/terminull_brigade_ends_december_13th_2025_700_orbs/",
+      "confidence": "medium",
+      "source": "reddit",
+      "postTitle": "Terminull Brigade - Ends December 13th, 2025 (700 Orbs)"
+    },
+    {
+      "gameName": "The Mound: Omen of Cthulhu",
+      "executableName": "TheMound-Win64-Shipping.exe",
+      "folderPath": "..\\The Mound Omen of Cthulhu\\Binaries\\Win64",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1u6npud/the_mound_omen_of_cthulhu_quest_exe_location/",
+      "confidence": "medium",
+      "source": "reddit",
+      "postTitle": "The Mound: Omen Of Cthulhu Quest EXE Location"
+    },
+    {
+      "gameName": "Torchlight: Infinite",
+      "executableName": "Torchlight_Infinite.exe",
+      "folderPath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\UE_game\\Binaries\\Win64",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1qer5b4/blue_pro_and_torchlight_inf/",
+      "confidence": "medium",
+      "source": "reddit",
+      "postTitle": "blue pro and torchlight inf"
+    },
+    {
+      "gameName": "Umamusume: Pretty Derby",
+      "executableName": "UmamusumePrettyDerby.exe",
+      "folderPath": "..\\UmamusumePrettyDerby",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1v418tr/umamusume_pretty_derby_quest/",
+      "confidence": "medium",
+      "source": "reddit",
+      "postTitle": "Umamusume: Pretty Derby Quest"
+    },
+    {
+      "gameName": "VALORANT",
+      "executableName": "VALORANT-Win64-Shipping.exe",
+      "folderPath": "..\\Riot Games\\VALORANT\\live\\ShooterGame\\Binaries\\Win64",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1uembac/valorant_quests/",
+      "confidence": "medium",
+      "source": "reddit",
+      "postTitle": "Valorant Quests"
+    },
+    {
+      "gameName": "Vindictus",
+      "executableName": "Vindictus_x64.exe",
+      "folderPath": "Vindictus",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1r1tfl5/vindictus_quest/",
+      "confidence": "medium",
+      "source": "reddit",
+      "postTitle": "Vindictus Quest",
+      "notes": "Any folder works, even the root of a drive."
+    },
+    {
+      "gameName": "War Thunder",
+      "executableName": "aces.exe",
+      "folderPath": "..\\win64",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1wj0o8q/war_thunder_quest/",
+      "confidence": "medium",
+      "source": "reddit",
+      "postTitle": "War Thunder Quest"
+    },
+    {
+      "gameName": "Warframe",
+      "executableName": "warframe.exe",
+      "folderPath": "Warframe",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1u8h6kd/complete_warframe_quest/",
+      "confidence": "medium",
+      "source": "reddit",
+      "postTitle": "Complete Warframe Quest",
+      "notes": "Any folder name works: the executable only has to sit inside one folder (..\\warframe.exe).",
+      "aliases": [
+        "Complete Warframe"
+      ]
+    },
+    {
+      "gameName": "Where Winds Meet",
+      "executableName": "wwm.exe",
+      "folderPath": "common\\wwm_standard\\Engine\\Binaries\\Win64r",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1qtu2hc/where_winds_meet_questt/",
+      "confidence": "medium",
+      "source": "reddit",
+      "postTitle": "Where Winds Meet Questt"
+    },
+    {
+      "gameName": "Wizard101",
+      "executableName": "Wizard101.exe",
+      "folderPath": "Wizard101",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1wmjjry/wizard101_quest/",
+      "confidence": "medium",
+      "source": "reddit",
+      "postTitle": "Wizard101 Quest"
+    },
+    {
+      "gameName": "World of Tanks: HEAT",
+      "executableName": "wgcs_api.exe",
+      "folderPath": "..\\WoT HEAT",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1tr93af/world_of_tanks_heat_quest/",
+      "confidence": "medium",
+      "source": "reddit",
+      "postTitle": "World of Tanks: HEAT quest"
+    },
+    {
+      "gameName": "World of Warcraft",
+      "executableName": "Wow.exe",
+      "folderPath": "World of Warcraft\\_retail_",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1rjd8bv/world_of_warcraft_midnight_quest/",
+      "confidence": "medium",
+      "source": "reddit",
+      "postTitle": "World of Warcraft: Midnight Quest",
+      "aliases": [
+        "World of Warcraft: Midnight"
+      ]
+    },
+    {
+      "gameName": "Wuthering Waves",
+      "executableName": "Wuthering Waves.exe",
+      "folderPath": "SteamLibrary\\steamapps\\common\\Wuthering Waves",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1u1hfja/wuthering_waves/",
+      "confidence": "medium",
+      "source": "reddit",
+      "postTitle": "Wuthering Waves"
+    },
+    {
+      "gameName": "Wuthering Waves",
+      "executableName": "Client-Win64-Shipping.exe",
+      "folderPath": "Wuthering Waves\\Wuthering Waves Game\\Client\\Binaries\\Win64",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1u293gt/wuthering_waves_quest/",
+      "confidence": "medium",
+      "source": "reddit",
+      "postTitle": "Wuthering Waves Quest"
+    },
+    {
+      "gameName": "Yu-Gi-Oh! Master Duel",
+      "executableName": "masterduel.exe",
+      "folderPath": "Yu-Gi-Oh!  Master Duel",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1u2bpa1/yugioh_master_duel_quest/",
+      "confidence": "medium",
+      "source": "reddit",
+      "postTitle": "Yu-Gi-Oh! Master Duel Quest",
+      "notes": "The folder name needs two spaces between \"Yu-Gi-Oh!\" and \"Master Duel\"."
+    },
+    {
+      "gameName": "Zenless Zone Zero",
+      "executableName": "ZenlessZoneZero.exe",
+      "folderPath": "..\\ZenlessZoneZero Game",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1u8gt3s/zenless_zone_zero_quests/",
+      "confidence": "medium",
+      "source": "reddit",
+      "postTitle": "Zenless Zone Zero Quests"
+    }
+  ]
+}

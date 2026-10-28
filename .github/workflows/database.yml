@@ -1,0 +1,87 @@
+name: Quest database
+
+# Reads new r/DiscordQuests posts every six hours and commits the rebuilt
+# quest database to main. Every OrbQuest install downloads that one file
+# (src/server/publishedDatabase.ts), so Reddit is asked from here only,
+# not from every user's PC.
+on:
+  schedule:
+    - cron: '17 */6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: quest-database
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Reddit and the Arctic Shift archive are sometimes briefly unreachable.
+      # A missed run is only a warning; the next one catches up.
+      - name: Read new r/DiscordQuests posts
+        id: fetch
+        continue-on-error: true
+        run: npm run update-database
+
+      - name: Warn about a missed update
+        if: steps.fetch.outcome == 'failure'
+        run: echo "::warning::Neither Reddit nor the Arctic Shift archive answered. The next scheduled run tries again."
+
+      # A week without new posts means the sources stopped working: fail so it is noticed.
+      - name: Fail when the database is a week behind
+        run: |
+          node --input-type=module -e "
+          import fs from 'node:fs';
+          const { checkedThrough } = JSON.parse(fs.readFileSync('src/server/redditCache.json', 'utf8'));
+          const days = (Date.now() - Date.parse(checkedThrough)) / 86400000;
+          console.log('Checked through ' + checkedThrough + ' (' + days.toFixed(1) + ' days ago)');
+          if (!(days < 7)) throw new Error('No new r/DiscordQuests posts for a week. Check the update step.');
+          "
+
+      - name: Check the rebuilt database
+        run: |
+          node --input-type=module -e "
+          import fs from 'node:fs';
+          import { execSync } from 'node:child_process';
+          const file = 'src/server/redditCache.json';
+          const next = JSON.parse(fs.readFileSync(file, 'utf8'));
+          const before = JSON.parse(execSync('git show HEAD:' + file, { encoding: 'utf8' }));
+          if (!Array.isArray(next.entries) || next.entries.some((e) => !e.gameName || !e.executableName)) {
+            throw new Error('The database has malformed entries.');
+          }
+          if (next.entries.length < before.entries.length * 0.9) {
+            throw new Error('The database shrank from ' + before.entries.length + ' to ' + next.entries.length + ' entries.');
+          }
+          console.log('Entries: ' + before.entries.length + ' -> ' + next.entries.length);
+          "
+
+      - name: Tests
+        run: npm test
+
+      - name: Commit the update
+        run: |
+          if git diff --quiet && [ -z "$(git ls-files --others --exclude-standard data/reddit)" ]; then
+            echo "The database did not change."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/reddit src/server/redditCache.json src/server/questDatabaseInfo.ts
+          git commit -m "chore(data): update the quest database from r/DiscordQuests"
+          git push

@@ -1,0 +1,8 @@
+# Text files are stored with LF; Windows batch files need CRLF to run.
+* text=auto eol=lf
+*.bat text eol=crlf
+
+*.png binary
+*.jpg binary
+*.ico binary
+*.exe binary
