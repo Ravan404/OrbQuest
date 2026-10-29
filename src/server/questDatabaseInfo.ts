@@ -23,11 +23,23 @@ export interface QuestDatabaseUpdate {
 }
 
 /** Last time the bundled database changed. */
-export const QUEST_DATABASE_UPDATED_AT = "2026-10-29T13:09:01.877Z";
+export const QUEST_DATABASE_UPDATED_AT = "2026-10-29T22:48:40.089Z";
 /** Newest r/DiscordQuests post the bundled database had checked. */
-export const QUEST_DATABASE_CHECKED_THROUGH = "2026-10-29T07:13:50.000Z";
+export const QUEST_DATABASE_CHECKED_THROUGH = "2026-10-29T18:20:20.000Z";
 
 export const QUEST_DATABASE_UPDATE_HISTORY: QuestDatabaseUpdate[] = [
+  {
+    "updatedAt": "2026-10-29T22:48:40.089Z",
+    "checkedThrough": "2026-10-29T18:20:20.000Z",
+    "entries": 98,
+    "games": 91,
+    "posts": 142,
+    "sources": [
+      "apify-reddit-scraper",
+      "arctic-shift"
+    ],
+    "note": "Update from r/DiscordQuests via arctic-shift: 1 new post(s)."
+  },
   {
     "updatedAt": "2026-10-29T13:09:01.877Z",
     "checkedThrough": "2026-10-29T07:13:50.000Z",
