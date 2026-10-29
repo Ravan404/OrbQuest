@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-10-27T17:18:26.521Z",
+  "generatedAt": "2026-10-29T05:53:34.030Z",
   "version": "1.3.0",
-  "checkedThrough": "2026-10-27T01:36:04.000Z",
+  "checkedThrough": "2026-10-29T03:47:50.000Z",
   "entries": [
     {
       "gameName": "2XKO",
@@ -703,6 +703,15 @@
         "Resident Evil",
         "RESIDENT EVIL 2 BIOHAZARD RE2"
       ]
+    },
+    {
+      "gameName": "Resident Evil 7 Biohazard",
+      "executableName": "re7.exe",
+      "folderPath": "..\\steamapps\\common\\RESIDENT EVIL 7 biohazard",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1xi9mfb/resident_evil_7_biohazard_quest/",
+      "confidence": "medium",
+      "source": "reddit",
+      "postTitle": "Resident Evil 7: Biohazard Quest"
     },
     {
       "gameName": "Resident Evil Sale",
