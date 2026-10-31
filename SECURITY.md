@@ -23,3 +23,5 @@ It never logs in to Discord, never reads your token and never changes the Discor
 | Game icons | `cdn.discordapp.com` |
 
 `DQR_OFFLINE=1` turns all of them off; the bundled database and saved icons keep working.
+
+The app never contacts Reddit. The Game database workflow on GitHub reads r/DiscordQuests (`www.reddit.com`, or the `arctic-shift.photon-reddit.com` archive) to fill in executables Discord does not publish.

@@ -1,9 +1,10 @@
 name: Game database
 
-# Rebuilds src/server/gameDatabase.json from Discord's list of detectable
-# games every six hours and commits it to main when it changed. Every
-# OrbQuest install downloads that compact file (src/server/publishedDatabase.ts)
-# instead of Discord's full list.
+# Rebuilds src/server/gameDatabase.json every six hours from Discord's list
+# of detectable games, plus r/DiscordQuests for the quest programs Discord's
+# list has no executable for, and commits it to main when it changed. Every
+# OrbQuest install downloads that one file (src/server/publishedDatabase.ts);
+# no install asks Reddit or reads Discord's full list itself.
 on:
   schedule:
     - cron: '17 */6 * * *'
@@ -34,7 +35,7 @@ jobs:
 
       # Discord is sometimes briefly unreachable. A missed run is only a
       # warning; the next one catches up.
-      - name: Read Discord's list of detectable games
+      - name: Read Discord's list and new r/DiscordQuests posts
         id: fetch
         continue-on-error: true
         run: npm run update-database
@@ -67,12 +68,12 @@ jobs:
 
       - name: Commit the update
         run: |
-          if git diff --quiet; then
+          if git diff --quiet && [ -z "$(git ls-files --others --exclude-standard data/reddit)" ]; then
             echo "The database did not change."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add src/server/gameDatabase.json
+          git add src/server/gameDatabase.json data/reddit
           git commit -m "chore(data): update the game database from Discord"
           git push

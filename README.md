@@ -3,7 +3,7 @@
 [![CI](https://github.com/Ravan404/OrbQuest/actions/workflows/ci.yml/badge.svg)](https://github.com/Ravan404/OrbQuest/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-Local timer for Discord's play-a-game Quests, for Windows. It starts a small placeholder process under a game's `.exe` name, counts the time, and can stop that process when the timer ends. The games and their executables come from Discord's own list of detectable games, so the placeholder gets exactly the name and folder Discord looks for.
+Local timer for Discord's play-a-game Quests, for Windows. It starts a small placeholder process under a game's `.exe` name, counts the time, and can stop that process when the timer ends. The games and their executables come from Discord's own list of detectable games, so the placeholder gets exactly the name and folder Discord looks for. Quest programs Discord's list has no executable for (browsers and other apps, brand-new quest games) are filled in from r/DiscordQuests.
 
 It does not log into Discord, does not take a token, and does not change the Discord client. A finished timer here is not proof that Discord counted the quest.
 
@@ -35,7 +35,7 @@ The server listens on `http://127.0.0.1:3000`.
 | `npm run build` | Frontend plus `dist/server.cjs` |
 | `npm start` | Run the production server |
 | `npm run verify:dist` | Boot the built server and check the offline database |
-| `npm run update-database` | Rebuild `src/server/gameDatabase.json` from Discord's list (`-- --dry-run` only shows the changes) |
+| `npm run update-database` | Rebuild `src/server/gameDatabase.json` from Discord's list and r/DiscordQuests (`-- --dry-run` only shows the changes) |
 | `npm run clean` | Delete `dist/` and Vite's cache |
 
 Windows package:
@@ -96,18 +96,22 @@ If two folder names would become the same id (`Foo Bar` and `Foo-Bar`), the seco
 
 ## The game database
 
-`src/server/gameDatabase.json` is Discord's list of detectable games (`discord.com/api/v9/applications/detectable`) in compact form: every game with a Windows executable, the executables with the folder part Discord matches, its other names and its icon id. `src/server/featuredGames.json` names the games shown on the catalog page before anything is searched: the ones that have had Discord quests.
+`src/server/gameDatabase.json` is Discord's list of detectable games (`discord.com/api/v9/applications/detectable`) in compact form: every game with a Windows executable, the executables with the folder part Discord matches, its other names and its icon id.
+
+Discord also lists quest programs without any executable (Firefox, the Comet browser) and adds new quest games to its list late. For those the database takes the executable from r/DiscordQuests posts, marked `"source": "reddit"` and shown with an r/DiscordQuests label in the catalog. Such an entry is only used while Discord's list knows neither its executable nor the game; once Discord adds it, Discord's entry takes over. It keeps Discord's id and icon when Discord knows the program by name.
+
+`src/server/featuredGames.json` names the games shown on the catalog page before anything is searched: the ones that have had Discord quests, plus every r/DiscordQuests entry.
 
 Typing in the catalog searches this list in memory: exact names first, then names that start with or contain the text, then executable names. Nothing is sent over the network for a search.
 
-The [Game database workflow](.github/workflows/database.yml) reads Discord's list every six hours, checks that it did not suddenly lose many games, runs the tests and commits `gameDatabase.json` to `main` when it changed. Every install downloads that file every six hours, from `raw.githubusercontent.com` or, if that fails, jsDelivr, with an ETag so an unchanged file is not sent again. A downloaded database that is newer than the one in the build replaces it and is kept in `Games/.game-database.json`, so it works offline too. Only when the file cannot be downloaded for a day does the app read Discord's list itself.
+The [Game database workflow](.github/workflows/database.yml) reads Discord's list and the r/DiscordQuests posts newer than the snapshots in `data/reddit/` (through the Arctic Shift archive when Reddit refuses) every six hours, checks that the list did not suddenly lose many games, runs the tests and commits `gameDatabase.json` and any new snapshot to `main` when something changed. The app itself never asks Reddit. Every install downloads that file every six hours, from `raw.githubusercontent.com` or, if that fails, jsDelivr, with an ETag so an unchanged file is not sent again. A downloaded database that is newer than the one in the build replaces it and is kept in `Games/.game-database.json`, so it works offline too. Only when the file cannot be downloaded for a day does the app read Discord's list itself.
 
 ```bash
-npm run update-database              # rebuild gameDatabase.json from Discord's list
+npm run update-database              # rebuild gameDatabase.json from Discord's list and r/DiscordQuests
 npm run update-database -- --dry-run # show what would change, write nothing
 ```
 
-A game Discord does not list (some quests use programs Discord has not added yet, such as a browser) can be added by hand with Add game.
+A post the extractor reads wrongly gets a fix in `src/server/reddit/corrections.ts`. Anything still missing can be added by hand with Add game.
 
 ## Layout
 
@@ -123,6 +127,8 @@ src/index.css              Light and dark theme colours
 src/server/                Library, game database, catalog, icons, Steam checks
 src/server/gameDatabase.json  Discord's list of detectable games (compact)
 src/server/featuredGames.json Games shown before a search
+src/server/reddit/         Reads r/DiscordQuests for the database update (not part of the app)
+data/reddit/               r/DiscordQuests post snapshots
 tests/                     node:test suites (npm test)
 scripts/                   Test runner, database update, release checks
 desktop_app.py             Windows window (pywebview), with single_instance.py

@@ -32,8 +32,15 @@ const CatalogTile: React.FC<{
     <div className="flex min-w-0 items-center gap-3 rounded-lg border border-line bg-surface px-3 py-2.5">
       <GameIcon name={game.name} src={game.icon} size="md" />
       <div className="min-w-0 flex-1">
-        <p className="truncate text-[13px] font-medium text-text" title={game.name}>
-          {game.name}
+        <p className="flex min-w-0 items-center gap-1.5">
+          <span className="truncate text-[13px] font-medium text-text" title={game.name}>
+            {game.name}
+          </span>
+          {game.source === 'reddit' && (
+            <span className="shrink-0" title={t('fromRedditTitle')}>
+              <Chip>{t('fromReddit')}</Chip>
+            </span>
+          )}
         </p>
         {game.executables.length > 1 ? (
           <select

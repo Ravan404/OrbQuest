@@ -34,6 +34,7 @@ function toCatalogGame(game: DatabaseGame, inLibrary: Set<string>): CatalogGame 
     icon: localGameIcon(game) ?? discordIconUrl(game, 64),
     executables: game.executables,
     inLibrary: inLibrary.has(game.id),
+    ...(game.source ? { source: game.source } : {}),
   };
 }
 

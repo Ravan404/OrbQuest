@@ -25,6 +25,10 @@ export interface DatabaseGame {
   executables: string[];
   /** Icon hash on cdn.discordapp.com/app-icons/<id>/<icon>.png. */
   icon?: string;
+  /** `reddit`: an executable Discord's list does not give, read from r/DiscordQuests. */
+  source?: 'reddit';
+  /** The r/DiscordQuests post a `reddit` entry comes from. */
+  url?: string;
 }
 
 export interface GameDatabase {
@@ -69,7 +73,8 @@ function cleanName(value: unknown): string {
 export function toDatabaseGame(raw: unknown): DatabaseGame | null {
   if (!raw || typeof raw !== 'object') return null;
   const app = raw as Record<string, unknown>;
-  const id = typeof app.id === 'string' && /^\d{5,25}$/.test(app.id) ? app.id : '';
+  // Discord application ids are numbers; `r-<name>` marks an r/DiscordQuests entry without one.
+  const id = typeof app.id === 'string' && /^(?:\d{5,25}|r-[a-z0-9]{1,60})$/.test(app.id) ? app.id : '';
   const name = cleanName(app.name);
   if (!id || !name) return null;
 
@@ -95,7 +100,22 @@ export function toDatabaseGame(raw: unknown): DatabaseGame | null {
   }
   const icon = typeof app.icon_hash === 'string' && /^[a-f0-9]{32}$/.test(app.icon_hash) ? app.icon_hash : undefined;
 
-  return { id, name, ...(aliases.length ? { aliases } : {}), executables, ...(icon ? { icon } : {}) };
+  const fromReddit = app.source === 'reddit';
+  const url = fromReddit && typeof app.url === 'string' && /^https:\/\/www\.reddit\.com\//.test(app.url) ? app.url : undefined;
+  return {
+    id,
+    name,
+    ...(aliases.length ? { aliases } : {}),
+    executables,
+    ...(icon ? { icon } : {}),
+    ...(fromReddit ? { source: 'reddit' as const } : {}),
+    ...(url ? { url } : {}),
+  };
+}
+
+/** Sorted by name, the order of the file. */
+export function sortGames(games: DatabaseGame[]): DatabaseGame[] {
+  return [...games].sort((a, b) => a.name.localeCompare(b.name, 'en', { sensitivity: 'base' }) || a.id.localeCompare(b.id));
 }
 
 /** The compact database for Discord's whole list, sorted by name. */
@@ -106,10 +126,7 @@ export function buildGameDatabase(list: unknown, generatedAt: string): GameDatab
     const game = toDatabaseGame(raw);
     if (game && !byId.has(game.id)) byId.set(game.id, game);
   }
-  const games = [...byId.values()].sort(
-    (a, b) => a.name.localeCompare(b.name, 'en', { sensitivity: 'base' }) || a.id.localeCompare(b.id)
-  );
-  return { source: DISCORD_DETECTABLE_URL, generatedAt, games };
+  return { source: DISCORD_DETECTABLE_URL, generatedAt, games: sortGames([...byId.values()]) };
 }
 
 /** True when two databases list the same games (the date is ignored). */

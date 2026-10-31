@@ -155,6 +155,12 @@ async function main() {
       'searching "valorant" finds VALORANT with its Discord executable path and icon'
     );
 
+    const firefox = ((await getJson(base, '/api/catalog?q=firefox')).json || []).find((game) => game.name === 'Firefox');
+    check(
+      firefox?.source === 'reddit' && firefox.executables?.includes('firefox.exe'),
+      'an app Discord gives no executable for (Firefox) comes from r/DiscordQuests'
+    );
+
     const featured = await getJson(base, '/api/catalog/featured');
     const featuredList = Array.isArray(featured.json) ? featured.json : [];
     check(

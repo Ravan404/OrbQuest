@@ -90,6 +90,9 @@ test('search and executable lookups use the bundled database', () => {
   const featured = db.getFeaturedGames();
   assert.ok(featured.length >= 90, `featured games: ${featured.length}`);
   assert.ok(featured.some((game) => game.name === 'VALORANT'));
+  const firefox = db.findGameByExecutable('firefox.exe');
+  assert.equal(firefox?.source, 'reddit', 'a program Discord gives no executable for comes from r/DiscordQuests');
+  assert.ok(featured.some((game) => game.id === firefox?.id), 'and is on the catalog page');
 });
 
 test('a newer published database replaces the bundled one and survives a restart', async () => {

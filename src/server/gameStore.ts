@@ -112,7 +112,7 @@ export function readGameMeta(folder: string): GameMeta {
       addedAt: typeof parsed.addedAt === 'string' ? parsed.addedAt : undefined,
       specialRootPath: typeof parsed.specialRootPath === 'string' ? parsed.specialRootPath : undefined,
       steamAppId: Number.isSafeInteger(parsed.steamAppId) ? parsed.steamAppId : undefined,
-      appId: typeof parsed.appId === 'string' && /^\d{5,25}$/.test(parsed.appId) ? parsed.appId : undefined,
+      appId: typeof parsed.appId === 'string' && /^(?:\d{5,25}|r-[a-z0-9]{1,60})$/.test(parsed.appId) ? parsed.appId : undefined,
     };
   } catch {
     return {};

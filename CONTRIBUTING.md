@@ -29,9 +29,9 @@ CI runs the same four commands on Windows and Ubuntu.
 
 ## The game database
 
-`src/server/gameDatabase.json` comes from Discord's list of detectable games and is rebuilt by the Game database workflow every six hours; do not edit it by hand. `npm run update-database` does the same locally.
+`src/server/gameDatabase.json` comes from Discord's list of detectable games, plus r/DiscordQuests for programs Discord publishes no executable for. The Game database workflow rebuilds it every six hours; do not edit it by hand. `npm run update-database` does the same locally.
 
-A game is missing or has the wrong executable: that is Discord's list, so it cannot be fixed here. The game can still be added by hand with Add game.
+An r/DiscordQuests entry with the wrong name or executable: add a fix for its post in `src/server/reddit/corrections.ts`. A game Discord lists with the wrong executable cannot be fixed here; it can still be added by hand with Add game.
 
 The games shown on the catalog page before a search are the Discord application ids in `src/server/featuredGames.json`. A game that gets a Discord quest belongs there.
 

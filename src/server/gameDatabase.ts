@@ -99,6 +99,8 @@ function validDatabase(value: unknown): GameDatabase | null {
         name: g?.name,
         aliases: g?.aliases,
         icon_hash: g?.icon,
+        source: g?.source,
+        url: g?.url,
         executables: Array.isArray(g?.executables) ? g.executables.map((name) => ({ name, os: 'win32' })) : [],
       });
     })
@@ -171,9 +173,18 @@ export function getGameById(id: string | undefined): DatabaseGame | undefined {
   return id ? _byId.get(id) : undefined;
 }
 
-/** The games shown on the catalog page before anything is searched. */
+/**
+ * The games shown on the catalog page before anything is searched: the ones
+ * that have had Discord quests, and every r/DiscordQuests entry (each comes
+ * from a quest post).
+ */
 export function getFeaturedGames(): DatabaseGame[] {
-  return featured.ids.map((id) => _byId.get(id)).filter((game): game is DatabaseGame => Boolean(game));
+  const ids = new Set(featured.ids);
+  for (const game of _database.games) if (game.source === 'reddit') ids.add(game.id);
+  return [...ids]
+    .map((id) => _byId.get(id))
+    .filter((game): game is DatabaseGame => Boolean(game))
+    .sort((a, b) => a.name.localeCompare(b.name, 'en', { sensitivity: 'base' }));
 }
 
 /**

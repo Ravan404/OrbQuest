@@ -73,6 +73,8 @@ export interface CatalogGame {
   executables: string[];
   /** True when a library entry is this game. */
   inLibrary: boolean;
+  /** `reddit`: Discord's list has no executable for it; the one shown comes from r/DiscordQuests. */
+  source?: 'reddit';
 }
 
 /** Server profile returned by GET /api/profile. */
