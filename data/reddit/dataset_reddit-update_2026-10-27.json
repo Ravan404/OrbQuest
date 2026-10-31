@@ -1,0 +1,241 @@
+{
+  "source": "arctic-shift",
+  "subreddit": "DiscordQuests",
+  "fetchedAt": "2026-10-27T17:18:26.487Z",
+  "checkedThrough": "2026-10-27T01:36:04.000Z",
+  "textFormat": "markdown",
+  "note": "Written by scripts/update-quest-database.ts: the r/DiscordQuests posts created after the previous snapshots.",
+  "posts": [
+    {
+      "id": "1x7dcmh",
+      "title": "Can vpns not bypass regional restrictions now?",
+      "selfText": "i wanted the mw4 deco for the US region, but using my vpn didnt show up even though im placed in the adult age group",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1x7dcmh/can_vpns_not_bypass_regional_restrictions_now/",
+      "createdAt": "2026-10-16T11:09:22.000Z"
+    },
+    {
+      "id": "1x7oflj",
+      "title": "[Gaming for Cause] Quest tutorial (all 5 stickets + 7 crystals)",
+      "selfText": "No titles or achievements for this one so its quick",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1x7oflj/",
+      "createdAt": "2026-10-16T18:44:27.000Z"
+    },
+    {
+      "id": "1x7p4hd",
+      "title": "Call of Duty Modern Warfare 4 Quest",
+      "selfText": "    .../Call of Duty Modern Warfare IV/cod26-cod.exe",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1x7p4hd/call_of_duty_modern_warfare_4_quest/",
+      "createdAt": "2026-10-16T19:11:11.000Z"
+    },
+    {
+      "id": "1x80pch",
+      "title": "Did discord remove mini-quests?",
+      "selfText": "Discord mobile had nini quests for watching 15 sec videos. It used to give 250 orbs daily. I don't see that functionality now. Did discord remove it? ",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1x80pch/did_discord_remove_miniquests/",
+      "createdAt": "2026-10-17T04:10:29.000Z"
+    },
+    {
+      "id": "1x9wh5x",
+      "title": "Orbs are actually goated",
+      "selfText": "The fact that I've been having Nitro for free since march 27 and I still have 141 days left. And I still have around 30k Orbs, which could get me another 60 days of Nitro if I redeemed them.\n\nI've literally never paid for Nitro lmao, that's would be 407+ days of nitro in total without spending a single penny",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1x9wh5x/",
+      "createdAt": "2026-10-19T13:09:54.000Z"
+    },
+    {
+      "id": "1xabfos",
+      "title": "fallout season 2 pip-boy",
+      "selfText": "i just realized you could go back on the old minigame quests and finish off the titles if you start an activity in vc, which made me wanna finish the fallout pip-boy titles but it seems locked on quest 3. is anyone able to set it to previous quests? (i need quest 2 specifically)",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1xabfos/fallout_season_2_pipboy/",
+      "createdAt": "2026-10-19T22:40:33.000Z"
+    },
+    {
+      "id": "1xb1d9l",
+      "title": "Nekome Quest",
+      "selfText": "`Win64/nekomedemo.exe`",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1xb1d9l/nekome_quest/",
+      "createdAt": "2026-10-20T19:17:09.000Z"
+    },
+    {
+      "id": "1xc344m",
+      "title": "Resident Evil Quest",
+      "selfText": "Instructions:\n\n1. Navigate to the steamapps directory: (By default: `C:\\Program Files (x86)\\Steam\\steamapps`)\n2. Make a copy of any .acf file found there, then rename it to `appmanifest_883710.acf`\n3. Right click the .acf and select \"Edit in Notepad\" (Depending on OS, you may need to select \"Open with\" then manually select Notepad)\n4. Delete and replace everything with the following and save the file:\n\n&#8203;\n\n    \"AppState\"\n    {\n        \"appid\"    \"883710\"\n        \"name\"     \"Resident Evil 2\"\n        \"installdir\"       \"RESIDENT EVIL 2  BIOHAZARD RE2\"\n    }\n\n1. Open the folder named \"Common\" in the same directory as the .acf file (By default: `C:\\Program Files (x86)\\Steam\\steamapps\\common`)\n2. Right click > New > Folder, name it RESIDENT EVIL 2  BIOHAZARD RE2 (It may require the double space before BIOHAZARD)\n3. Copy your chosen .exe file into this new folder and name it re2.exe\n4. Start the `.exe` file and it should start progressing the quest\n\n*It may take a moment to notice the quest progressing. If the progress circle hasn't changed after a minute, close the .exe and restart Discord before starting the .exe again.*",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1xc344m/resident_evil_quest/",
+      "createdAt": "2026-10-21T23:41:49.000Z"
+    },
+    {
+      "id": "1xc3vbz",
+      "title": "Discord Quests get stuck on the three dots when I try to start them on desktop or browser, but work on mobile with the same account and Wi-Fi. Restarting didn’t help. Anyone else having this issue or know a fix?",
+      "selfText": "https://i.redd.it/q02mkz7tvwwh1.png\n\n",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1xc3vbz/discord_quests_get_stuck_on_the_three_dots_when_i/",
+      "createdAt": "2026-10-22T00:15:44.000Z"
+    },
+    {
+      "id": "1xc8n6p",
+      "title": "Help I no longer receive orb quests on my main account",
+      "selfText": "So it’s been 4 months since i last earned orbs from a quest meanwhile all friends are getting them just fine. I didn’t receive a warning they just disappeared.\n\nSo i made a new account to check maybe the problem could be from my pc or iphone but nope. I got TONS of orb quests\n\nSo i contacted support and they said i could be restricted for a number of reasons such as verification and age verification and regional stuff\n\nI explained that none of these restrictions really made sense because i met all the requirements. But they brushed me off and set the ticket as “Solved” though it isn’t.\n\nDoes anyone know what caused this? Is there a way i can still receive orb quests? Or is my account shadow banned forever?",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1xc8n6p/help_i_no_longer_receive_orb_quests_on_my_main/",
+      "createdAt": "2026-10-22T04:11:58.000Z"
+    },
+    {
+      "id": "1xcg15h",
+      "title": "Once Human",
+      "selfText": "Once Human\\\\ONCE\\_HUMAN.exe",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1xcg15h/once_human/",
+      "createdAt": "2026-10-22T11:31:00.000Z"
+    },
+    {
+      "id": "1xcpfoh",
+      "title": "Resident Evil Sale Quest",
+      "selfText": "...\\\\common\\\\RE3\\\\re3.exe",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1xcpfoh/resident_evil_sale_quest/",
+      "createdAt": "2026-10-22T17:45:10.000Z"
+    },
+    {
+      "id": "1xcqaha",
+      "title": "Resident Evil Sale Quest",
+      "selfText": "\\`RE3\\\\re3.exe\\`\n\n",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1xcqaha/resident_evil_sale_quest/",
+      "createdAt": "2026-10-22T18:16:11.000Z"
+    },
+    {
+      "id": "1xcqcbh",
+      "title": "[Resident Evil Sale] Quest",
+      "selfText": "    RE3\\re3.exe ",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1xcqcbh/resident_evil_sale_quest/",
+      "createdAt": "2026-10-22T18:18:05.000Z"
+    },
+    {
+      "id": "1xcrbme",
+      "title": "Firefox Quest",
+      "selfText": "Mozilla Firefox/firefox.exe",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1xcrbme/firefox_quest/",
+      "createdAt": "2026-10-22T18:54:16.000Z"
+    },
+    {
+      "id": "1xcyn49",
+      "title": "Firefox Quest help, please",
+      "selfText": "I downloaded Firefox straight from the quest and opened it but Discord is stuck on \"Waiting for you to launch the latest Firefox browser update on desktop...\" I had both Firefox and Discord open for over 20 minutes. Not sure what to do. Can someone help me, please? I usually only do the video quests so I'm a bit confused. ",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1xcyn49/firefox_quest_help_please/",
+      "createdAt": "2026-10-22T23:49:38.000Z"
+    },
+    {
+      "id": "1xd3pyo",
+      "title": "Resident Evil Sale Quest",
+      "selfText": "Resident Evil Village BIOHAZARD VILLAGE\\re8.exe",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1xd3pyo/resident_evil_sale_quest/",
+      "createdAt": "2026-10-23T03:57:45.000Z"
+    },
+    {
+      "id": "1xd7mb4",
+      "title": "Once Human Quest",
+      "selfText": "...\\\\Once Human\\\\ONCE\\_HUMAN.exe",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1xd7mb4/once_human_quest/",
+      "createdAt": "2026-10-23T07:41:52.000Z"
+    },
+    {
+      "id": "1xd7mm4",
+      "title": "Once Human Quest",
+      "selfText": "",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1xd7mb4/once_human_quest/",
+      "createdAt": "2026-10-23T07:42:16.000Z"
+    },
+    {
+      "id": "1xd8c46",
+      "title": "How do i complete this quests? Any guide on youtube",
+      "selfText": "",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1xd8c46/",
+      "createdAt": "2026-10-23T08:26:11.000Z"
+    },
+    {
+      "id": "1xda4aa",
+      "title": "Call of Duty Modern Warfare 4 Quest.",
+      "selfText": "Call of Duty Modern Warfare 4/sp26-cod.exe",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1xda4aa/call_of_duty_modern_warfare_4_quest/",
+      "createdAt": "2026-10-23T10:15:37.000Z"
+    },
+    {
+      "id": "1xda56o",
+      "title": "Would using another account to farm orbs and then gifting stuff to my main be against TOS?",
+      "selfText": "I have an alt account and a main account, and I'm wondering if I use the alt account to farm orbs and then gift stuff from my alt to my main, could I be banned from discord for doing that?",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1xda56o/would_using_another_account_to_farm_orbs_and_then/",
+      "createdAt": "2026-10-23T10:17:10.000Z"
+    },
+    {
+      "id": "1xdadli",
+      "title": "Problems with the firefox quest",
+      "selfText": "Hello, I've accepted the discord quest to use firefox for 15 minutes, a browser I already use, however it doesn't seem to get over 0% completion no matter what I do\n\nI've tried: \n\n\\-redownloading firefox\n\n\\-removing my adblockers\n\n\\-turning on and off my hardware acceleration on both discord and firefox\n\n\\-restarting my computer\n\nPlease help me, you can also redirect me to another subreddit\n\n",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1xdadli/problems_with_the_firefox_quest/",
+      "createdAt": "2026-10-23T10:31:04.000Z"
+    },
+    {
+      "id": "1xduds5",
+      "title": "Resident Evil Quest",
+      "selfText": "...\\\\Resident Evil 0\\\\re0hd.exe",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1xduds5/resident_evil_quest/",
+      "createdAt": "2026-10-24T00:14:59.000Z"
+    },
+    {
+      "id": "1xe243g",
+      "title": "Any residentevil?",
+      "selfText": "Any Resident Evil path please",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1xe243g/any_residentevil/",
+      "createdAt": "2026-10-24T07:16:29.000Z"
+    },
+    {
+      "id": "1xeay4q",
+      "title": "Resident Evil Quest",
+      "selfText": "re9.exe\n\nThere's a ton of different REs you can pick, but doing a dummy \"re9.exe\" seems to work just fine. No file pathing or anything required.",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1xeay4q/resident_evil_quest/",
+      "createdAt": "2026-10-24T15:03:39.000Z"
+    },
+    {
+      "id": "1xeme3x",
+      "title": "Game quests on MacBook",
+      "selfText": "Does anyone know how to complete the game quests on a MacBook ? ",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1xeme3x/game_quests_on_macbook/",
+      "createdAt": "2026-10-24T22:59:25.000Z"
+    },
+    {
+      "id": "1xesels",
+      "title": "Raid",
+      "selfText": "Game",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1xesels/raid/",
+      "createdAt": "2026-10-25T04:00:51.000Z"
+    },
+    {
+      "id": "1xeyafd",
+      "title": "So is there any new discord quest completeter etc with out getting banned possiblely or low risk one",
+      "selfText": "",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1xeyafd/so_is_there_any_new_discord_quest_completeter_etc/",
+      "createdAt": "2026-10-25T09:51:52.000Z"
+    },
+    {
+      "id": "1xez345",
+      "title": "So how to manual execution for disrd quests can u help u",
+      "selfText": "",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1xez345/so_how_to_manual_execution_for_disrd_quests_can_u/",
+      "createdAt": "2026-10-25T10:38:42.000Z"
+    },
+    {
+      "id": "1xezu2m",
+      "title": "Title: James Bond 007 First Light executable path help\n\nPost:\n\nHi everyone, I need help with manual executable paths for Discord Quests.\n\nI tried adding a game executable, but Discord detects the game without showing the official blue checkmark.\n\nCould someone explain how manual executable paths wor",
+      "selfText": "",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1xezu2m/title_james_bond_007_first_light_executable_path/",
+      "createdAt": "2026-10-25T11:20:52.000Z"
+    },
+    {
+      "id": "1xg90nu",
+      "title": "firefox quest",
+      "selfText": "hi im on linux and installed firefox thrpugh pacman and already ran firefox but the discord client wasnt detecting and theres no progress flowing through the bar",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1xg90nu/firefox_quest/",
+      "createdAt": "2026-10-26T20:58:51.000Z"
+    },
+    {
+      "id": "1xgfky3",
+      "title": "Can't find a dummy .exe file to use??",
+      "selfText": "what is everyone else using? nobody seems to be asking, and the guide didn't help",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1xgfky3/cant_find_a_dummy_exe_file_to_use/",
+      "createdAt": "2026-10-27T01:36:04.000Z"
+    }
+  ]
+}

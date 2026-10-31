@@ -1,0 +1,101 @@
+name: Game database
+
+# Rebuilds the game database every six hours from Discord's list of
+# detectable games, plus r/DiscordQuests for the quest programs Discord's list
+# has no executable for. The result is published on the `database` branch,
+# not on main: every OrbQuest install downloads src/server/gameDatabase.json
+# from there (src/server/publishedDatabase.ts), and the Release workflow
+# builds the exe with it. The branch holds one commit that each update
+# replaces, so main keeps only the project's own history.
+on:
+  schedule:
+    - cron: '17 */6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: game-database
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Start from the last published database and post snapshots, so only new
+      # r/DiscordQuests posts are read.
+      - name: Take the published database
+        run: |
+          if git fetch --depth=1 origin +refs/heads/database:refs/remotes/origin/database; then
+            git checkout origin/database -- src/server/gameDatabase.json data/reddit
+            echo "BEFORE=origin/database" >> "$GITHUB_ENV"
+          else
+            echo "No database branch yet; starting from main."
+            echo "BEFORE=HEAD" >> "$GITHUB_ENV"
+          fi
+
+      # Discord is sometimes briefly unreachable. A missed run is only a
+      # warning; the next one catches up.
+      - name: Read Discord's list and new r/DiscordQuests posts
+        id: fetch
+        continue-on-error: true
+        run: npm run update-database
+
+      - name: Warn about a missed update
+        if: steps.fetch.outcome == 'failure'
+        run: echo "::warning::Discord's list could not be read. The next scheduled run tries again."
+
+      # A list that suddenly lost many games is more likely a fault on
+      # Discord's side than real removals: stop before it reaches the users.
+      - name: Check the rebuilt database
+        run: |
+          node --input-type=module -e "
+          import fs from 'node:fs';
+          import { execSync } from 'node:child_process';
+          const file = 'src/server/gameDatabase.json';
+          const next = JSON.parse(fs.readFileSync(file, 'utf8'));
+          const before = JSON.parse(execSync('git show ' + process.env.BEFORE + ':' + file, { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 }));
+          if (!Array.isArray(next.games) || next.games.some((g) => !g.id || !g.name || !g.executables?.length)) {
+            throw new Error('The database has malformed games.');
+          }
+          if (next.games.length < before.games.length * 0.9) {
+            throw new Error('The database shrank from ' + before.games.length + ' to ' + next.games.length + ' games.');
+          }
+          console.log('Games: ' + before.games.length + ' -> ' + next.games.length);
+          "
+
+      - name: Tests
+        run: npm test
+
+      - name: Publish to the database branch
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          out="$RUNNER_TEMP/database"
+          mkdir -p "$out/src/server"
+          cp src/server/gameDatabase.json "$out/src/server/"
+          cp -r data "$out/"
+          cd "$out"
+          git init -q -b database
+          git add -A
+          tree=$(git write-tree)
+          if [ "$tree" = "$(git -C "$GITHUB_WORKSPACE" rev-parse --verify --quiet origin/database^{tree})" ]; then
+            echo "The database did not change."
+            exit 0
+          fi
+          git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+            commit -q -m "Game database $(date -u +%Y-%m-%dT%H:%MZ)"
+          git push --force "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" database

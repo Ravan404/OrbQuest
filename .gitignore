@@ -1,0 +1,32 @@
+# Dependencies
+node_modules/
+
+# Build output (npm run build, build_windows_exe.bat)
+dist/
+build/
+placeholder_runtime.spec
+
+# Runtime data: the library and saved icons
+Games/
+icon-cache/
+
+# Python
+*.py[cod]
+__pycache__/
+*.egg-info/
+.venv/
+
+# Other package managers (the project uses npm and package-lock.json)
+bun.lock
+bun.lockb
+yarn.lock
+
+# OS, editors, logs
+.DS_Store
+Thumbs.db
+desktop.ini
+*.log
+npm-debug.log*
+.env
+.vscode/
+.idea/
