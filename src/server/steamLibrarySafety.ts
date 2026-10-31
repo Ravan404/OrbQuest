@@ -1,10 +1,10 @@
 /**
  * steamLibrarySafety.ts
  *
- * Steam-manifest quests are installed into a real Steam `steamapps` folder so
- * Discord can see the simulated install. That folder may already contain the
- * user's actual games. These checks refuse to overwrite or delete anything
- * this app did not create.
+ * Earlier versions could install a Steam-manifest quest into a real Steam
+ * `steamapps` folder, which may also hold the user's actual games. Those
+ * installs are still listed and can be removed; these checks make sure a
+ * removal never deletes anything this app did not create.
  */
 
 import fs from 'node:fs';
@@ -25,19 +25,6 @@ const MAX_INSPECTED_FILES = 200;
 
 const MANAGED_MANIFEST_KEYS = new Set(['appid', 'name', 'stateflags', 'installdir']);
 
-/** Manifest this app writes. Steam's own manifests contain many more keys. */
-export function buildSimulatedManifest(appId: number, name: string, installDir: string): string {
-  const safe = (value: string) => value.replace(/[\r\n"]/g, ' ').replace(/\s+/g, ' ').trim();
-  return `"AppState"
-{
-\t"appid"\t\t"${appId}"
-\t"name"\t\t"${safe(name)}"
-\t"StateFlags"\t\t"4"
-\t"installdir"\t\t"${safe(installDir)}"
-}
-`;
-}
-
 /**
  * True only for the minimal manifest this app writes.
  * A real Steam manifest (buildid, SizeOnDisk, LastUpdated, ...) is never "managed".
@@ -47,15 +34,6 @@ export function manifestLooksManaged(content: string): boolean {
   const keys = [...content.matchAll(/"([A-Za-z][A-Za-z0-9]*)"\s+"/g)].map((match) => match[1].toLowerCase());
   if (keys.length === 0) return false;
   return keys.every((key) => MANAGED_MANIFEST_KEYS.has(key));
-}
-
-export function canReplaceManifest(manifestPath: string): boolean {
-  if (!fs.existsSync(manifestPath)) return true;
-  try {
-    return manifestLooksManaged(fs.readFileSync(manifestPath, 'utf8'));
-  } catch {
-    return false;
-  }
 }
 
 function isOurPlaceholder(filePath: string): boolean {
@@ -102,16 +80,6 @@ export function installDirectoryIsForeign(dir: string, expectedExecutable: strin
     }
   }
   return false;
-}
-
-export function writeManagedMarker(dir: string, info: { appId?: number; executable: string }): void {
-  const marker = {
-    managedBy: 'OrbQuest',
-    executable: info.executable,
-    ...(info.appId ? { appId: info.appId } : {}),
-    createdAt: new Date().toISOString(),
-  };
-  fs.writeFileSync(path.join(dir, MANAGED_INSTALL_MARKER), `${JSON.stringify(marker, null, 2)}\n`, 'utf8');
 }
 
 export interface SteamRemovalDecision {

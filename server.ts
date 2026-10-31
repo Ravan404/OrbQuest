@@ -22,11 +22,9 @@ import {
 } from './src/server/gameStore.ts';
 import gamesRouter from './src/server/routes/games.ts';
 import catalogRouter from './src/server/routes/catalog.ts';
-import { startBackgroundIcons } from './src/server/logo.ts';
-import searchRouter from './src/server/routes/search.ts';
 import settingsRouter from './src/server/routes/settings.ts';
 import { APP_VERSION } from './src/version.ts';
-import { getQuestDatabaseInfo, loadRedditCache, scheduleRedditCacheRefresh } from './src/server/redditCacheStore.ts';
+import { getGameDatabaseInfo, loadGameDatabase, scheduleGameDatabaseRefresh } from './src/server/gameDatabase.ts';
 import { ICON_CACHE_DIR } from './src/server/iconStore.ts';
 
 const app = express();
@@ -51,8 +49,8 @@ function shutdownHandler() {
  * Content-Security-Policy for the packaged app.
  *
  * `style-src` keeps `'unsafe-inline'` because React writes the timer progress
- * width through inline style attributes, and `img-src` allows `https:` because
- * game icons are loaded from SteamGridDB / Steam / PCGamingWiki. Everything
+ * width through inline style attributes, and `img-src` allows Discord's CDN
+ * because game icons come from there until they are saved. Everything
  * else is locked to same-origin. Applied in production builds only: the dev
  * server injects the Vite client, which needs a WebSocket connection that
  * `connect-src 'self'` would block.
@@ -64,7 +62,7 @@ const CONTENT_SECURITY_POLICY = [
   "form-action 'self'",
   "script-src 'self'",
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: https:",
+  "img-src 'self' data: https://cdn.discordapp.com",
   "connect-src 'self'",
   "object-src 'none'",
 ].join('; ');
@@ -113,7 +111,7 @@ const rateLimited = (req: express.Request, res: express.Response, next: express.
 app.get('/api/profile', (_req, res) => {
   res.json({
     version: APP_VERSION,
-    questDatabase: getQuestDatabaseInfo(),
+    gameDatabase: getGameDatabaseInfo(),
     gamesFolder: GAMES_DIR,
   });
 });
@@ -143,7 +141,6 @@ app.post('/api/internal/shutdown', (req, res) => {
 });
 app.use('/api/games', gamesRouter);
 app.use('/api/catalog', rateLimited, catalogRouter);
-app.use('/api/search-quests', rateLimited, searchRouter);
 app.use('/api/settings', settingsRouter);
 
 // ---------------------------------------------------------------
@@ -154,11 +151,10 @@ async function startServer() {
   await initGameStore();
   startElapsedTicker();
 
-  loadRedditCache();
-  scheduleRedditCacheRefresh();
+  loadGameDatabase();
+  scheduleGameDatabaseRefresh();
 
-  // Icons downloaded at runtime (see iconStore.ts). Bundled icons are served
-  // from dist/game-icons by the static handler below.
+  // Game icons saved from Discord's CDN (see iconStore.ts).
   app.use(
     '/game-icons-cache',
     express.static(ICON_CACHE_DIR, { dotfiles: 'deny', maxAge: '7d', fallthrough: false })
@@ -179,9 +175,8 @@ async function startServer() {
      * into the same `dist/` folder. Serving the latter would hand the entire
      * backend implementation to anyone who can reach the app, and
      * `server.cjs.map` even embeds the original TypeScript sources
-     * (`sourcesContent`). The quest database is baked into server.cjs; a
-     * `redditCache.json` left in dist/ by an older build is refused as well -
-     * the API serves matching rows instead of exposing the whole dataset.
+     * (`sourcesContent`). The game database is baked into server.cjs; its
+     * JSON files (and those an older build left in dist/) are refused as well.
      */
     const isBackendArtifact = (requestPath: string): boolean => {
       // `req.path` is still percent-encoded while `send` decodes it before
@@ -196,7 +191,7 @@ async function startServer() {
       return [requestPath, decoded].some((candidate) => {
         const withoutQuery = candidate.split('?')[0].split('#')[0];
         if (withoutQuery.startsWith('/.')) return true; // dotfiles
-        if (/(?:^|\/)(?:redditCache|discordIconCatalog)\.json$/i.test(withoutQuery)) return true;
+        if (/(?:^|\/)(?:gameDatabase|featuredGames|redditCache|discordIconCatalog)\.json$/i.test(withoutQuery)) return true;
         const fileName = withoutQuery.replace(/\/+$/, '').split('/').pop() ?? '';
         return /\.(?:cjs|mjs|map)$/i.test(fileName);
       });
@@ -244,9 +239,6 @@ async function startServer() {
       `Server running at http://${BIND_HOST === '0.0.0.0' ? 'localhost' : BIND_HOST}:${PORT}`
     );
   });
-  // Icons for database games without one are fetched in the background, a few
-  // seconds after start, so the window opens without waiting for them.
-  setTimeout(() => startBackgroundIcons(), 5000).unref();
   server.on('error', (error: NodeJS.ErrnoException) => {
     if (error.code === 'EADDRINUSE') {
       console.error(`Port ${PORT} is already in use. Stop the other OrbQuest server, or set PORT to a free port.`);

@@ -5,7 +5,7 @@ import fs from 'fs';
 import path from 'path';
 import { spawn, ChildProcess } from 'child_process';
 import { ASSET_ROOT, GAMES_DIR, PLACEHOLDER_EXE, StoredGame } from '../config.ts';
-import { isPathInside, isSafeFileName, libraryFolderName } from '../security.ts';
+import { isPathInside, isSafeExecutablePath, isSafeFileName, libraryFolderName } from '../security.ts';
 import {
   gamesMap,
   allocateLibraryId,
@@ -34,18 +34,10 @@ import {
   upgradeLegacyPlaceholder,
 } from '../placeholderUpgrade.ts';
 import { parseSimulatedSteamManifest } from '../steamManifest.ts';
-import { findSteamAppsPath } from '../steamPaths.ts';
-import { learnFromLibraryAddition } from '../questDatabaseLearning.ts';
 import { getSettings } from '../settingsStore.ts';
 import { writePlaceholderIcon } from '../placeholderIcon.ts';
-import {
-  MANAGED_INSTALL_MARKER,
-  buildSimulatedManifest,
-  canReplaceManifest,
-  installDirectoryIsForeign,
-  planSteamRemoval,
-  writeManagedMarker,
-} from '../steamLibrarySafety.ts';
+import { getGameById } from '../gameDatabase.ts';
+import { MANAGED_INSTALL_MARKER, planSteamRemoval } from '../steamLibrarySafety.ts';
 
 /** How long a launch may wait for the child `spawn` event before failing the request. */
 const LAUNCH_SPAWN_TIMEOUT_MS = 15_000;
@@ -65,12 +57,15 @@ function publicList() {
   });
 }
 
-/** Validates an executable file name from a request. Returns the name or an error. */
+/**
+ * Validates an executable from a request: a file name (`game.exe`) or a path
+ * inside the game folder as Discord expects it (`win64/game.exe`).
+ */
 function parseExecutableName(value: unknown): { value: string } | { error: string } {
-  const requested = typeof value === 'string' ? value.trim() : '';
+  const requested = typeof value === 'string' ? value.trim().replace(/\\/g, '/').replace(/^\/+/, '') : '';
   if (!requested) return { error: 'Executable name is required' };
   if (!requested.toLowerCase().endsWith('.exe')) return { error: 'Executable must end with .exe' };
-  if (!isSafeFileName(requested)) return { error: 'Executable name must be a safe file name.' };
+  if (!isSafeExecutablePath(requested)) return { error: 'Executable must be a safe file name or path inside the game folder.' };
   return { value: requested };
 }
 
@@ -139,7 +134,7 @@ router.post('/:id/launch', (req: Request<IdParams>, res: Response) => {
     fs.existsSync(path.join(workingDirectory, '.game-name.txt'));
 
   if (isManagedDirectory) {
-    const knownExe = inferKnownExecutableForGame(game.name, game.folder);
+    const knownExe = inferKnownExecutableForGame(game.name, game.folder, game.appId);
     const fallbackExe = `${path.basename(game.folder).toLowerCase().replace(/[^a-z0-9_-]/g, '') || 'game'}.exe`;
     if (
       knownExe &&
@@ -412,7 +407,10 @@ router.patch('/:id', (req: Request<IdParams>, res: Response) => {
     const currentExecutablePath = path.join(currentDir, game.executable);
     const nextExecutablePath = path.join(currentDir, nextExecutable);
     try {
-      if (!fs.existsSync(nextExecutablePath)) fs.copyFileSync(PLACEHOLDER_EXE, nextExecutablePath);
+      if (!fs.existsSync(nextExecutablePath)) {
+        fs.mkdirSync(path.dirname(nextExecutablePath), { recursive: true });
+        fs.copyFileSync(PLACEHOLDER_EXE, nextExecutablePath);
+      }
       // Only remove the previous file when it is the placeholder this app
       // created; a real game executable the user placed there is left alone.
       if (fs.existsSync(currentExecutablePath) && hasPlaceholderRuntimeSignature(currentExecutablePath)) {
@@ -446,7 +444,6 @@ router.patch('/:id', (req: Request<IdParams>, res: Response) => {
   applyTimerPreferences(game, prefs);
   if (nameChanged || exeChanged) {
     game.logoUrl = undefined;
-    game.logoFailed = false;
     kickoffLogo(game);
   }
 
@@ -564,9 +561,13 @@ router.delete('/:id', (req: Request<IdParams>, res: Response) => {
 });
 
 // 10. Add Game to Library
+//
+// A catalog game sends its Discord application id and one of the executables
+// Discord lists for it; the placeholder is written to that relative path
+// (`Games/VALORANT/win64/valorant-win64-shipping.exe`), which is what Discord
+// matches. A custom game sends a name and an executable of its own.
 router.post('/', (req: Request, res: Response) => {
   const body = (req.body || {}) as Record<string, unknown>;
-  const { folderPath, origin, questMethod, steamAppId, manifestFileName, manifestContent } = body;
 
   const parsedName = parseDisplayName(body.name);
   if ('error' in parsedName) return res.status(400).json({ error: parsedName.error });
@@ -577,117 +578,67 @@ router.post('/', (req: Request, res: Response) => {
 
   const displayName = parsedName.value;
   const cleanExe = parsedExe.value;
-
-  // Provenance tag: the Add Custom Game dialog sends 'custom', the catalog
-  // discovery flow sends 'catalog'. Anything else is treated as custom.
-  const entryOrigin: GameOrigin = origin === 'catalog' ? 'catalog' : 'custom';
-  const isSteamManifest = questMethod === 'steam-manifest';
-  let parsedManifest: ReturnType<typeof parseSimulatedSteamManifest> | undefined;
-  if (isSteamManifest) {
-    if (typeof manifestContent !== 'string' || typeof manifestFileName !== 'string') {
-      return res.status(400).json({ error: 'Steam manifest content is required.' });
+  const entryOrigin: GameOrigin = body.origin === 'catalog' ? 'catalog' : 'custom';
+  let appId: string | undefined;
+  if (body.appId !== undefined) {
+    const known = typeof body.appId === 'string' ? getGameById(body.appId) : undefined;
+    if (!known) return res.status(400).json({ error: 'Unknown game.' });
+    if (!known.executables.includes(cleanExe.toLowerCase())) {
+      return res.status(400).json({ error: 'That executable is not one Discord lists for this game.' });
     }
-    try {
-      parsedManifest = parseSimulatedSteamManifest(manifestContent);
-    } catch (error) {
-      return res.status(400).json({ error: error instanceof Error ? error.message : 'Invalid Steam manifest.' });
-    }
-    if (steamAppId !== undefined && Number(steamAppId) !== parsedManifest.appId) {
-      return res.status(400).json({ error: 'Manifest appid does not match the catalog result.' });
-    }
-    if (!/^appmanifest_\d+\.acf$/i.test(manifestFileName)) {
-      return res.status(400).json({ error: 'Manifest file name is invalid.' });
-    }
+    appId = known.id;
   }
 
   if (!fs.existsSync(PLACEHOLDER_EXE)) {
     return res.status(500).json({ error: 'App files are missing.' });
   }
 
-  const steamAppsPath = parsedManifest ? findSteamAppsPath() : undefined;
-  if (parsedManifest && !steamAppsPath) {
-    return res.status(404).json({ error: 'Steam installation folder was not found.' });
-  }
-
-  // Steam's installdir must match the folder exactly, so it is never renamed
-  // to "Name (2)". A normal library folder can be disambiguated.
-  const sanitizedFolderName = parsedManifest
-    ? parsedManifest.installDir
-    : libraryFolderName(typeof folderPath === 'string' ? folderPath : undefined, displayName);
-  if (parsedManifest && !isSafeFileName(sanitizedFolderName)) {
-    return res.status(400).json({ error: 'Manifest installdir is not a safe folder name.' });
-  }
-
+  const sanitizedFolderName = libraryFolderName(
+    typeof body.folderPath === 'string' ? body.folderPath : undefined,
+    displayName
+  );
   let targetFolder = sanitizedFolderName;
-  if (!parsedManifest) {
-    let counter = 2;
-    const existingFolders = new Set(Array.from(gamesMap.values()).map((g) => g.folder.toLowerCase()));
-    while (
-      existingFolders.has(targetFolder.toLowerCase()) ||
-      fs.existsSync(path.join(GAMES_DIR, targetFolder)) ||
-      !isSafeFileName(targetFolder)
-    ) {
-      targetFolder = `${sanitizedFolderName} (${counter})`;
-      counter++;
-      if (counter > 100) {
-        return res.status(409).json({ error: 'A game folder with that name already exists.' });
-      }
+  let counter = 2;
+  const existingFolders = new Set(Array.from(gamesMap.values()).map((g) => g.folder.toLowerCase()));
+  while (
+    existingFolders.has(targetFolder.toLowerCase()) ||
+    fs.existsSync(path.join(GAMES_DIR, targetFolder)) ||
+    !isSafeFileName(targetFolder)
+  ) {
+    targetFolder = `${sanitizedFolderName} (${counter})`;
+    counter++;
+    if (counter > 100) {
+      return res.status(409).json({ error: 'A game folder with that name already exists.' });
     }
   }
 
-  const id = parsedManifest ? `steam-${parsedManifest.appId}` : allocateLibraryId(targetFolder);
+  const id = allocateLibraryId(targetFolder);
   if (gamesMap.has(id)) {
     return res.status(409).json({ error: 'This game is already in the library.' });
   }
-
-  const targetDir = parsedManifest
-    ? path.join(steamAppsPath!, 'common', targetFolder)
-    : path.join(GAMES_DIR, targetFolder);
-  const manifestPath = parsedManifest
-    ? path.join(steamAppsPath!, `appmanifest_${parsedManifest.appId}.acf`)
-    : undefined;
-  // Security: ensure targetDir is inside the allowed root (path-relative, not prefix).
-  if (!isPathInside(parsedManifest ? steamAppsPath! : GAMES_DIR, targetDir)) {
+  const targetDir = path.join(GAMES_DIR, targetFolder);
+  const targetExecutable = path.join(targetDir, cleanExe);
+  if (!isPathInside(GAMES_DIR, targetDir) || !isPathInside(targetDir, targetExecutable)) {
     return res.status(400).json({ error: 'Invalid folder path' });
-  }
-  if (manifestPath && !isPathInside(steamAppsPath!, manifestPath)) {
-    return res.status(400).json({ error: 'Invalid manifest path' });
-  }
-  if (
-    parsedManifest &&
-    (installDirectoryIsForeign(targetDir, cleanExe) || (manifestPath && !canReplaceManifest(manifestPath)))
-  ) {
-    return res.status(409).json({
-      error: 'That Steam install was left alone.',
-    });
   }
 
   const addedAt = new Date().toISOString();
   try {
-    fs.mkdirSync(targetDir, { recursive: true });
-    const targetExecutable = path.join(targetDir, cleanExe);
+    fs.mkdirSync(path.dirname(targetExecutable), { recursive: true });
     if (!fs.existsSync(targetExecutable)) {
       fs.copyFileSync(PLACEHOLDER_EXE, targetExecutable);
     } else {
       upgradeLegacyPlaceholder(targetExecutable, PLACEHOLDER_EXE);
     }
     fs.writeFileSync(path.join(targetDir, '.game-name.txt'), displayName, 'utf-8');
-    if (parsedManifest && manifestPath) {
-      fs.writeFileSync(
-        manifestPath,
-        buildSimulatedManifest(parsedManifest.appId, parsedManifest.name, targetFolder),
-        'utf-8'
-      );
-      writeManagedMarker(targetDir, { appId: parsedManifest.appId, executable: cleanExe });
-    } else {
-      writeGameMeta(targetFolder, {
-        id,
-        name: displayName,
-        executable: cleanExe,
-        origin: entryOrigin,
-        addedAt,
-      });
-    }
+    writeGameMeta(targetFolder, {
+      id,
+      name: displayName,
+      executable: cleanExe,
+      origin: entryOrigin,
+      addedAt,
+      ...(appId ? { appId } : {}),
+    });
   } catch (e) {
     console.warn('Could not write game folder files', e);
     return res.status(500).json({ error: 'Failed to create game folder' });
@@ -696,35 +647,20 @@ router.post('/', (req: Request, res: Response) => {
   const newGame: StoredGame = {
     id,
     name: displayName,
-    // Steam installs use the same `special/<installdir>` key the scan uses.
-    folder: parsedManifest ? path.join('special', targetFolder) : targetFolder,
+    folder: targetFolder,
     executable: cleanExe,
     isRunning: false,
     elapsedSeconds: 0,
     origin: entryOrigin,
     addedAt,
-    specialRootPath: parsedManifest ? steamAppsPath : undefined,
-    steamAppId: parsedManifest?.appId,
+    appId,
   };
   applyTimerPreferences(newGame, prefs);
 
   gamesMap.set(id, newGame);
-  if (parsedManifest && steamAppsPath) {
-    saveSpecialGame({
-      id,
-      rootPath: steamAppsPath,
-      installDir: targetFolder,
-      executable: cleanExe,
-      name: displayName,
-      steamAppId: parsedManifest.appId,
-    });
-  }
   savePersistedState(true);
   kickoffLogo(newGame);
-  // A game found by a live Reddit search is saved to the local quest
-  // database too, so the next search finds it offline.
-  const learned = learnFromLibraryAddition(cleanExe);
-  res.json({ success: true, game: toPublicGame(newGame), addedToQuestDatabase: Boolean(learned) });
+  res.json({ success: true, game: toPublicGame(newGame) });
 });
 
 export default router;

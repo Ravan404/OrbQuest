@@ -1,45 +1,27 @@
 /**
  * iconStore.ts
  *
- * Game icons that are already on disk, so the UI never waits for a remote
- * image service to show them.
- *
- *   - Bundled icons: `public/game-icons/<key>.<ext>`, copied into `dist/` by the
- *     Vite build and therefore part of the Windows package. They are produced
- *     by `npm run icons:download` for every game of the local quest database.
- *   - Cached icons: remote icons that were resolved for other games (catalog
- *     entries, custom games) are saved once to `icon-cache/` next to the
- *     Games folder. They are served from the same origin on later launches.
- *
- * `<key>` is `normalizeGameKey(name)`, the same key the quest database uses,
- * so "Helldivers™ 2" and "Helldivers 2" share one icon file.
- *
- * Nothing in here blocks on the network. Only `saveRemoteIcon` downloads, and
- * it is only called from the background lookup in logo.ts.
+ * Game icons from Discord. Every game of the database (gameDatabase.ts) has
+ * an icon on Discord's CDN (`cdn.discordapp.com/app-icons/<id>/<hash>.png`).
+ * The window shows that address right away; in the background the icon of a
+ * library game is saved once to `icon-cache/<id>.png` next to the Games
+ * folder, so it also shows offline and the placeholder window can use it.
  */
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { ASSET_ROOT, PROJECT_ROOT } from './config.ts';
-import { normalizeGameKey } from './gameKey.ts';
-import { listQuestDbRecords, recordExecutables, type QuestDbRecord } from './questLookup.ts';
+import { PROJECT_ROOT } from './config.ts';
+import type { DatabaseGame } from './gameDatabaseSource.ts';
 
 /** Network lookup failures are expected offline; printed only with DQR_DEBUG=1. */
 const debugLog = (...args: unknown[]): void => {
   if (process.env.DQR_DEBUG) console.debug(...args);
 };
 
-export const BUNDLED_ICON_URL_PREFIX = '/game-icons/';
 export const CACHED_ICON_URL_PREFIX = '/game-icons-cache/';
 
 /** Largest icon file that is stored. Icons are shown at 40-64 px. */
 export const MAX_ICON_BYTES = 512 * 1024;
-/**
- * Steam's CDN occasionally returns HTTP 200 with a tiny (<1 KB) blank placeholder
- * when an app's image asset has not been published. Requiring at least 1,500 bytes
- * for Steam CDN responses avoids caching blank placeholders.
- */
-const STEAM_CDN_MIN_BYTES = 1_500;
 const MIN_ICON_BYTES = 64;
 /** How long a game without an icon is not searched again (persisted). */
 export const ICON_FAILURE_TTL_MS = 24 * 60 * 60 * 1000;
@@ -114,9 +96,7 @@ function detectImageExtension(bytes: Buffer, contentType: string): string | unde
 }
 
 export interface IconStoreOptions {
-  /** Folders that hold bundled icons, first match wins. */
-  bundledDirs: string[];
-  /** Writable folder for icons downloaded at runtime. */
+  /** Writable folder for downloaded icons. */
   cacheDir: string;
 }
 
@@ -130,7 +110,7 @@ export interface IconStore {
   saveRemoteIcon(key: string, remoteUrl: string): Promise<string | undefined>;
 }
 
-/** Creates an icon store for the given bundled and cache folders. */
+/** Creates an icon store for the given cache folder. */
 export function createIconStore(options: IconStoreOptions): IconStore {
   let index: Map<string, string> | null = null;
   let failures: Map<string, number> | null = null;
@@ -138,22 +118,15 @@ export function createIconStore(options: IconStoreOptions): IconStore {
 
   function scan(): Map<string, string> {
     const found = new Map<string, string>();
-    const sources: Array<{ dir: string; prefix: string }> = [
-      ...options.bundledDirs.map((dir) => ({ dir, prefix: BUNDLED_ICON_URL_PREFIX })),
-      { dir: options.cacheDir, prefix: CACHED_ICON_URL_PREFIX },
-    ];
-    for (const { dir, prefix } of sources) {
-      let files: string[] = [];
-      try {
-        files = fs.readdirSync(dir);
-      } catch {
-        continue; // folder missing: nothing bundled / nothing cached yet
-      }
-      for (const file of files) {
-        const match = ICON_FILE.exec(file);
-        if (!match || found.has(match[1])) continue;
-        found.set(match[1], prefix + file);
-      }
+    let files: string[] = [];
+    try {
+      files = fs.readdirSync(options.cacheDir);
+    } catch {
+      return found; // nothing cached yet
+    }
+    for (const file of files) {
+      const match = ICON_FILE.exec(file);
+      if (match && !found.has(match[1])) found.set(match[1], CACHED_ICON_URL_PREFIX + file);
     }
     return found;
   }
@@ -219,10 +192,7 @@ export function createIconStore(options: IconStoreOptions): IconStore {
         const type = (response.headers.get('content-type') || '').split(';')[0].trim().toLowerCase();
         if (!IMAGE_TYPES[type] && !type.startsWith('image/')) return undefined;
         const bytes = Buffer.from(await response.arrayBuffer());
-        const minBytes = /(?:steamstatic|akamaihd)\.net/i.test(remoteUrl)
-          ? STEAM_CDN_MIN_BYTES
-          : MIN_ICON_BYTES;
-        if (bytes.length < minBytes || bytes.length > MAX_ICON_BYTES) return undefined;
+        if (bytes.length < MIN_ICON_BYTES || bytes.length > MAX_ICON_BYTES) return undefined;
 
         const extension = detectImageExtension(bytes, type) ?? IMAGE_TYPES[type];
         if (!extension) return undefined;
@@ -251,73 +221,25 @@ export function createIconStore(options: IconStoreOptions): IconStore {
 // Application instance
 // ---------------------------------------------------------------------------
 
-/** Where bundled icons are looked for: the built app first, then the source folder. */
-export const BUNDLED_ICON_DIRS = [
-  path.join(ASSET_ROOT, 'dist', 'game-icons'),
-  path.join(ASSET_ROOT, 'public', 'game-icons'),
-];
-
-const store = createIconStore({
-  bundledDirs: BUNDLED_ICON_DIRS,
-  cacheDir: path.join(PROJECT_ROOT, 'icon-cache'),
-});
-
 export const ICON_CACHE_DIR = path.join(PROJECT_ROOT, 'icon-cache');
 
-export function localIconForKey(key: string): string | undefined {
-  return store.localIconForKey(key);
+const store = createIconStore({ cacheDir: ICON_CACHE_DIR });
+
+/** The game's icon on Discord's CDN. */
+export function discordIconUrl(game: Pick<DatabaseGame, 'id' | 'icon'>, size = 128): string | undefined {
+  return game.icon ? `https://cdn.discordapp.com/app-icons/${game.id}/${game.icon}.png?size=${size}` : undefined;
 }
 
-function findQuestRecordForNameOrExe(name: string, executable?: string): QuestDbRecord | undefined {
-  const key = normalizeGameKey(name);
-  const cleanExe = executable ? executable.replace(/\\/g, '/').split('/').pop()?.trim().toLowerCase() : '';
-  const records = listQuestDbRecords();
-  if (key) {
-    const byKeyOrAlias = records.find((item) => item.key === key || item.aliasKeys.includes(key));
-    if (byKeyOrAlias) return byKeyOrAlias;
-  }
-  if (cleanExe) {
-    return records.find((item) =>
-      recordExecutables(item).some((exe) => exe.trim().toLowerCase() === cleanExe)
-    );
-  }
-  return undefined;
+/** The saved icon of a game, without touching the network. */
+export function localGameIcon(game: Pick<DatabaseGame, 'id'>): string | undefined {
+  return store.localIconForKey(game.id);
 }
 
-/**
- * Icon for a game name (and optional executable). A name that is only an alias
- * of a database game ("osrs", "ow2") or matches a database executable resolves
- * to that game's local icon.
- */
-export function localIconForName(name: string, executable?: string): string | undefined {
-  const key = normalizeGameKey(name);
-  if (key) {
-    const direct = store.localIconForKey(key);
-    if (direct) return direct;
-  }
-  const record = findQuestRecordForNameOrExe(name, executable);
-  return record ? store.localIconForKey(record.key) : undefined;
-}
-
-/**
- * The key an icon is stored under for a game name: the database record's key
- * when the name is that game, one of its aliases, or matches its executable;
- * otherwise the plain normalized name key.
- */
-export function canonicalIconKey(name: string, executable?: string): string {
-  const key = normalizeGameKey(name);
-  const record = findQuestRecordForNameOrExe(name, executable);
-  return record ? record.key : key;
-}
-
-export function recentlyFailedIcon(key: string): boolean {
-  return store.recentlyFailed(key);
-}
-
-export function markIconFailed(key: string): void {
-  store.markFailed(key);
-}
-
-export function saveRemoteIcon(key: string, remoteUrl: string): Promise<string | undefined> {
-  return store.saveRemoteIcon(key, remoteUrl);
+/** Saves the game's Discord icon to icon-cache/ once. Returns its local URL. */
+export async function cacheGameIcon(game: Pick<DatabaseGame, 'id' | 'icon'>): Promise<string | undefined> {
+  const remote = discordIconUrl(game, 256);
+  if (!remote || store.recentlyFailed(game.id)) return store.localIconForKey(game.id);
+  const local = await store.saveRemoteIcon(game.id, remote);
+  if (!local) store.markFailed(game.id);
+  return local;
 }

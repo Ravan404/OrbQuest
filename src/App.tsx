@@ -11,7 +11,6 @@ import { Toast } from './components/Toast';
 import { Button } from './components/ui';
 import { LibraryView } from './views/LibraryView';
 import { CatalogView } from './views/CatalogView';
-import { LookupView } from './views/LookupView';
 import { AboutView } from './views/AboutView';
 import { GameDialog } from './dialogs/GameDialog';
 import { ScriptDialog } from './dialogs/ScriptDialog';
@@ -35,7 +34,6 @@ export default function App() {
   const [games, setGames] = useState<Game[]>([]);
   const [selectedGameId, setSelectedGameId] = useState<string | null>(null);
   const [view, setView] = useState<View>('library');
-  const [lookupName, setLookupName] = useState<string | null>(null);
 
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [theme, setTheme] = useState<ThemeSetting>('system');
@@ -264,7 +262,6 @@ export default function App() {
 
   const openView = (next: View) => {
     click();
-    setLookupName(null);
     setView(next);
   };
 
@@ -281,7 +278,7 @@ export default function App() {
     <div className="flex h-full flex-col overflow-hidden">
       <TopBar
         version={profile.version}
-        view={lookupName ? 'catalog' : view}
+        view={view}
         onView={openView}
         runningCount={runningCount}
         theme={theme}
@@ -296,20 +293,7 @@ export default function App() {
       />
 
       <main className="flex min-h-0 flex-1 flex-col">
-        {lookupName ? (
-          <LookupView
-            gameName={lookupName}
-            onBack={() => {
-              click();
-              setLookupName(null);
-            }}
-            onAdded={(name) => {
-              showNotice(t('noticeAdded'), t('noticeAddedText', { name }), 'success');
-              loadGames();
-            }}
-            onError={(message) => showNotice(t('noticeError'), message, 'warning')}
-          />
-        ) : view === 'library' ? (
+        {view === 'library' ? (
           <LibraryView
             games={games}
             selectedGameId={selectedGameId}
@@ -333,9 +317,15 @@ export default function App() {
           />
         ) : view === 'catalog' ? (
           <CatalogView
-            onLookUp={(name) => {
+            databaseSize={profile.gameDatabase?.games}
+            onAdded={(name) => {
+              showNotice(t('noticeAdded'), t('noticeAddedText', { name }), 'success');
+              loadGames();
+            }}
+            onError={(message) => showNotice(t('noticeError'), message, 'warning')}
+            onAddCustom={() => {
               click();
-              setLookupName(name);
+              setDialog({ kind: 'add' });
             }}
           />
         ) : (

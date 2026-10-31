@@ -29,6 +29,20 @@ export function isSafeFileName(value: string): boolean {
 }
 
 /**
+ * An executable inside a game folder: a file name (`game.exe`) or a relative
+ * path as Discord expects it (`win64/game.exe`). Every segment must be a safe
+ * file name; `..`, drive letters and absolute paths are refused.
+ */
+export function isSafeExecutablePath(value: string): boolean {
+  if (typeof value !== 'string' || !/\.exe$/i.test(value)) return false;
+  const segments = value.split(/[\\/]/);
+  return (
+    segments.length <= 8 &&
+    segments.every((segment) => segment !== '.' && segment !== '..' && !/[. ]$/.test(segment) && isSafeFileName(segment))
+  );
+}
+
+/**
  * Directory segments that are engine layout, not a game's install folder.
  * `...\Binaries\Win64\Game.exe` must not become a library folder named `Win64`.
  */

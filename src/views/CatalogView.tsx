@@ -1,62 +1,102 @@
 import React, { useEffect, useState } from 'react';
-import { ChevronRight, CornerDownLeft, Loader2 } from 'lucide-react';
+import { Check, Loader2, Plus } from 'lucide-react';
 import { CatalogGame } from '../types';
 import { api } from '../api';
 import { t } from '../strings';
-import { CATALOG_TYPING_DEBOUNCE_MS, MIN_CATALOG_QUERY_LENGTH, catalogSubmitTarget } from '../utils/catalogSearch';
+import { preferredExecutable } from '../utils/executables';
 import { Button, Chip, SearchInput, SectionLabel } from '../components/ui';
 import { GameIcon } from '../components/GameIcon';
 
 interface CatalogViewProps {
-  /** Opens the lookup screen for a game name. */
-  onLookUp: (gameName: string) => void;
+  /** Number of games in Discord's list, for the hint under the search. */
+  databaseSize?: number;
+  onAdded: (name: string) => void;
+  onError: (message: string) => void;
+  onAddCustom: () => void;
 }
 
-const POPULAR = [
-  'Marvel Rivals',
-  'Genshin Impact',
-  'Honkai: Star Rail',
-  'Zenless Zone Zero',
-  'Arknights: Endfield',
-  'Where Winds Meet',
-  'Delta Force',
-  'The First Descendant',
-  'Roblox',
-  'War Thunder',
-  'Fortnite',
-  'VALORANT',
-  'Once Human',
-  'Black Myth: Wukong',
-  'Apex Legends',
-];
+/** Typing searches after this pause; the search itself is local and instant. */
+const TYPING_DEBOUNCE_MS = 150;
+const MIN_QUERY_LENGTH = 2;
 
-const exeLabel = (count: number) => (count === 1 ? t('exeCountOne') : t('exeCount', { n: count }));
+/** One game: icon, name, the executable to use, and Add. */
+const CatalogTile: React.FC<{
+  game: CatalogGame;
+  onAdd: (game: CatalogGame, executable: string) => Promise<void>;
+}> = ({ game, onAdd }) => {
+  const [executable, setExecutable] = useState(() => preferredExecutable(game));
+  const [busy, setBusy] = useState(false);
+  const exeId = `exe-${game.id}`;
 
-const tileClass =
-  'flex w-full min-w-0 items-center gap-3 rounded-lg border px-3 py-2.5 text-left transition-colors';
+  return (
+    <div className="flex min-w-0 items-center gap-3 rounded-lg border border-line bg-surface px-3 py-2.5">
+      <GameIcon name={game.name} src={game.icon} size="md" />
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-[13px] font-medium text-text" title={game.name}>
+          {game.name}
+        </p>
+        {game.executables.length > 1 ? (
+          <select
+            id={exeId}
+            aria-label={t('executable')}
+            value={executable}
+            onChange={(event) => setExecutable(event.target.value)}
+            className="mt-0.5 w-full max-w-full truncate rounded border border-line bg-surface font-mono text-[11px] text-faint focus:border-primary focus:outline-none"
+          >
+            {game.executables.map((exe) => (
+              <option key={exe} value={exe}>
+                {exe}
+              </option>
+            ))}
+          </select>
+        ) : (
+          <p className="truncate font-mono text-[11px] text-faint" title={executable}>
+            {executable}
+          </p>
+        )}
+      </div>
+      {game.inLibrary ? (
+        <Chip tone="run">
+          <Check className="h-3 w-3" />
+          {t('inLibrary')}
+        </Chip>
+      ) : (
+        <Button
+          size="sm"
+          icon={busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Plus className="h-3.5 w-3.5" />}
+          disabled={busy}
+          onClick={async () => {
+            setBusy(true);
+            await onAdd(game, executable);
+            setBusy(false);
+          }}
+        >
+          {busy ? t('adding') : t('add')}
+        </Button>
+      )}
+    </div>
+  );
+};
 
-export const CatalogView: React.FC<CatalogViewProps> = ({ onLookUp }) => {
+export const CatalogView: React.FC<CatalogViewProps> = ({ databaseSize, onAdded, onError, onAddCustom }) => {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<CatalogGame[]>([]);
+  const [featured, setFeatured] = useState<CatalogGame[]>([]);
   const [loading, setLoading] = useState(false);
-  const [picked, setPicked] = useState<string | null>(null);
-  const [database, setDatabase] = useState<CatalogGame[]>([]);
+  const [refresh, setRefresh] = useState(0);
 
-  // The whole local database, shown while nothing is typed. Works offline.
   useEffect(() => {
     const controller = new AbortController();
     api
-      .catalogDatabase(controller.signal)
-      .then((list) => setDatabase(Array.isArray(list) ? list : []))
+      .catalogFeatured(controller.signal)
+      .then((list) => setFeatured(Array.isArray(list) ? list : []))
       .catch(() => undefined);
     return () => controller.abort();
-  }, []);
+  }, [refresh]);
 
-  // Typing searches the local catalog only, after a short pause.
   useEffect(() => {
     const trimmed = query.trim();
-    setPicked(null);
-    if (trimmed.length < MIN_CATALOG_QUERY_LENGTH) {
+    if (trimmed.length < MIN_QUERY_LENGTH) {
       setResults([]);
       setLoading(false);
       return;
@@ -73,125 +113,62 @@ export const CatalogView: React.FC<CatalogViewProps> = ({ onLookUp }) => {
         .finally(() => {
           if (!controller.signal.aborted) setLoading(false);
         });
-    }, CATALOG_TYPING_DEBOUNCE_MS);
+    }, TYPING_DEBOUNCE_MS);
     return () => {
       clearTimeout(timer);
       controller.abort();
     };
-  }, [query]);
+  }, [query, refresh]);
 
-  const target = catalogSubmitTarget(query, picked);
-  const typed = query.trim().length >= MIN_CATALOG_QUERY_LENGTH;
+  const add = async (game: CatalogGame, executable: string) => {
+    try {
+      await api.addFromCatalog(game, executable);
+      onAdded(game.name);
+      setRefresh((n) => n + 1);
+    } catch (error) {
+      onError((error as Error)?.message || t('addFailed'));
+    }
+  };
+
+  const typed = query.trim().length >= MIN_QUERY_LENGTH;
+  const shown = typed ? results : featured;
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
-      <div className="shrink-0 space-y-3 px-6 pb-3 pt-5">
-        <form
-          id="catalog-search-form"
-          className="flex items-center gap-2"
-          onSubmit={(event) => {
-            event.preventDefault();
-            if (target) onLookUp(target);
-          }}
-        >
-          <SearchInput
-            id="catalog-search-input"
-            className="w-full max-w-md"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder={t('catalogSearch')}
-            enterKeyHint="search"
-            trailing={
-              loading ? (
-                <Loader2 className="h-3.5 w-3.5 animate-spin" />
-              ) : typed ? (
-                <CornerDownLeft className="h-3.5 w-3.5" />
-              ) : null
-            }
-          />
-          <Button id="catalog-search-reddit-btn" type="submit" variant="primary" disabled={!target}>
-            {t('lookUp')}
-          </Button>
-        </form>
-        <div className="flex flex-wrap gap-1.5">
-          {POPULAR.map((name) => (
-            <button
-              key={name}
-              type="button"
-              onClick={() => setQuery(name)}
-              className="rounded-full border border-line px-2.5 py-0.5 text-[12px] text-muted transition-colors hover:border-line-strong hover:text-text"
-            >
-              {name}
-            </button>
-          ))}
-        </div>
+      <div className="shrink-0 space-y-1.5 px-6 pb-3 pt-5">
+        <SearchInput
+          id="catalog-search-input"
+          className="w-full max-w-md"
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+          placeholder={t('catalogSearch')}
+          enterKeyHint="search"
+          trailing={loading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
+        />
+        {databaseSize ? (
+          <p className="text-[12px] text-faint">{t('catalogFeaturedHint', { n: databaseSize.toLocaleString('en') })}</p>
+        ) : null}
       </div>
 
       <div className="min-h-0 flex-1 overflow-y-auto px-6 pb-6 pt-2">
-        {!typed ? (
-          <>
-            <div className="mb-3 flex items-baseline gap-3">
-              <SectionLabel>{t('catalogDatabase')}</SectionLabel>
-              <span className="text-[12px] text-faint">{t('catalogDatabaseHint')}</span>
-              <span className="tabular ml-auto text-[12px] text-faint">{t('gameCount', { n: database.length })}</span>
-            </div>
-            <div className="grid grid-cols-[repeat(auto-fill,minmax(230px,1fr))] gap-2">
-              {database.map((game) => (
-                <button
-                  key={game.name}
-                  type="button"
-                  onClick={() => setQuery(game.name)}
-                  className={`${tileClass} border-line bg-surface hover:border-line-strong`}
-                >
-                  <GameIcon name={game.name} src={game.icon} size="sm" />
-                  <span className="truncate text-[13px] text-text">{game.name}</span>
-                  <span className="tabular ml-auto shrink-0 text-[11px] text-faint">{exeLabel(game.executableCount ?? 0)}</span>
-                </button>
-              ))}
-            </div>
-          </>
-        ) : results.length === 0 && !loading ? (
+        {typed && !loading && results.length === 0 ? (
           <div className="mt-16 text-center">
             <p className="text-[14px] text-muted">{t('catalogNoMatch', { query: query.trim() })}</p>
-            <Button id="catalog-search-online-btn" variant="primary" className="mt-4" onClick={() => onLookUp(query.trim())}>
-              {t('searchOnline')}
+            <Button variant="primary" className="mt-4" icon={<Plus className="h-3.5 w-3.5" />} onClick={onAddCustom}>
+              {t('catalogAddCustom')}
             </Button>
           </div>
         ) : (
-          <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-2">
-            {results.map((game) => {
-              const active = picked === game.name;
-              return (
-                <div
-                  key={`${game.source}-${game.name}`}
-                  role="button"
-                  tabIndex={0}
-                  onClick={() => setPicked(game.name)}
-                  onDoubleClick={() => onLookUp(game.name)}
-                  onKeyDown={(event) => event.key === 'Enter' && onLookUp(game.name)}
-                  className={`${tileClass} cursor-default ${
-                    active ? 'border-primary bg-surface' : 'border-line bg-surface hover:border-line-strong'
-                  }`}
-                >
-                  <GameIcon name={game.name} src={game.icon} size="sm" />
-                  <span className="truncate text-[13px] text-text">{game.name}</span>
-                  {game.source === 'database' && <Chip tone="run">{t('database')}</Chip>}
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    className="ml-auto"
-                    icon={<ChevronRight className="order-last h-3.5 w-3.5" />}
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      onLookUp(game.name);
-                    }}
-                  >
-                    {t('lookUp')}
-                  </Button>
-                </div>
-              );
-            })}
-          </div>
+          <>
+            <div className="mb-3 flex items-baseline gap-3">
+              <SectionLabel>{typed ? t('catalogResults', { n: shown.length }) : t('catalogFeatured')}</SectionLabel>
+            </div>
+            <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-2">
+              {shown.map((game) => (
+                <CatalogTile key={game.id} game={game} onAdd={add} />
+              ))}
+            </div>
+          </>
         )}
       </div>
     </div>

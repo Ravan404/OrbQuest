@@ -1,11 +1,4 @@
-import type {
-  AppProfile,
-  BufferPreset,
-  CatalogGame,
-  Game,
-  SearchMatch,
-  SearchQuestsResponse,
-} from './types';
+import type { AppProfile, BufferPreset, CatalogGame, Game } from './types';
 
 export type ThemeSetting = 'system' | 'light' | 'dark';
 
@@ -70,30 +63,16 @@ export const api = {
   setTimer: (id: string, timer: TimerSettings) => request<{ game: Game }>(gameUrl(id, 'timer'), { method: 'PUT', json: timer }),
 
   add: (draft: GameDraft) => request<{ game?: Game }>('/api/games', { method: 'POST', json: { ...draft, origin: 'custom' } }),
-  addMatch: (match: SearchMatch, fallbackName: string) =>
+  /** Adds a catalog game with one of the executables Discord lists for it. */
+  addFromCatalog: (game: CatalogGame, executable: string) =>
     request<{ game?: Game }>('/api/games', {
       method: 'POST',
-      json: {
-        // Only this result is added, under its own resolved title.
-        name: match.gameName?.trim() || fallbackName,
-        folderPath: match.folderPath,
-        executableName: match.executableName,
-        origin: 'catalog',
-        questMethod: match.questMethod,
-        steamAppId: match.steamAppId,
-        manifestFileName: match.manifestFileName,
-        manifestContent: match.manifestContent,
-      },
+      json: { name: game.name, executableName: executable, appId: game.id, origin: 'catalog' },
     }),
   edit: (id: string, draft: GameDraft) => request<{ game: Game }>(gameUrl(id), { method: 'PATCH', json: draft }),
   remove: (id: string) => request<{ preservedSteamInstall?: boolean }>(gameUrl(id), { method: 'DELETE' }),
 
-  catalogDatabase: (signal?: AbortSignal) => request<CatalogGame[]>('/api/catalog/database', { signal }),
+  catalogFeatured: (signal?: AbortSignal) => request<CatalogGame[]>('/api/catalog/featured', { signal }),
   catalog: (query: string, signal?: AbortSignal) =>
     request<CatalogGame[]>(`/api/catalog?q=${encodeURIComponent(query)}`, { signal }),
-  lookup: (game: string, online: boolean, signal?: AbortSignal) =>
-    request<SearchQuestsResponse | SearchMatch[]>(
-      `/api/search-quests?game=${encodeURIComponent(game)}&format=full${online ? '&online=1' : ''}`,
-      { signal }
-    ),
 };

@@ -68,8 +68,6 @@ export interface StoredGame {
   folder: string;
   executable: string;
   logoUrl?: string;
-  /** True once logo resolution was attempted and failed (negative cache). */
-  logoFailed?: boolean;
   /** Pending logo resolution, kicked off once per game. */
   logoPromise?: Promise<string | undefined>;
   isRunning: boolean;
@@ -88,4 +86,6 @@ export interface StoredGame {
   addedAt?: string;
   specialRootPath?: string;
   steamAppId?: number;
+  /** Discord application id (game database) of a game added from the catalog. */
+  appId?: string;
 }

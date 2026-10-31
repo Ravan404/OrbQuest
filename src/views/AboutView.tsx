@@ -20,7 +20,7 @@ const Fact: React.FC<{ label: string; value: React.ReactNode }> = ({ label, valu
 const dateOnly = (iso?: string) => (iso ? iso.slice(0, 10) : '-');
 
 export const AboutView: React.FC<{ profile: AppProfile }> = ({ profile }) => {
-  const database = profile.questDatabase?.bundled;
+  const database = profile.gameDatabase;
 
   return (
     <div className="min-h-0 flex-1 overflow-y-auto px-6 py-6">

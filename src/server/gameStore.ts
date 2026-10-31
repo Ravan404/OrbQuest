@@ -14,12 +14,11 @@ import {
   PLACEHOLDER_EXE,
   StoredGame,
 } from './config.ts';
-import { isPathInside, isSafeFileName } from './security.ts';
-import { instantGameLogo, resolveGameLogo } from './logo.ts';
-import { localIconForName } from './iconStore.ts';
+import { isPathInside, isSafeExecutablePath } from './security.ts';
+import { cacheGameIcon, discordIconUrl, localGameIcon } from './iconStore.ts';
+import { findGameByExecutable, findGameByName, getGameById, type DatabaseGame } from './gameDatabase.ts';
 import { isGameOrigin, type GameOrigin } from '../types.ts';
 import { readSimulatedSteamManifest } from './steamManifest.ts';
-import { listQuestDbRecords, recordExecutables } from './questLookup.ts';
 import { writeJsonAtomic } from './fsUtil.ts';
 
 /**
@@ -31,22 +30,6 @@ import { writeJsonAtomic } from './fsUtil.ts';
  * quest counter is deliberately reset on every launcher restart: a finished
  * quest is a closed event, so the library always starts a new day at 00:00.
  */
-
-const KNOWN_PLACEHOLDER_NAMES: Record<string, string> = {
-  'robloxplayerbeta.exe': 'Roblox',
-  'marvel-win64-shipping.exe': 'Marvel Rivals',
-  'wwm.exe': 'Where Winds Meet',
-  'endfield.exe': 'Arknights: Endfield',
-  'deltaforceclient-win64-shipping.exe': 'Delta Force',
-  'aces.exe': 'War Thunder',
-  'osclient.exe': 'Old School RuneScape',
-  'aniimo.exe': 'Aniimo',
-  'dragonheir.exe': 'Dragonheir: Silent Gods',
-};
-
-// The general game list moved to gameCatalog.ts (bundled into the server
-// build instead of being read from the working directory at runtime).
-export { NON_STEAM_GAMES, STEAM_CATALOG_NAMES as catalogCache } from './gameCatalog.ts';
 
 export const gamesMap = new Map<string, StoredGame>();
 
@@ -72,47 +55,18 @@ export interface GameMeta {
   addedAt?: string;
   specialRootPath?: string;
   steamAppId?: number;
+  /** Discord application id of a game added from the catalog. */
+  appId?: string;
 }
 
 /**
- * Resolve the known quest executable filename (e.g. `wwm.exe` for
- * `Where Winds Meet` / `Win64r`) when a managed game folder's `.exe` was
- * removed by an external tool or antivirus scan.
+ * The executable Discord expects for a game (e.g. `win64/valorant-win64-shipping.exe`),
+ * used when a managed game folder's `.exe` was removed by an antivirus scan.
+ * The game is found by its Discord id, its name or its folder name.
  */
-export function inferKnownExecutableForGame(displayName: string, folderName: string): string | undefined {
-  const normName = displayName.trim().toLowerCase();
-  const normFolder = path.basename(folderName.trim()).toLowerCase();
-
-  for (const [exe, gameTitle] of Object.entries(KNOWN_PLACEHOLDER_NAMES)) {
-    if (gameTitle.toLowerCase() === normName) return exe;
-  }
-
-  for (const record of listQuestDbRecords()) {
-    const recName = record.name.trim().toLowerCase();
-    const aliasMatch = record.aliases.some((a) => a.trim().toLowerCase() === normName || a.trim().toLowerCase() === normFolder);
-    const exes = recordExecutables(record);
-    const firstExe = exes.find((e) => e.toLowerCase().endsWith('.exe') && isSafeFileName(e));
-    if (!firstExe) continue;
-
-    if (recName === normName || recName === normFolder || aliasMatch) {
-      return firstExe;
-    }
-
-    for (const entry of record.entries) {
-      const folderSeg = path.basename((entry.folderPath || '').replace(/[\\/]+$/, '')).toLowerCase();
-      if (folderSeg && folderSeg === normFolder && entry.executableName && isSafeFileName(entry.executableName)) {
-        return entry.executableName;
-      }
-    }
-    if (record.verified?.defaultFolder) {
-      const folderSeg = path.basename(record.verified.defaultFolder.replace(/[\\/]+$/, '')).toLowerCase();
-      if (folderSeg && folderSeg === normFolder) {
-        return firstExe;
-      }
-    }
-  }
-
-  return undefined;
+export function inferKnownExecutableForGame(displayName: string, folderName: string, appId?: string): string | undefined {
+  const game = getGameById(appId) ?? findGameByName(displayName) ?? findGameByName(path.basename(folderName.trim()));
+  return game?.executables[0];
 }
 
 /** Ids we are willing to restore from a metadata file. */
@@ -153,12 +107,12 @@ export function readGameMeta(folder: string): GameMeta {
     return {
       id: typeof parsed.id === 'string' && isStableGameId(parsed.id) ? parsed.id : undefined,
       name: typeof parsed.name === 'string' && parsed.name.trim() ? parsed.name.trim() : undefined,
-      executable:
-        rawExe && rawExe.toLowerCase().endsWith('.exe') && isSafeFileName(rawExe) ? rawExe : undefined,
+      executable: rawExe && isSafeExecutablePath(rawExe) ? rawExe.replace(/\\/g, '/') : undefined,
       origin: isGameOrigin(parsed.origin) ? parsed.origin : undefined,
       addedAt: typeof parsed.addedAt === 'string' ? parsed.addedAt : undefined,
       specialRootPath: typeof parsed.specialRootPath === 'string' ? parsed.specialRootPath : undefined,
       steamAppId: Number.isSafeInteger(parsed.steamAppId) ? parsed.steamAppId : undefined,
+      appId: typeof parsed.appId === 'string' && /^\d{5,25}$/.test(parsed.appId) ? parsed.appId : undefined,
     };
   } catch {
     return {};
@@ -356,27 +310,29 @@ export function removeSpecialGame(id: string): void {
 // Logo resolution (fire-and-forget, cached, write-back)
 // ---------------------------------------------------------------
 
+/** The Discord database game a library entry is: by its id, its executable or its exact name. */
+export function databaseGameFor(game: Pick<StoredGame, 'appId' | 'executable' | 'name'>): DatabaseGame | undefined {
+  return getGameById(game.appId) ?? findGameByExecutable(game.executable) ?? findGameByName(game.name);
+}
+
+/**
+ * Sets the game's icon: the saved copy, or Discord's CDN address while the
+ * icon is saved in the background. A game Discord does not know has none.
+ */
 export function kickoffLogo(game: StoredGame): void {
-  if (game.logoUrl?.startsWith('/') || game.logoFailed || game.logoPromise) return;
-  // An icon already on disk is set right away, so the first response has it.
-  const local = localIconForName(game.name, game.executable);
+  if (game.logoUrl?.startsWith('/') || game.logoPromise) return;
+  const match = databaseGameFor(game);
+  if (!match) return;
+  const local = localGameIcon(match);
   if (local) {
     game.logoUrl = local;
     return;
   }
-  // If the bundled Discord catalog has an instant icon URL, show it right away
-  // while the background resolver caches the image to disk.
-  if (!game.logoUrl) {
-    const instant = instantGameLogo(game.name, game.executable, game.steamAppId);
-    if (instant) game.logoUrl = instant;
-  }
-  game.logoPromise = resolveGameLogo(game.name, game.executable, game.steamAppId).then((url) => {
+  game.logoUrl = discordIconUrl(match);
+  if (!game.logoUrl) return;
+  game.logoPromise = cacheGameIcon(match).then((url) => {
     game.logoPromise = undefined;
-    if (url) {
-      game.logoUrl = url;
-    } else if (!game.logoUrl) {
-      game.logoFailed = true;
-    }
+    if (url) game.logoUrl = url;
     return url;
   });
 }
@@ -444,13 +400,18 @@ async function scanGamesDir(): Promise<void> {
       // Provenance marker (custom / catalog) written when the entry was added
       const meta = readGameMeta(folder.name);
       const hintedName = meta.name || storedName || folder.name;
-      const knownExe = meta.executable || inferKnownExecutableForGame(hintedName, folder.name);
+      const metaExe = meta.executable && isSafeExecutablePath(meta.executable) ? meta.executable : '';
+      const knownExe = metaExe || inferKnownExecutableForGame(hintedName, folder.name, meta.appId);
       const fallbackExe = `${folder.name.toLowerCase().replace(/[^a-z0-9_-]/g, '') || 'game'}.exe`;
 
-      // Find executable or restore if the placeholder was removed by AV
+      // Find executable or restore if the placeholder was removed by AV.
+      // Catalog games keep theirs in a subfolder (`win64/x.exe`), as Discord expects.
       let exeName = '';
       const actualExe = files.find((f) => f.toLowerCase().endsWith('.exe'));
-      if (actualExe) {
+      if (metaExe && fs.existsSync(path.join(folderPath, metaExe))) {
+        exeName = metaExe;
+        if (!folder.isSymbolicLink()) upgradeLegacyPlaceholder(path.join(folderPath, metaExe), PLACEHOLDER_EXE);
+      } else if (actualExe) {
         const actualPath = path.join(folderPath, actualExe);
         if (
           !folder.isSymbolicLink() &&
@@ -475,8 +436,7 @@ async function scanGamesDir(): Promise<void> {
         }
       }
 
-      const displayName =
-        meta.name || storedName || KNOWN_PLACEHOLDER_NAMES[exeName.toLowerCase()] || folder.name;
+      const displayName = meta.name || storedName || findGameByExecutable(exeName)?.name || folder.name;
 
       const id = allocateLibraryId(folder.name, meta.id);
       const defaultId = folder.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9._-]/g, '') || 'game';
@@ -498,6 +458,7 @@ async function scanGamesDir(): Promise<void> {
           addedAt: meta.addedAt,
           specialRootPath: meta.specialRootPath,
           steamAppId: meta.steamAppId,
+          appId: meta.appId,
         };
         gamesMap.set(id, game);
         // Logo resolution is intentionally fire-and-forget: it must never

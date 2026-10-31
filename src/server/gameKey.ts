@@ -34,11 +34,6 @@ export function normalizeGameKey(value: unknown): string {
     .replace(/[^a-z0-9]/g, '');
 }
 
-/** Display form of a game name: no trademark marks, single spaces, trimmed. */
-export function cleanDisplayName(value: unknown): string {
-  return text(value).replace(TRADEMARK_MARKS, '').replace(/\s+/g, ' ').trim();
-}
-
 /**
  * Keys of every word-start suffix of a name:
  * "EA SPORTS FC 26" -> ["easportsfc26", "sportsfc26", "fc26", "26"].

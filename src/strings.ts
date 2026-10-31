@@ -86,34 +86,15 @@ const strings = {
 
   // Catalog
   catalogSearch: 'Search games',
-  lookUp: 'Look up',
-  catalogDatabase: 'Quest database',
-  catalogDatabaseHint: 'These have a known .exe and work offline.',
-  gameCount: '{n} games',
-  exeCount: '{n} .exe',
-  exeCountOne: '1 .exe',
-  database: 'Database',
-  catalogNoMatch: 'Nothing in the catalog for "{query}"',
-
-  // Lookup results
-  back: 'Back',
-  searchOnline: 'Search Reddit',
-  searching: 'Searching…',
-  online: 'Reddit',
-  steam: 'Steam',
+  catalogFeatured: 'Games with Discord quests',
+  catalogFeaturedHint: 'Search finds any of the {n} games Discord can detect.',
+  catalogResults: '{n} games',
+  catalogNoMatch: 'Discord\'s game list has nothing called "{query}".',
+  catalogAddCustom: 'Add it by its .exe name',
+  executable: 'Executable',
   inLibrary: 'In library',
   add: 'Add',
   adding: 'Adding…',
-  added: 'Added',
-  addSelected: 'Add selected',
-  source: 'Source',
-  copyExe: 'Copy file name',
-  noResults: 'No results for "{query}"',
-  noResultsInFilter: 'Nothing under this filter.',
-  redditBusy: 'Reddit is limiting requests. Try again in {n}s.',
-  redditBusyShort: 'Reddit is limiting requests. Try again shortly.',
-  redditUnreachable: 'Reddit could not be reached.',
-  searchFailed: 'The search failed.',
   addFailed: 'Could not add the game.',
 
   // Add / edit dialog
@@ -182,7 +163,7 @@ const strings = {
     'Discord needs a moment to notice a new game, so the count starts after a short wait: {fast}, {normal} or {long} seconds for Fast, Normal and Long, none for Off. Once the target is reached the stand-in keeps running for another {end} seconds so the last minute isn\'t cut short, then it stops. Untick "Stop at the end" if you want it to stay open.',
   aboutAddTitle: 'Getting games in',
   aboutAdd:
-    'The catalog lists games with a known quest .exe. Those marked Database work offline; for anything else the app checks r/DiscordQuests. If you already know the file name, use Add game and type it in.',
+    "The catalog is Discord's own list of games it can detect, so the stand-in gets exactly the name and folder Discord looks for (for VALORANT that is win64\\valorant-win64-shipping.exe). The list is updated every six hours. A game Discord does not list yet can still be added by hand with Add game.",
   aboutScript:
     "If you'd rather run the real game, the start script button on a card saves a .bat, .ps1 or .py that starts it and closes it when the same timer is up.",
   aboutFilesTitle: 'Where things are',

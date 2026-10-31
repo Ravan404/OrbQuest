@@ -10,33 +10,19 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { BUNDLED_ICON_DIRS, BUNDLED_ICON_URL_PREFIX, CACHED_ICON_URL_PREFIX, ICON_CACHE_DIR } from './iconStore.ts';
+import { CACHED_ICON_URL_PREFIX, ICON_CACHE_DIR } from './iconStore.ts';
 
 export const GAME_ICON_FILE = '.game-icon.ico';
 
 const PNG_SIGNATURE = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
 
-/** The PNG on disk behind a `/game-icons/...` or `/game-icons-cache/...` URL, if there is one. */
+/** The PNG on disk behind a `/game-icons-cache/...` URL, if there is one. */
 export function localIconFile(logoUrl: string | undefined): string | null {
-  if (!logoUrl) return null;
-  let dirs: string[];
-  let name: string;
-  if (logoUrl.startsWith(BUNDLED_ICON_URL_PREFIX)) {
-    dirs = BUNDLED_ICON_DIRS;
-    name = logoUrl.slice(BUNDLED_ICON_URL_PREFIX.length);
-  } else if (logoUrl.startsWith(CACHED_ICON_URL_PREFIX)) {
-    dirs = [ICON_CACHE_DIR];
-    name = logoUrl.slice(CACHED_ICON_URL_PREFIX.length);
-  } else {
-    return null;
-  }
-  name = decodeURIComponent(name.split('?')[0]);
+  if (!logoUrl?.startsWith(CACHED_ICON_URL_PREFIX)) return null;
+  const name = decodeURIComponent(logoUrl.slice(CACHED_ICON_URL_PREFIX.length).split('?')[0]);
   if (!/^[\w.-]+\.png$/i.test(name)) return null;
-  for (const dir of dirs) {
-    const file = path.join(dir, name);
-    if (fs.existsSync(file)) return file;
-  }
-  return null;
+  const file = path.join(ICON_CACHE_DIR, name);
+  return fs.existsSync(file) ? file : null;
 }
 
 /**
