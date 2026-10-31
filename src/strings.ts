@@ -89,6 +89,7 @@ const strings = {
   catalogFeatured: 'Games with Discord quests',
   catalogFeaturedHint: 'Search finds any of the {n} games Discord can detect.',
   catalogResults: '{n} games',
+  catalogResultOne: '1 game',
   catalogNoMatch: 'Discord\'s game list has nothing called "{query}".',
   catalogAddCustom: 'Add it by its .exe name',
   executable: 'Executable',

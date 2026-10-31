@@ -5,7 +5,8 @@
  * (https://discord.com/api/v9/applications/detectable) into the compact game
  * database the app ships and downloads (src/server/gameDatabase.json).
  *
- * Only Windows executables are kept, launchers are dropped, and each
+ * Only Windows executables are kept, launchers and entries that need
+ * command-line arguments are dropped, and each
  * executable keeps the folder part Discord matches on: Discord recognises
  * VALORANT only when the running file's path ends in
  * `win64/valorant-win64-shipping.exe`, so the placeholder is written to that
@@ -76,7 +77,10 @@ export function toDatabaseGame(raw: unknown): DatabaseGame | null {
   for (const entry of Array.isArray(app.executables) ? app.executables : []) {
     if (!entry || typeof entry !== 'object') continue;
     const exe = entry as Record<string, unknown>;
+    // A launcher is not the game, and an entry that needs command-line
+    // arguments (Source games' `-game tf`) cannot be matched by a placeholder.
     if (exe.os !== 'win32' || exe.is_launcher === true) continue;
+    if (typeof exe.arguments === 'string' && exe.arguments.trim()) continue;
     const normalized = normalizeExecutablePath(exe.name);
     if (normalized && !executables.includes(normalized)) executables.push(normalized);
   }

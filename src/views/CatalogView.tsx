@@ -161,7 +161,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({ databaseSize, onAdded,
         ) : (
           <>
             <div className="mb-3 flex items-baseline gap-3">
-              <SectionLabel>{typed ? t('catalogResults', { n: shown.length }) : t('catalogFeatured')}</SectionLabel>
+              <SectionLabel>{!typed ? t('catalogFeatured') : shown.length === 1 ? t('catalogResultOne') : t('catalogResults', { n: shown.length })}</SectionLabel>
             </div>
             <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-2">
               {shown.map((game) => (

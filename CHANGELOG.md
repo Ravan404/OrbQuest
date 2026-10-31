@@ -4,7 +4,7 @@
 
 ### Changed
 
-- **The catalog is Discord's own list of detectable games** (`discord.com/api/v9/applications/detectable`) instead of executables read from r/DiscordQuests posts. It has every game Discord can detect (10,445 with a Windows executable), and the placeholder is written to the path Discord matches, including its folder: `Games\VALORANT\win64\valorant-win64-shipping.exe`. Before, a placeholder such as `Games\VALORANT\VALORANT-Win64-Shipping.exe` could miss Discord's folder rule.
+- **The catalog is Discord's own list of detectable games** (`discord.com/api/v9/applications/detectable`) instead of executables read from r/DiscordQuests posts. It has every game Discord can detect with a Windows executable (about 10,400), and the placeholder is written to the path Discord matches, including its folder: `Games\VALORANT\win64\valorant-win64-shipping.exe`. Before, a placeholder such as `Games\VALORANT\VALORANT-Win64-Shipping.exe` could miss Discord's folder rule.
 - The catalog page shows the games that have had Discord quests; searching finds any game in Discord's list, by name, other name or executable. When Discord lists several executables, the game's own is preselected and the others are in a list.
 - The Game database workflow rebuilds `src/server/gameDatabase.json` from Discord every six hours; the app downloads it as before, and reads Discord's list itself only when the published file has been unreachable for a day.
 - Icons come only from Discord's CDN and are saved for offline use. The Content-Security-Policy now allows images only from the app and `cdn.discordapp.com`.
@@ -16,6 +16,7 @@
 - Icon lookups on Steam, SteamGridDB, Lutris and PCGamingWiki, and the bundled icon files.
 - Adding Steam-manifest installs from the catalog. Installs made by earlier versions are still listed and can be removed safely.
 - A game Discord does not list (for example a browser quest) is no longer in the catalog; add it by hand with Add game.
+- Games Discord only recognises with command-line arguments (Team Fortress 2, Half-Life 2) are not in the catalog, because a placeholder is started without arguments.
 
 
 ## [1.3.0] — 2026-10-28
