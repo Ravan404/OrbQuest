@@ -116,3 +116,23 @@ test('a PNG icon is wrapped in a one-image .ico for the placeholder window', asy
   assert.ok(ico.subarray(22).equals(png));
   assert.equal(pngToIco(Buffer.from('not a png at all, just text')), null);
 });
+
+test('the default executable of a catalog game is the game binary, not a helper', async () => {
+  const { preferredExecutable } = await import('../src/utils/executables.ts');
+  const marvel = [
+    'win64/marvel-win64-test.exe',
+    'win64/marvel-win64-shipping.exe',
+    'marvelrivals/marvelrivals_launcher.exe',
+    'win64/marvel.exe',
+  ];
+  assert.equal(preferredExecutable({ name: 'Marvel Rivals', executables: marvel }), 'win64/marvel-win64-shipping.exe');
+  assert.equal(preferredExecutable({ name: 'Where Winds Meet', executables: ['wwm.exe', 'where winds meet.exe'] }), 'where winds meet.exe');
+  assert.equal(preferredExecutable({ name: 'One', executables: ['one.exe'] }), 'one.exe');
+});
+
+test('isSafeExecutablePath accepts a file or a relative path inside the game folder only', async () => {
+  const { isSafeExecutablePath } = await import('../src/server/security.ts');
+  for (const ok of ['game.exe', 'win64/game.exe', 'Binaries\\Win64\\Game.exe']) assert.ok(isSafeExecutablePath(ok), ok);
+  for (const bad of ['../game.exe', 'a/../game.exe', 'C:/game.exe', '/game.exe', 'game.bin', 'con/game.exe', 'a./game.exe', ''])
+    assert.ok(!isSafeExecutablePath(bad), bad);
+});

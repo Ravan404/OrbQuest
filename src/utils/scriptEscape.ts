@@ -1,6 +1,6 @@
 /**
- * Escaping for the start scripts of the script dialog (ScriptDialog.tsx). Game names come from Reddit posts and user input,
- * so every value is escaped for the exact place it ends up in.
+ * Escaping for the start scripts of the script dialog (ScriptDialog.tsx). Game names come from Discord's list and user
+ * input, so every value is escaped for the exact place it ends up in.
  */
 
 export const stripControlChars = (value: string) => value.replace(/[\r\n\x00-\x1F\x7F]/g, ' ').trim();

@@ -11,6 +11,7 @@ const store = await import('../src/server/gameStore.ts');
 const gamesRouter = (await import('../src/server/routes/games.ts')).default;
 const settingsRouter = (await import('../src/server/routes/settings.ts')).default;
 const { resetSettingsCache } = await import('../src/server/settingsStore.ts');
+const { loadGameDatabase } = await import('../src/server/gameDatabase.ts');
 
 const stateFile = path.join(gamesDir, '.state.json');
 
@@ -40,6 +41,7 @@ async function addGame(name: string, executableName: string, extra: Record<strin
 }
 
 before(async () => {
+  loadGameDatabase();
   await store.initGameStore();
   const app = express();
   app.use(express.json());
@@ -234,6 +236,47 @@ test('a rescan drops a game whose folder was deleted, but repairs a missing plac
   assert.ok(fs.existsSync(path.join(gamesDir, quarantined.folder, 'quarantined.exe')), 'the placeholder is restored');
   assert.ok(!fs.existsSync(path.join(gamesDir, deleted.folder)), 'the deleted folder is not recreated');
   assert.equal(readJson(stateFile)[deleted.id], undefined);
+});
+
+test('a catalog game is written to the path Discord matches and keeps it after a restart', async () => {
+  const added = await call('POST', '/api/games', {
+    name: 'VALORANT',
+    executableName: 'win64/valorant-win64-shipping.exe',
+    appId: '700136079562375258',
+    origin: 'catalog',
+  });
+  assert.equal(added.status, 200, JSON.stringify(added.json));
+  const game = added.json.game;
+  const exePath = path.join(gamesDir, game.folder, 'win64', 'valorant-win64-shipping.exe');
+  assert.ok(fs.existsSync(exePath), 'the placeholder sits in the win64 subfolder');
+  assert.equal(game.executable, 'win64/valorant-win64-shipping.exe');
+  assert.match(game.logoUrl ?? '', /^https:\/\/cdn\.discordapp\.com\/app-icons\/700136079562375258\//);
+
+  await restart();
+  const reloaded = store.gamesMap.get(game.id)!;
+  assert.equal(reloaded.executable, 'win64/valorant-win64-shipping.exe');
+  assert.equal(reloaded.appId, '700136079562375258');
+
+  fs.rmSync(exePath);
+  await call('POST', '/api/games/rescan');
+  assert.ok(fs.existsSync(exePath), 'a removed placeholder is put back in the same subfolder');
+});
+
+test('a catalog game only accepts executables Discord lists for it, and paths stay inside the folder', async () => {
+  const wrongExe = await call('POST', '/api/games', {
+    name: 'VALORANT',
+    executableName: 'other.exe',
+    appId: '700136079562375258',
+    origin: 'catalog',
+  });
+  assert.equal(wrongExe.status, 400);
+  const unknownApp = await call('POST', '/api/games', { name: 'X', executableName: 'x.exe', appId: '123' });
+  assert.equal(unknownApp.status, 400);
+  for (const executableName of ['../evil.exe', 'C:/Windows/evil.exe', 'a/../../evil.exe', '/abs.exe']) {
+    const response = await call('POST', '/api/games', { name: 'Escape', executableName });
+    assert.ok(response.status === 400 || !fs.existsSync(path.join(sandboxRoot, 'evil.exe')), executableName);
+  }
+  assert.ok(!fs.existsSync(path.join(sandboxRoot, 'evil.exe')));
 });
 
 test('sound and theme settings are saved next to the library', async () => {

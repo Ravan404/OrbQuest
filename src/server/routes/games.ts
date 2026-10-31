@@ -142,8 +142,8 @@ router.post('/:id/launch', (req: Request<IdParams>, res: Response) => {
       knownExe.toLowerCase() !== game.executable.toLowerCase() &&
       (!fs.existsSync(executablePath) || hasPlaceholderRuntimeSignature(executablePath))
     ) {
-      // A placeholder named after the folder: switch to the executable the
-      // quest database knows for this game.
+      // A placeholder named after the folder: switch to the executable
+      // Discord lists for this game.
       const oldPath = executablePath;
       game.executable = knownExe;
       executablePath = getExecutablePath(game);

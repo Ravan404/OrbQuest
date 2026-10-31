@@ -7,7 +7,7 @@
  * Downloads Discord's list of detectable games and rebuilds
  * src/server/gameDatabase.json from it. The file is only rewritten when the
  * games changed, so its date says when Discord's list last changed. The
- * Quest database workflow (.github/workflows/database.yml) runs this every
+ * Game database workflow (.github/workflows/database.yml) runs this every
  * six hours and commits the result.
  */
 

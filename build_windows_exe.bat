@@ -17,10 +17,9 @@ if errorlevel 1 exit /b 1
 echo.
 
 echo [2/6] Building production bundle (dist/ frontend + dist/server.cjs)...
-rem The quest database (src/server/redditCache.json), its update date
-rem (src/server/questDatabaseInfo.ts) and the game list (catalog_cache.json)
-rem are baked into dist/server.cjs by this step. To update the database from
-rem r/DiscordQuests first, run "npm run update-database" before this script.
+rem The game database (src/server/gameDatabase.json, Discord's list of
+rem detectable games) is baked into dist/server.cjs by this step. To take the
+rem newest list from Discord first, run "npm run update-database" before this script.
 call npm run build
 if errorlevel 1 exit /b 1
 if not exist "%ROOT%dist\server.cjs" (
@@ -30,10 +29,10 @@ if not exist "%ROOT%dist\server.cjs" (
 echo         Backend bundle: "%ROOT%dist\server.cjs"
 echo.
 
-echo [3/6] Verifying the production bundle (versions, quest database date, offline search)...
+echo [3/6] Verifying the production bundle (versions, game database, offline search)...
 rem Starts dist/server.cjs once in production mode: it must boot, report this
-rem version, answer a known game from the local database without Reddit and
-rem show one catalog card per game. Stops the build before packaging if not.
+rem version, find a game in the bundled database without the network and write
+rem its placeholder where Discord looks. Stops the build before packaging if not.
 call npm run verify:dist
 if errorlevel 1 (
   echo [ERROR] The production bundle failed verification - not packaging it.

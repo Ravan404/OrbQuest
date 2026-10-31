@@ -21,7 +21,7 @@ fs.copyFileSync(path.join(repoRoot, 'placeholder_runtime.exe'), path.join(assetR
 process.env.DQR_ROOT = sandboxRoot;
 process.env.DQR_ASSET_ROOT = assetRoot;
 process.env.DQR_OFFLINE = '1';
-process.env.DQR_REDDIT_CACHE_REFRESH = '0';
+process.env.DQR_DATABASE_REFRESH = '0';
 delete process.env.DQR_GAMES_DIR;
 
 export const placeholderPath = path.join(assetRoot, 'placeholder_runtime.exe');

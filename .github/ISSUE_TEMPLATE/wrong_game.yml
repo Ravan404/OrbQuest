@@ -1,6 +1,6 @@
-name: Wrong or missing game
-description: A quest game has the wrong .exe or icon, or is missing from the database
-labels: [quest-database]
+name: Catalog problem
+description: A quest game is missing from the featured games, or the wrong executable is chosen for it
+labels: [catalog]
 body:
   - type: input
     id: game
@@ -11,10 +11,10 @@ body:
   - type: input
     id: exe
     attributes:
-      label: Correct executable
-      placeholder: VALORANT-Win64-Shipping.exe
+      label: Executable the quest needs
+      placeholder: win64/valorant-win64-shipping.exe
   - type: textarea
     id: details
     attributes:
       label: Details
-      description: What is wrong, and a link to the quest or a r/DiscordQuests post if you have one.
+      description: What is wrong. A game missing from Discord's own list cannot be added to the catalog, but it can be added by hand with Add game.

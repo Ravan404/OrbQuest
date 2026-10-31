@@ -7,8 +7,7 @@
  * Writes one version number into every file that carries it:
  *   package.json, package-lock.json (two fields), src/version.ts,
  *   desktop_app.py (APP_VERSION), build_windows_exe.bat (the "Version:" banner),
- *   placeholder_runtime.rc (version resource of the placeholder exe),
- *   src/server/redditCache.json (the stamp the app writes on refresh).
+ *   placeholder_runtime.rc (version resource of the placeholder exe).
  * The CHANGELOG [Unreleased] heading becomes the new version (an empty section
  * is added when there is none).
  *
@@ -40,7 +39,6 @@ if (current === next) {
 }
 
 const lock = JSON.parse(read('package-lock.json'));
-const cache = JSON.parse(read('src/server/redditCache.json'));
 
 // Each entry: file, how to find the old text, how to replace it.
 const edits = [
@@ -87,11 +85,6 @@ const edits = [
         .replace(/(FILEVERSION|PRODUCTVERSION)(\s+)\d+,\d+,\d+,0/g, `$1$2${major},${minor},${patch},0`)
         .replaceAll(`"${current}.0\\0"`, `"${next}.0\\0"`);
     },
-  },
-  {
-    file: 'src/server/redditCache.json',
-    check: cache.version === current,
-    apply: (text) => text.replace(/("version":\s*")[^"]+(")/, `$1${next}$2`),
   },
 ];
 

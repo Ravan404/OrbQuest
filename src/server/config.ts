@@ -22,8 +22,8 @@ export const GAMES_DIR = process.env.DQR_GAMES_DIR || path.join(PROJECT_ROOT, 'G
 export const PLACEHOLDER_EXE = path.join(ASSET_ROOT, 'placeholder_runtime.exe');
 
 /**
- * DQR_OFFLINE=1: no network requests at all (icon services, Reddit, Discord's
- * game list). The local quest database and bundled icons still work. Used by
+ * DQR_OFFLINE=1: no network requests at all (database updates, Discord's
+ * icons). The bundled game database and saved icons still work. Used by
  * the tests, and available to anyone who wants the app to stay offline.
  */
 export const OFFLINE = process.env.DQR_OFFLINE === '1';

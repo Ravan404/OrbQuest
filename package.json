@@ -3,7 +3,7 @@
   "version": "1.3.0",
   "private": true,
   "type": "module",
-  "description": "Local quest timer for Windows. Starts a stand-in process under a game's .exe name and stops it when the time is up. Never logs into Discord.",
+  "description": "Local timer for Discord's play-a-game Quests on Windows. Uses Discord's own list of detectable games; never logs into Discord.",
   "license": "MIT",
   "author": "Ravan404",
   "homepage": "https://github.com/Ravan404/OrbQuest#readme",
@@ -33,11 +33,9 @@
     "typecheck": "tsc --noEmit",
     "test": "node scripts/run-tests.mjs",
     "clean": "node -e \"for (const p of ['dist','node_modules/.vite']) require('fs').rmSync(p,{recursive:true,force:true})\"",
-    "update-database": "tsx scripts/update-quest-database.ts",
-    "build-reddit-cache": "tsx process-apify.ts",
+    "update-database": "tsx scripts/update-game-database.ts",
     "verify:dist": "node scripts/verify-dist.mjs",
-    "bump-version": "node scripts/bump-version.mjs",
-    "icons:download": "tsx scripts/download-game-icons.ts"
+    "bump-version": "node scripts/bump-version.mjs"
   },
   "dependencies": {
     "express": "^5.3.0",

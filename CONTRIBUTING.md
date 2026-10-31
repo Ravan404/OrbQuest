@@ -1,6 +1,6 @@
 # Contributing
 
-Thanks for wanting to help. Bug reports, quest database fixes and pull requests are all welcome.
+Thanks for wanting to help. Bug reports, catalog suggestions and pull requests are all welcome.
 
 ## Set up
 
@@ -27,11 +27,15 @@ CI runs the same four commands on Windows and Ubuntu.
 - Add a line under `[Unreleased]` in `CHANGELOG.md` for anything a user would notice.
 - Do not commit `dist/`, `Games/` or downloaded icons in `icon-cache/`.
 
-## Quest database fixes
+## The game database
 
-A game with the wrong `.exe`: add a correction in `src/server/redditCorrections.ts`, or edit the curated list in `src/server/questDatabase.ts`. New r/DiscordQuests posts are added by the Quest database workflow every six hours; `npm run update-database` does the same by hand. A fix in `redditCorrections.ts` takes effect after `npm run build-reddit-cache`; review `git diff src/server/redditCache.json` before you commit it.
+`src/server/gameDatabase.json` comes from Discord's list of detectable games and is rebuilt by the Game database workflow every six hours; do not edit it by hand. `npm run update-database` does the same locally.
 
-A wrong or missing bundled icon: put a square PNG at `public/game-icons/<key>.png`. The key is the game's name in lower case without spaces or punctuation (`Delta Force` → `deltaforce`). `npm run icons:download` fetches icons for games that have none.
+A game is missing or has the wrong executable: that is Discord's list, so it cannot be fixed here. The game can still be added by hand with Add game.
+
+The games shown on the catalog page before a search are the Discord application ids in `src/server/featuredGames.json`. A game that gets a Discord quest belongs there.
+
+The executable chosen by default when Discord lists several is decided by `src/utils/executables.ts`.
 
 ## The placeholder executable
 

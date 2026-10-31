@@ -1,11 +1,9 @@
 /**
  * gameKey.ts
  *
- * Tiny, dependency-free helpers that decide when two game names refer to the
- * same game. Every list the app merges (the general game list, the curated
- * quest registry, the Reddit-derived database and live Reddit results) is
- * compared through `normalizeGameKey`, so "HELLDIVERS™ 2", "Helldivers 2" and
- * "helldivers-2" can never show up as three different games again.
+ * Tiny, dependency-free helpers that decide when a typed name matches a game
+ * name: "helldivers 2" finds "HELLDIVERS™ 2", and a short query only matches
+ * at the start of a word.
  */
 
 /** Trademark-style marks that Steam store names carry but nobody types. */

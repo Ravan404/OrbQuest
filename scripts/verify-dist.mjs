@@ -14,11 +14,12 @@
  *   1. the version number is the same in package.json, desktop_app.py,
  *      build_windows_exe.bat and placeholder_runtime.rc;
  *   2. `dist/server.cjs` starts in production mode (with a throw-away data
- *      folder, no background Reddit refresh);
- *   3. the bundled quest database is the one in the repository (same update
- *      date) and answers offline: one catalog card per game and a database
- *      answer for a known game, without Reddit;
- *   4. the frontend is served and backend/database files are not.
+ *      folder, no background database update);
+ *   3. the bundled game database is the one in the repository and answers
+ *      offline: search, the featured games and Discord's executable paths;
+ *   4. a catalog game is written where Discord looks for it and its
+ *      placeholder runs;
+ *   5. the frontend is served and backend/database files are not.
  */
 
 import { spawn } from 'node:child_process';
@@ -106,7 +107,7 @@ async function main() {
       NODE_ENV: 'production',
       PORT: String(port),
       DQR_BIND_HOST: '127.0.0.1',
-      DQR_REDDIT_CACHE_REFRESH: '0',
+      DQR_DATABASE_REFRESH: '0',
       DQR_ROOT: dataRoot,
       DQR_ASSET_ROOT: root,
       DQR_GAMES_DIR: path.join(dataRoot, 'Games'),
@@ -136,52 +137,32 @@ async function main() {
     }
     check(profile.json?.version === version, `backend reports version ${version} (found ${profile.json?.version})`);
 
-    // The update date of the bundled quest database is part of the build.
-    const bundled = JSON.parse(read('src/server/redditCache.json'));
-    const info = profile.json?.questDatabase?.bundled;
+    // The bundled game database is part of the build.
+    const bundled = JSON.parse(read('src/server/gameDatabase.json'));
+    const info = profile.json?.gameDatabase;
     check(
-      info?.updatedAt === bundled.generatedAt && info?.entries === bundled.entries.length,
-      `bundled quest database updated ${bundled.generatedAt} (${bundled.entries.length} entries, checked through ${bundled.checkedThrough})`
+      info?.updatedAt === bundled.generatedAt && info?.games === bundled.games.length && info?.from === 'bundled',
+      `bundled game database updated ${bundled.generatedAt} (${bundled.games.length} games from Discord's list)`
     );
 
-    // 3. Offline quest database ------------------------------------------------
-    const catalog = await getJson(base, '/api/catalog?q=marvel%20rivals');
-    const rivals = (catalog.json || []).filter((card) => card.name.toLowerCase().includes('marvel rivals'));
+    // 3. Offline game database ---------------------------------------------------
+    const catalog = await getJson(base, '/api/catalog?q=valorant');
+    const valorant = (catalog.json || [])[0];
     check(
-      rivals.length === 1 && rivals[0].name === 'Marvel Rivals' && rivals[0].source === 'database',
-      'catalog shows exactly one "Marvel Rivals" card from the quest database'
+      valorant?.name === 'VALORANT' &&
+        valorant.executables?.includes('win64/valorant-win64-shipping.exe') &&
+        /^https:\/\/cdn\.discordapp\.com\/app-icons\//.test(valorant.icon ?? ''),
+      'searching "valorant" finds VALORANT with its Discord executable path and icon'
     );
 
-    const helldivers = await getJson(base, '/api/catalog?q=helldivers');
+    const featured = await getJson(base, '/api/catalog/featured');
+    const featuredList = Array.isArray(featured.json) ? featured.json : [];
     check(
-      (helldivers.json || []).length === 1 && helldivers.json[0].name === 'Helldivers 2',
-      'catalog merges "HELLDIVERS 2" spellings into one card'
+      featuredList.length >= 90 && featuredList.every((game) => game.executables?.length > 0),
+      `the catalog page lists ${featuredList.length} games with Discord quests`
     );
 
-    const dbCatalog = await getJson(base, '/api/catalog/database');
-    const dbCatalogList = Array.isArray(dbCatalog.json) ? dbCatalog.json : [];
-    const dbWithIcons = dbCatalogList.filter((item) => typeof item?.icon === 'string' && item.icon.length > 0);
-    // Games the scheduled database update just added may have no icon yet; the
-    // window shows their initials and the server looks the icon up later. Most
-    // games without one means the icon lookup itself is broken.
-    check(
-      dbCatalogList.length > 0 && dbWithIcons.length >= dbCatalogList.length * 0.9,
-      `at least 90% of the ${dbCatalogList.length} quest database games resolve an icon immediately (${dbWithIcons.length}/${dbCatalogList.length})`
-    );
-    const withoutIcon = dbCatalogList.filter((item) => !item?.icon).map((item) => item.name);
-    if (withoutIcon.length > 0) console.log(`  note no immediate icon yet: ${withoutIcon.join(', ')}`);
-
-    const search = await getJson(base, '/api/search-quests?game=Where%20Winds%20Meet&format=full');
-    const wwm = (search.json?.matches || []).find((match) => match.executableName === 'wwm.exe');
-    check(
-      JSON.stringify(search.json?.sourcesSearched) === JSON.stringify(['database']) &&
-        wwm?.foundVia === 'database' &&
-        typeof wwm?.logoUrl === 'string' &&
-        wwm.logoUrl.length > 0,
-      'executable search answers "Where Winds Meet" (wwm.exe) with its icon from the local database without Reddit'
-    );
-
-    // 4. Placeholder runtime & launcher lifecycle ------------------------------
+    // 4-5. Placeholder runtime & launcher lifecycle ------------------------------
     const placeholderBytes = fs.readFileSync(path.join(root, 'placeholder_runtime.exe'));
     const peOffset = placeholderBytes.readUInt32LE(0x3c);
     const stackCommit = Number(placeholderBytes.readBigUInt64LE(peOffset + 24 + 80));
@@ -193,17 +174,17 @@ async function main() {
     const added = await getJson(base, '/api/games', {
       method: 'POST',
       body: {
-        name: 'Where Winds Meet',
-        folderPath: 'wwm_standard\\Engine\\Binaries\\Win64r',
-        executableName: 'wwm.exe',
+        name: valorant?.name,
+        appId: valorant?.id,
+        executableName: 'win64/valorant-win64-shipping.exe',
         origin: 'catalog',
       },
     });
     const addedId = added.json?.game?.id;
-    const addedExePath = path.join(dataRoot, 'Games', added.json?.game?.folder || 'Win64r', 'wwm.exe');
+    const addedExePath = path.join(dataRoot, 'Games', added.json?.game?.folder || 'VALORANT', 'win64', 'valorant-win64-shipping.exe');
     check(
-      added.status === 200 && added.json?.game?.executable === 'wwm.exe' && fs.existsSync(addedExePath),
-      'adding "Where Winds Meet" creates Games/Win64r/wwm.exe'
+      added.status === 200 && fs.existsSync(addedExePath),
+      'adding VALORANT from the catalog creates Games/VALORANT/win64/valorant-win64-shipping.exe'
     );
 
     fs.rmSync(addedExePath, { force: true });
@@ -256,10 +237,10 @@ async function main() {
       'stop, reset-timer, and delete endpoints complete cleanly'
     );
 
-    // 5. Static files ------------------------------------------------------------
+    // 6. Static files ------------------------------------------------------------
     const page = await getJson(base, '/');
     check(page.status === 200 && page.type.includes('text/html'), 'frontend index.html is served');
-    for (const forbidden of ['/server.cjs', '/server.cjs.map', '/redditCache.json', '/discordIconCatalog.json']) {
+    for (const forbidden of ['/server.cjs', '/server.cjs.map', '/gameDatabase.json', '/featuredGames.json']) {
       const response = await getJson(base, forbidden);
       check(response.status === 404, `${forbidden} is not served`);
     }
