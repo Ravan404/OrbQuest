@@ -27,6 +27,19 @@ export interface DatabaseGame {
   source?: 'reddit';
   /** The r/DiscordQuests post a `reddit` entry comes from. */
   url?: string;
+  /**
+   * A `reddit` quest Discord only detects through Steam: the placeholder goes
+   * to `steamapps/common/<installDir>/` of the Steam library, next to an
+   * `appmanifest_<appId>.acf`. Its executables are relative to that folder.
+   */
+  steam?: SteamQuest;
+  /** Website of a `reddit` program Discord has no icon for; its icon is used instead. */
+  site?: string;
+}
+
+export interface SteamQuest {
+  appId: number;
+  installDir: string;
 }
 
 export interface GameDatabase {
@@ -100,6 +113,8 @@ export function toDatabaseGame(raw: unknown): DatabaseGame | null {
 
   const fromReddit = app.source === 'reddit';
   const url = fromReddit && typeof app.url === 'string' && /^https:\/\/www\.reddit\.com\//.test(app.url) ? app.url : undefined;
+  const steam = fromReddit ? toSteamQuest(app.steam) : undefined;
+  const site = fromReddit && !icon ? toSite(app.site) : undefined;
   return {
     id,
     name,
@@ -108,7 +123,34 @@ export function toDatabaseGame(raw: unknown): DatabaseGame | null {
     ...(icon ? { icon } : {}),
     ...(fromReddit ? { source: 'reddit' as const } : {}),
     ...(url ? { url } : {}),
+    ...(steam ? { steam } : {}),
+    ...(site ? { site } : {}),
   };
+}
+
+/** A folder name Windows and Steam accept as a `steamapps/common` entry, or null. */
+export function safeInstallDir(value: unknown): string | null {
+  if (typeof value !== 'string') return null;
+  const dir = value.trim();
+  if (!dir || dir.length > 120 || dir === '.' || dir === '..') return null;
+  if (/[\\/]/.test(dir) || NTFS_ILLEGAL.test(dir) || RESERVED_NAMES.test(dir) || /[. ]$/.test(dir)) return null;
+  return dir;
+}
+
+function toSteamQuest(value: unknown): SteamQuest | undefined {
+  if (!value || typeof value !== 'object') return undefined;
+  const raw = value as Record<string, unknown>;
+  const appId = Number(raw.appId);
+  const installDir = safeInstallDir(raw.installDir);
+  if (!Number.isSafeInteger(appId) || appId <= 0 || !installDir) return undefined;
+  return { appId, installDir };
+}
+
+/** A bare host name such as `firefox.com`, or undefined. */
+function toSite(value: unknown): string | undefined {
+  if (typeof value !== 'string') return undefined;
+  const site = value.trim().toLowerCase();
+  return site.length <= 100 && /^(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z]{2,}$/.test(site) ? site : undefined;
 }
 
 /** Sorted by name, the order of the file. */

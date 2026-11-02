@@ -136,3 +136,36 @@ test('isSafeExecutablePath accepts a file or a relative path inside the game fol
   for (const bad of ['../game.exe', 'a/../game.exe', 'C:/game.exe', '/game.exe', 'game.bin', 'con/game.exe', 'a./game.exe', ''])
     assert.ok(!isSafeExecutablePath(bad), bad);
 });
+
+test('icons come from Discord, or from the website of a program Discord has none for', async () => {
+  const { cacheGameIcon, remoteIconUrl } = await import('../src/server/iconStore.ts');
+  assert.equal(remoteIconUrl({ id: '1', icon: 'a'.repeat(32) }), `https://cdn.discordapp.com/app-icons/1/${'a'.repeat(32)}.png?size=256`);
+  assert.equal(remoteIconUrl({ id: 'r-operagx', site: 'operagx.gg' }), 'https://www.google.com/s2/favicons?domain=operagx.gg&sz=256');
+  assert.equal(remoteIconUrl({ id: '2' }), undefined);
+  // The tests run with DQR_OFFLINE=1: nothing is downloaded.
+  assert.equal(await cacheGameIcon({ id: 'r-operagx', site: 'operagx.gg' }), undefined);
+});
+
+test('a newer GitHub release is offered, anything else is not', async () => {
+  const { availableUpdate, checkForUpdate, isNewerVersion, parseLatestRelease } = await import('../src/server/updateCheck.ts');
+  const { APP_VERSION } = await import('../src/version.ts');
+  assert.ok(isNewerVersion('1.10.0', '1.9.3'));
+  assert.ok(isNewerVersion('v2.0.0', '1.4.0'));
+  assert.ok(!isNewerVersion('1.4.0', '1.4.0'));
+  assert.ok(!isNewerVersion('1.3.9', '1.4.0'));
+  assert.ok(!isNewerVersion('next', '1.4.0'));
+
+  const page = 'https://github.com/Ravan404/OrbQuest/releases/tag/v99.0.0';
+  assert.deepEqual(parseLatestRelease({ tag_name: 'v99.0.0', html_url: page }), { version: '99.0.0', url: page });
+  assert.equal(parseLatestRelease({ tag_name: 'v99.0.0', html_url: page, prerelease: true }), null);
+  assert.equal(parseLatestRelease({ tag_name: 'v99.0.0', html_url: 'https://evil.example/OrbQuest.exe' }), null);
+
+  const answer = (body: unknown, status = 200) => async () => new Response(JSON.stringify(body), { status });
+  assert.equal(availableUpdate(), null);
+  await checkForUpdate(answer({ tag_name: `v${APP_VERSION}`, html_url: page }));
+  assert.equal(availableUpdate(), null, 'the running version is not an update');
+  await checkForUpdate(answer({ tag_name: 'v99.0.0', html_url: page }));
+  assert.deepEqual(availableUpdate(), { version: '99.0.0', url: page });
+  await checkForUpdate(answer({ message: 'rate limited' }, 403));
+  assert.deepEqual(availableUpdate(), { version: '99.0.0', url: page }, 'a failed check keeps what was found');
+});

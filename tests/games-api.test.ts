@@ -294,3 +294,59 @@ test('sound and theme settings are saved next to the library', async () => {
   assert.equal((await call('GET', '/api/settings')).json.theme, 'dark');
   assert.equal((await call('GET', '/api/settings')).json.soundEnabled, false);
 });
+
+test('a Steam quest from the catalog is written into the Steam library with its manifest', async () => {
+  const fc27 = { name: 'EA SPORTS FC 27', executableName: 'fc27.exe', appId: '1531874756096295054', origin: 'catalog' };
+  process.env.DQR_STEAMAPPS = path.join(sandboxRoot, 'NoSteam', 'steamapps');
+  const noSteam = await call('POST', '/api/games', fc27);
+  assert.equal(noSteam.status, 404);
+  assert.match(noSteam.json.error, /needs Steam/);
+
+  const steamApps = path.join(sandboxRoot, 'SteamQuest', 'steamapps');
+  fs.mkdirSync(steamApps, { recursive: true });
+  process.env.DQR_STEAMAPPS = steamApps;
+  try {
+    const added = await call('POST', '/api/games', fc27);
+    assert.equal(added.status, 200, JSON.stringify(added.json));
+    assert.equal(added.json.game.id, 'steam-4080220');
+    const installDir = path.join(steamApps, 'common', 'EA SPORTS FC 27');
+    assert.ok(fs.existsSync(path.join(installDir, 'fc27.exe')));
+    const manifest = fs.readFileSync(path.join(steamApps, 'appmanifest_4080220.acf'), 'utf8');
+    assert.match(manifest, /"appid"\s+"4080220"/);
+    assert.match(manifest, /"installdir"\s+"EA SPORTS FC 27"/);
+    assert.equal((await call('POST', '/api/games', fc27)).status, 409);
+
+    await restart();
+    assert.ok(store.gamesMap.has('steam-4080220'));
+    assert.equal(store.gamesMap.get('steam-4080220')!.appId, '1531874756096295054');
+
+    const removed = await call('DELETE', '/api/games/steam-4080220');
+    assert.equal(removed.status, 200);
+    assert.ok(!fs.existsSync(installDir));
+    assert.ok(!fs.existsSync(path.join(steamApps, 'appmanifest_4080220.acf')));
+
+    // A real install of the game is never overwritten.
+    const realManifest = path.join(steamApps, 'appmanifest_4080220.acf');
+    fs.writeFileSync(realManifest, '"AppState"\n{\n\t"appid"\t\t"4080220"\n\t"buildid"\t\t"7"\n\t"installdir"\t\t"EA SPORTS FC 27"\n}\n');
+    const refused = await call('POST', '/api/games', fc27);
+    assert.equal(refused.status, 409);
+    assert.match(fs.readFileSync(realManifest, 'utf8'), /buildid/);
+    fs.rmSync(realManifest);
+
+    // The executable of the Toxic Commando demo sits in subfolders of its install folder.
+    const exe = "client_pc/root/bin/pc/john carpenter's toxic commando.exe";
+    const demo = await call('POST', '/api/games', {
+      name: "John Carpenter's Toxic Commando Demo",
+      executableName: exe,
+      appId: '1442714232331436062',
+      origin: 'catalog',
+    });
+    assert.equal(demo.status, 200, JSON.stringify(demo.json));
+    const demoDir = path.join(steamApps, 'common', "John Carpenter's Toxic Commando Demo");
+    assert.ok(fs.existsSync(path.join(demoDir, ...exe.split('/'))));
+    assert.equal((await call('DELETE', '/api/games/steam-4354730')).status, 200);
+    assert.ok(!fs.existsSync(demoDir), 'our own install with subfolders is removed');
+  } finally {
+    delete process.env.DQR_STEAMAPPS;
+  }
+});

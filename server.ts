@@ -26,6 +26,8 @@ import settingsRouter from './src/server/routes/settings.ts';
 import { APP_VERSION } from './src/version.ts';
 import { getGameDatabaseInfo, loadGameDatabase, scheduleGameDatabaseRefresh } from './src/server/gameDatabase.ts';
 import { ICON_CACHE_DIR } from './src/server/iconStore.ts';
+import { availableUpdate, scheduleUpdateChecks } from './src/server/updateCheck.ts';
+import { spawn } from 'node:child_process';
 
 const app = express();
 
@@ -115,6 +117,21 @@ app.get('/api/profile', (_req, res) => {
     gamesFolder: GAMES_DIR,
   });
 });
+// A newer release, found by updateCheck.ts; the window asks now and then.
+app.get('/api/update', (_req, res) => {
+  res.json({ update: availableUpdate() });
+});
+// Opens the library folder in Explorer (Windows only). The path is fixed.
+app.post('/api/open-games-folder', rateLimited, (_req, res) => {
+  if (process.platform !== 'win32') return res.sendStatus(404);
+  try {
+    fs.mkdirSync(GAMES_DIR, { recursive: true });
+    spawn('explorer.exe', [GAMES_DIR], { detached: true, stdio: 'ignore' }).on('error', () => {}).unref();
+    res.json({ success: true });
+  } catch {
+    res.status(500).json({ error: 'Could not open the folder.' });
+  }
+});
 // Desktop-only control endpoints. The nonce is NOT returned to the browser.
 // They also prevent the launcher from mistaking another service on a raced
 // ephemeral port for its own backend. Without the token both routes are 404.
@@ -153,6 +170,7 @@ async function startServer() {
 
   loadGameDatabase();
   scheduleGameDatabaseRefresh();
+  scheduleUpdateChecks();
 
   // Game icons saved from Discord's CDN (see iconStore.ts).
   app.use(

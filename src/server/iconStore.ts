@@ -1,14 +1,15 @@
 /**
- * Game icons from Discord. Every game of the database (gameDatabase.ts) has
- * an icon on Discord's CDN (`cdn.discordapp.com/app-icons/<id>/<hash>.png`).
- * The window shows that address right away; in the background the icon of a
- * library game is saved once to `icon-cache/<id>.png` next to the Games
- * folder, so it also shows offline and the placeholder window can use it.
+ * Game icons. Almost every game of the database (gameDatabase.ts) has an
+ * icon on Discord's CDN (`cdn.discordapp.com/app-icons/<id>/<hash>.png`); the
+ * window shows that address right away. A few programs Discord has no icon
+ * for (Firefox, Opera GX) use their website's icon, which only the server
+ * downloads. The icon of a library game is saved once to the icon cache, so
+ * it also shows offline and the placeholder window can use it.
  */
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { PROJECT_ROOT } from './config.ts';
+import { OFFLINE, PROJECT_ROOT } from './config.ts';
 import type { DatabaseGame } from './gameDatabaseSource.ts';
 
 /** Network lookup failures are expected offline; printed only with DQR_DEBUG=1. */
@@ -223,21 +224,39 @@ export const ICON_CACHE_DIR = path.join(PROJECT_ROOT, 'icon-cache');
 
 const store = createIconStore({ cacheDir: ICON_CACHE_DIR });
 
+type IconSource = Pick<DatabaseGame, 'id' | 'icon' | 'site'>;
+
 /** The game's icon on Discord's CDN. */
 export function discordIconUrl(game: Pick<DatabaseGame, 'id' | 'icon'>, size = 128): string | undefined {
   return game.icon ? `https://cdn.discordapp.com/app-icons/${game.id}/${game.icon}.png?size=${size}` : undefined;
 }
 
-/** The saved icon of a game, without touching the network. */
-export function localGameIcon(game: Pick<DatabaseGame, 'id'>): string | undefined {
-  return store.localIconForKey(game.id);
+/**
+ * Where the game's icon is downloaded from: Discord's CDN, or for a program
+ * Discord has no icon for (Firefox), its website's icon through Google's
+ * favicon service, which returns the site's largest icon.
+ */
+export function remoteIconUrl(game: IconSource): string | undefined {
+  if (game.icon) return discordIconUrl(game, 256);
+  return game.site ? `https://www.google.com/s2/favicons?domain=${encodeURIComponent(game.site)}&sz=256` : undefined;
 }
 
-/** Saves the game's Discord icon to icon-cache/ once. Returns its local URL. */
-export async function cacheGameIcon(game: Pick<DatabaseGame, 'id' | 'icon'>): Promise<string | undefined> {
-  const remote = discordIconUrl(game, 256);
-  if (!remote || store.recentlyFailed(game.id)) return store.localIconForKey(game.id);
-  const local = await store.saveRemoteIcon(game.id, remote);
-  if (!local) store.markFailed(game.id);
+/** File name part of a game's saved icon: `r-operagx` -> `roperagx`. */
+function iconKey(game: Pick<DatabaseGame, 'id'>): string {
+  return game.id.toLowerCase().replace(/[^a-z0-9]/g, '');
+}
+
+/** The saved icon of a game, without touching the network. */
+export function localGameIcon(game: Pick<DatabaseGame, 'id'>): string | undefined {
+  return store.localIconForKey(iconKey(game));
+}
+
+/** Saves the game's icon to the icon cache once. Returns its local URL. */
+export async function cacheGameIcon(game: IconSource): Promise<string | undefined> {
+  const key = iconKey(game);
+  const remote = remoteIconUrl(game);
+  if (!remote || OFFLINE || store.recentlyFailed(key)) return store.localIconForKey(key);
+  const local = await store.saveRemoteIcon(key, remote);
+  if (!local) store.markFailed(key);
   return local;
 }

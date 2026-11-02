@@ -15,7 +15,7 @@ It does not log into Discord, does not take a token, and does not change the Dis
 
 ## Download
 
-Get `OrbQuest.exe` from the [latest release](https://github.com/Ravan404/OrbQuest/releases/latest) and run it. No install is needed; it keeps its `Games` folder next to the exe. Each release lists the SHA-256 of the file (`OrbQuest.exe.sha256`).
+Get `OrbQuest.exe` from the [latest release](https://github.com/Ravan404/OrbQuest/releases/latest) and run it. No install is needed: the exe can sit in any folder, and the library is kept in `%LOCALAPPDATA%\OrbQuest`, so a newer exe downloaded somewhere else finds the same games. When a new release is out, a link to it appears next to the version at the top of the window. Each release lists the SHA-256 of the file (`OrbQuest.exe.sha256`).
 
 The exe is not code-signed, so Windows SmartScreen may say it is from an unknown publisher (More info → Run anyway). Some antivirus programs also flag the placeholder because it is a tiny program that runs under another game's name. The source of both is in this repository, and the release is built by GitHub Actions from it.
 
@@ -46,7 +46,7 @@ Windows package:
 build_windows_exe.bat
 ```
 
-That writes `dist\OrbQuest.exe`. It needs a Windows machine. Games and settings go in a `Games` folder next to the exe. If startup fails, look at `%LOCALAPPDATA%\OrbQuest\startup.log`. The backend's own messages go to `backend.log` in the same folder (the previous run is kept as `backend.log.1`). The window needs the Microsoft Edge WebView2 runtime, which Windows 10 and 11 normally have; on a PC without it, put a Fixed Version runtime in a `WebView2Runtime` folder next to the exe.
+That writes `dist\OrbQuest.exe`. It needs a Windows machine. Games and settings go in `%LOCALAPPDATA%\OrbQuest\Games`; versions before 1.5.0 kept that folder next to the exe and it is moved there on the first start. If startup fails, look at `%LOCALAPPDATA%\OrbQuest\startup.log`. The backend's own messages go to `backend.log` in the same folder (the previous run is kept as `backend.log.1`). The window needs the Microsoft Edge WebView2 runtime, which Windows 10 and 11 normally have; on a PC without it, put a Fixed Version runtime in a `WebView2Runtime` folder next to the exe.
 
 The placeholder (`placeholder_runtime.exe`) is committed as a binary. To rebuild it from `placeholder_runtime.c`, install MinGW-w64 and run `scripts\build-placeholder.bat`, then add the old file's SHA-256 to `LEGACY_SHA256_HASHES` in `src/server/placeholderUpgrade.ts` so existing copies are upgraded.
 
@@ -60,12 +60,14 @@ Settings are environment variables; the app does not read a `.env` file. In Powe
 | `DQR_BIND_HOST` | `127.0.0.1` | Bind address. Use `0.0.0.0` only if you mean to share it on the LAN |
 | `DQR_ALLOWED_HOSTS` | loopback names | Extra `Host` values, comma separated. `*.example.com` is allowed. A single `*` turns the check off |
 | `DQR_RATE_LIMIT_MAX` | `100` | Catalog requests per IP per minute |
-| `DQR_ROOT` | working directory | Where `Games/` and `icon-cache/` are written. The desktop build sets this to the exe folder |
+| `DQR_ROOT` | working directory | Where `Games/` and `icon-cache/` are written. The desktop build uses `%LOCALAPPDATA%\OrbQuest` |
 | `DQR_GAMES_DIR` | `<DQR_ROOT>/Games` | The library folder itself |
 | `DQR_ASSET_ROOT` | `DQR_ROOT` | Read-only files: `dist/` and `placeholder_runtime.exe` |
 | `DQR_DATABASE_REFRESH` | unset | Background database update. Unset means every six hours. `1` forces one at boot. `0` never |
 | `DQR_DATABASE_URL` | `src/server/gameDatabase.json` on this repository's `database` branch | Where the published game database is downloaded from. Point it at your fork's copy |
-| `DQR_OFFLINE` | unset | `1`: no network requests at all (database updates and icons; the full host list is in [SECURITY.md](SECURITY.md)). The bundled database and saved icons still work |
+| `DQR_STEAMAPPS` | Steam's own `steamapps` | The Steam library Steam quests are written to |
+| `DQR_UPDATE_CHECK` | unset | `0`: never ask GitHub for a new release |
+| `DQR_OFFLINE` | unset | `1`: no network requests at all (database updates, icons, the release check; the full host list is in [SECURITY.md](SECURITY.md)). The bundled database and saved icons still work |
 | `DQR_DEBUG` | unset | Any value: log failed icon downloads |
 | `DQR_NODE_EXE` | `node.exe` on `PATH` | Build only: the Node.js runtime `build_windows_exe.bat` packs into the exe |
 
@@ -78,7 +80,8 @@ Settings are environment variables; the app does not read a `.env` file. In Powe
 - Rescan picks up game folders you added by hand, drops ones you deleted, and puts back a placeholder that antivirus removed.
 - Rename a custom or scanned entry and change its placeholder executable. Catalog entries only accept timer changes.
 - Switch between a light and a dark theme, or follow the Windows setting (the button left of the sound switch).
-- Steam-manifest installs made by version 1.3.0 and earlier are still listed and can be removed; a real manifest or game folder is never deleted.
+- Add a quest Discord only detects through Steam, such as EA SPORTS FC 27 (marked Steam in the catalog). Steam has to be installed: the placeholder goes to `steamapps\common\<game>` of the Steam installation with a small `appmanifest_<id>.acf`, as the r/DiscordQuests post describes. A real install or manifest of the game is never overwritten, and removing the entry deletes only what the app wrote.
+- Open the library folder from the About page.
 
 ## Files on disk
 
@@ -92,7 +95,8 @@ Each library entry is a folder under `Games/`:
 | `Games/.state.json` | Elapsed time and timer settings |
 | `Games/.settings.json` | App settings: sound on/off, theme (`system`, `light` or `dark`) |
 | `Games/.game-database.json` | The last downloaded game database, when it is newer than the one in the build |
-| `Games/.special-games.json` | Steam-manifest installs made by version 1.3.0 and earlier |
+| `Games/.special-games.json` | Steam quests, which live in the Steam library instead of `Games/` |
+| `icon-cache/` | Saved game icons, next to `Games/` |
 
 If two folder names would become the same id (`Foo Bar` and `Foo-Bar`), the second id is stored in `.game-meta.json` so both stay in the library.
 
@@ -100,7 +104,7 @@ If two folder names would become the same id (`Foo Bar` and `Foo-Bar`), the seco
 
 `src/server/gameDatabase.json` is Discord's list of detectable games (`discord.com/api/v9/applications/detectable`) in compact form: every game with a Windows executable, the executables with the folder part Discord matches, its other names and its icon id.
 
-Discord also lists quest programs without any executable (Firefox, the Comet browser) and adds new quest games to its list late. For those the database takes the executable from r/DiscordQuests posts, marked `"source": "reddit"` and shown with an r/DiscordQuests label in the catalog. Such an entry is only used while Discord's list knows neither its executable nor the game; once Discord adds it, Discord's entry takes over. It keeps Discord's id and icon when Discord knows the program by name.
+Discord also lists quest programs without any executable (Firefox, the Comet browser) and adds new quest games to its list late. For those the database takes the executable from r/DiscordQuests posts, marked `"source": "reddit"` and shown with an r/DiscordQuests label in the catalog. Such an entry is only used while Discord's list knows neither its executable nor the game; once Discord adds it, Discord's entry takes over. It keeps Discord's id and icon when Discord knows the program by name; a program Discord has no icon for (Firefox, Opera GX) gets its website in `"site"`, and the app shows that site's icon. A quest the post sets up through Steam keeps Steam's app id and folder in `"steam"`.
 
 `src/server/featuredGames.json` names the games shown on the catalog page before anything is searched: the ones that have had Discord quests, plus every r/DiscordQuests entry.
 
@@ -126,7 +130,7 @@ src/dialogs/               Add/edit game, start script
 src/hooks/, src/utils/     Polling, timer maths, start scripts, executable choice
 src/strings.ts             Every text the window shows
 src/index.css              Light and dark theme colours
-src/server/                Library, game database, catalog, icons, Steam checks
+src/server/                Library, game database, catalog, icons, Steam quests, release check
 src/server/gameDatabase.json  Discord's list of detectable games (compact)
 src/server/featuredGames.json Games shown before a search
 src/server/reddit/         Reads r/DiscordQuests for the database update (not part of the app)
@@ -149,8 +153,8 @@ docs/                      Screenshot for this README
 - Rejects a `Host` header that is not loopback, unless `DQR_ALLOWED_HOSTS` allows it. That blocks a page from calling this API by pointing its own hostname at `127.0.0.1`.
 - Production builds send a Content-Security-Policy. The dev server does not, so the Vite client can connect.
 - `dist/server.cjs`, its sourcemap and the database JSON files are not served as static files.
-- File writes stay inside `Games/` and `icon-cache/`. An executable path from a request or from Discord's list must stay inside its game folder (no `..`, drive letters or absolute paths).
-- Images are only loaded from the app itself and `cdn.discordapp.com`.
+- File writes stay inside `Games/` and `icon-cache/`, and for a Steam quest inside that game's folder and manifest in Steam's `steamapps`. An executable path from a request or from Discord's list must stay inside its game folder (no `..`, drive letters or absolute paths).
+- Images are only loaded from the app itself and `cdn.discordapp.com`. A website icon is downloaded by the server and served from `icon-cache/`.
 
 ## Contributing
 
