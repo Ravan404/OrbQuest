@@ -6,10 +6,15 @@ import { Button, IconButton } from './ui';
 
 export type View = 'library' | 'catalog' | 'about';
 
+const UPDATE_PILL =
+  'flex items-center gap-1 self-center rounded-full bg-primary px-2 py-0.5 text-[11px] font-medium text-on-primary hover:bg-primary-hover';
+
 interface TopBarProps {
   version: string;
-  /** A newer release, shown as a link to its page. */
+  /** A newer release: a button when the app installs it itself, else a link to its page. */
   update: UpdateInfo | null;
+  installable: boolean;
+  onInstallUpdate: () => void;
   view: View;
   onView: (view: View) => void;
   runningCount: number;
@@ -25,6 +30,8 @@ interface TopBarProps {
 export const TopBar: React.FC<TopBarProps> = ({
   version,
   update,
+  installable,
+  onInstallUpdate,
   view,
   onView,
   runningCount,
@@ -46,14 +53,26 @@ export const TopBar: React.FC<TopBarProps> = ({
       <div className="mr-5 flex items-baseline gap-2">
         <span className="text-[14px] font-semibold tracking-tight text-text">{t('appTitle')}</span>
         <span className="tabular text-[11px] text-faint">{version}</span>
-        {update && (
+        {update && installable && (
+          <button
+            id="update-available-link"
+            type="button"
+            onClick={onInstallUpdate}
+            title={t('updateInstallTitle', { version: update.version })}
+            className={UPDATE_PILL}
+          >
+            <ArrowUpCircle className="h-3 w-3" />
+            {t('updateAvailable', { version: update.version })}
+          </button>
+        )}
+        {update && !installable && (
           <a
             id="update-available-link"
             href={update.url}
             target="_blank"
             rel="noreferrer"
             title={t('updateTitle', { version: update.version })}
-            className="flex items-center gap-1 self-center rounded-full bg-primary px-2 py-0.5 text-[11px] font-medium text-on-primary hover:bg-primary-hover"
+            className={UPDATE_PILL}
           >
             <ArrowUpCircle className="h-3 w-3" />
             {t('updateAvailable', { version: update.version })}

@@ -2,8 +2,7 @@
  * Tells the window when a newer OrbQuest release is out. GitHub's API is
  * asked for the latest published release (drafts and pre-releases are not
  * returned) right at the start and then every six hours; a failed check is
- * tried again after ten minutes. Nothing is downloaded or installed: the
- * window links to the release page.
+ * tried again after ten minutes. Installing it is updateInstall.ts.
  *
  *   DQR_UPDATE_CHECK=0   never ask (DQR_OFFLINE=1 also turns it off)
  */
@@ -12,6 +11,8 @@ import { OFFLINE } from './config.ts';
 import { APP_VERSION } from '../version.ts';
 
 export const LATEST_RELEASE_URL = 'https://api.github.com/repos/Ravan404/OrbQuest/releases/latest';
+/** Release files are only ever downloaded from here. */
+export const RELEASE_DOWNLOAD_PREFIX = 'https://github.com/Ravan404/OrbQuest/releases/download/';
 
 const CHECK_INTERVAL_MS = 6 * 60 * 60 * 1000;
 const RETRY_INTERVAL_MS = 10 * 60 * 1000;
@@ -23,6 +24,8 @@ export interface UpdateInfo {
   version: string;
   /** The release page on GitHub. */
   url: string;
+  /** Download address of each release file, by file name. */
+  assets?: Record<string, string>;
 }
 
 let latest: UpdateInfo | null = null;
@@ -53,7 +56,19 @@ export function parseLatestRelease(body: unknown): UpdateInfo | null {
   const tag = typeof release.tag_name === 'string' ? release.tag_name.trim() : '';
   const url = typeof release.html_url === 'string' ? release.html_url : '';
   if (!versionParts(tag) || !/^https:\/\/github\.com\/[\w.-]+\/[\w.-]+\/releases\//.test(url)) return null;
-  return { version: tag.replace(/^v/, ''), url };
+  const assets: Record<string, string> = {};
+  for (const asset of Array.isArray(release.assets) ? release.assets : []) {
+    const { name, browser_download_url: download } = (asset ?? {}) as Record<string, unknown>;
+    if (
+      typeof name === 'string' &&
+      /^[\w.-]+$/.test(name) &&
+      typeof download === 'string' &&
+      download.startsWith(RELEASE_DOWNLOAD_PREFIX)
+    ) {
+      assets[name] = download;
+    }
+  }
+  return { version: tag.replace(/^v/, ''), url, ...(Object.keys(assets).length ? { assets } : {}) };
 }
 
 /** Asks GitHub once; true when it answered. A failure keeps what the last check found. */

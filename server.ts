@@ -13,6 +13,7 @@ import { ICON_CACHE_DIR } from './src/server/iconStore.ts';
 import { getSettings } from './src/server/settingsStore.ts';
 import { requireSession, sameSecret, startSession, withoutSecrets } from './src/server/session.ts';
 import { scheduleUpdateChecks, updateAnswer } from './src/server/updateCheck.ts';
+import { canInstall, downloadState, startUpdateDownload } from './src/server/updateInstall.ts';
 import { spawn } from 'node:child_process';
 
 const app = express();
@@ -109,7 +110,16 @@ app.get('/api/profile', (_req, res) => {
 });
 // A newer release, found by updateCheck.ts; the window asks now and then.
 app.get('/api/update', async (_req, res) => {
-  res.json({ update: await updateAnswer() });
+  const update = await updateAnswer();
+  res.json({
+    update: update ? { version: update.version, url: update.url } : null,
+    installable: canInstall(update),
+    download: downloadState(),
+  });
+});
+// Downloads and checks the update; the desktop app installs it (updateInstall.ts).
+app.post('/api/update/download', rateLimited, (_req, res) => {
+  res.json(startUpdateDownload());
 });
 // Opens the library folder in Explorer (Windows only). The path is fixed.
 app.post('/api/open-games-folder', rateLimited, (_req, res) => {

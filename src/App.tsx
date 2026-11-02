@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import type { AppProfile, Game, ToastNotification, UpdateInfo } from './types';
+import type { AppProfile, Game, ToastNotification, UpdateStatus } from './types';
 import { api, type GameDraft, type ThemeSetting, type TimerSettings } from './api';
 import { t } from './strings';
 import { useGamePoller } from './hooks/useGamePoller';
@@ -13,6 +13,7 @@ import { CatalogView } from './views/CatalogView';
 import { AboutView } from './views/AboutView';
 import { GameDialog } from './dialogs/GameDialog';
 import { ScriptDialog } from './dialogs/ScriptDialog';
+import { UpdateDialog } from './dialogs/UpdateDialog';
 
 type NoticeTone = NonNullable<ToastNotification['type']>;
 
@@ -44,7 +45,7 @@ export default function App() {
   const [profile, setProfile] = useState<AppProfile | null>(null);
   const [profileFailed, setProfileFailed] = useState(false);
   const [profileAttempt, setProfileAttempt] = useState(0);
-  const [update, setUpdate] = useState<UpdateInfo | null>(null);
+  const [updateStatus, setUpdateStatus] = useState<UpdateStatus | null>(null);
 
   const [games, setGames] = useState<Game[]>([]);
   const [selectedGameId, setSelectedGameId] = useState<string | null>(null);
@@ -58,7 +59,9 @@ export default function App() {
   });
 
   const [notice, setNotice] = useState<ToastNotification | null>(null);
-  const [dialog, setDialog] = useState<{ kind: 'add' } | { kind: 'edit' | 'script'; game: Game } | null>(null);
+  const [dialog, setDialog] = useState<{ kind: 'add' | 'update' } | { kind: 'edit' | 'script'; game: Game } | null>(
+    null
+  );
 
   // Games that already showed their "timer finished" notice, and games whose
   // notice may fire again after a reset or a new launch.
@@ -97,7 +100,7 @@ export default function App() {
     const check = () =>
       api
         .update()
-        .then((result) => setUpdate(result.update))
+        .then(setUpdateStatus)
         .catch(() => {});
     check();
     const timer = window.setInterval(check, UPDATE_POLL_MS);
@@ -317,7 +320,9 @@ export default function App() {
     <div className="flex h-full flex-col overflow-hidden">
       <TopBar
         version={profile.version}
-        update={update}
+        update={updateStatus?.update ?? null}
+        installable={Boolean(updateStatus?.installable)}
+        onInstallUpdate={() => setDialog({ kind: 'update' })}
         view={view}
         onView={openView}
         runningCount={runningCount}
@@ -397,6 +402,9 @@ export default function App() {
           onClose={() => setDialog(null)}
           onNotice={(title, text, tone) => showNotice(title, text, tone === 'warning' ? 'warning' : 'success')}
         />
+      )}
+      {dialog?.kind === 'update' && updateStatus?.update && (
+        <UpdateDialog update={updateStatus.update} onClose={() => setDialog(null)} />
       )}
     </div>
   );

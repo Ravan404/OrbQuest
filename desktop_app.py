@@ -11,7 +11,10 @@ import shutil
 import ctypes
 from ctypes import wintypes
 import json
+import hashlib
+import re
 import secrets
+import threading
 from single_instance import SingleInstance, focus_existing_window
 
 
@@ -23,6 +26,9 @@ API_TOKEN = None
 SERVER_LOG = None
 # Folder that holds Games/ and icon-cache/; set by main().
 DATA_ROOT = None
+# The checked update to start once the window is closed (apply_update).
+UPDATE_TO_RUN = None
+WINDOW = None
 
 # Application metadata
 APP_NAME = "OrbQuest"
@@ -165,6 +171,100 @@ def data_root() -> Path:
             if new_icons.exists() or not move_folder(old_icons, new_icons):
                 shutil.rmtree(old_icons, ignore_errors=True)
     return new_root
+
+
+def install_kind() -> str | None:
+    """How this copy runs: "installed" by OrbQuest-Setup (its uninstaller is
+    next to the exe), "portable" (the single exe), or None (from source)."""
+    if not getattr(sys, "frozen", False):
+        return None
+    return "installed" if (application_root() / "unins000.exe").is_file() else "portable"
+
+
+def file_sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with open(path, "rb") as handle:
+        for block in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(block)
+    return digest.hexdigest()
+
+
+def checked_pending_update() -> dict | None:
+    """The update the server downloaded and checked (src/server/updateInstall.ts),
+    checked once more here: the right kind, a file where only an update can be,
+    with the SHA-256 the release lists."""
+    try:
+        pending = json.loads((DATA_ROOT / "update" / "pending.json").read_text("utf-8"))
+        kind, file, sha256 = pending.get("kind"), Path(pending.get("file", "")), pending.get("sha256", "")
+    except (OSError, ValueError, AttributeError, TypeError):
+        return None
+    if kind != install_kind() or not file.is_file():
+        return None
+    if kind == "installed":
+        expected_folder = (DATA_ROOT / "update").resolve()
+        name_ok = re.fullmatch(r"OrbQuest-Setup-\d+\.\d+\.\d+\.exe", file.name)
+    else:
+        expected_folder = application_root().resolve()
+        name_ok = re.fullmatch(r"OrbQuest-\d+\.\d+\.\d+\.exe", file.name)
+    if file.resolve().parent != expected_folder or not name_ok:
+        return None
+    if not re.fullmatch(r"[0-9a-f]{64}", sha256) or file_sha256(file) != sha256:
+        return None
+    return {"kind": kind, "file": file.resolve()}
+
+
+class DesktopApi:
+    """What the window may ask of the desktop app (window.pywebview.api)."""
+
+    def apply_update(self) -> dict:
+        global UPDATE_TO_RUN
+        update = checked_pending_update()
+        if update is None:
+            return {"ok": False, "error": "The downloaded update could not be checked."}
+        UPDATE_TO_RUN = update
+        threading.Timer(0.3, lambda: WINDOW.destroy() if WINDOW else None).start()
+        return {"ok": True}
+
+
+def run_pending_update() -> None:
+    """Starts the update after OrbQuest has closed and released its lock."""
+    if UPDATE_TO_RUN is None:
+        return
+    flags = getattr(subprocess, "DETACHED_PROCESS", 0) | getattr(subprocess, "CREATE_NEW_PROCESS_GROUP", 0)
+    file = str(UPDATE_TO_RUN["file"])
+    if UPDATE_TO_RUN["kind"] == "installed":
+        arguments = [file, "/VERYSILENT", "/SUPPRESSMSGBOXES", "/NORESTART", "/RELAUNCH=1"]
+    else:
+        arguments = [file, "--replace", str(Path(sys.executable).resolve())]
+    subprocess.Popen(arguments, creationflags=flags, close_fds=True)
+
+
+def remove_replaced_exe() -> None:
+    """A portable update starts with --replace <old exe>: delete the old exe
+    once its process has gone, unless it is this one."""
+    if "--replace" not in sys.argv:
+        return
+    index = sys.argv.index("--replace")
+    if index + 1 >= len(sys.argv):
+        return
+    old = Path(sys.argv[index + 1])
+    current = Path(sys.executable).resolve()
+    if not getattr(sys, "frozen", False) or old.resolve() == current or old.parent.resolve() != current.parent:
+        return
+    if not re.fullmatch(r"OrbQuest(-\d+\.\d+\.\d+)?\.exe", old.name):
+        return
+
+    def remove() -> None:
+        for _ in range(120):
+            try:
+                old.unlink()
+                return
+            except FileNotFoundError:
+                return
+            except OSError:
+                time.sleep(0.5)
+
+    threading.Thread(target=remove, daemon=True).start()
 
 
 def startup_log_path() -> Path:
@@ -336,6 +436,10 @@ def start_backend_server() -> None:
             "DQR_API_TOKEN": API_TOKEN,
         }
     )
+    kind = install_kind()
+    if kind:
+        environment["DQR_INSTALL_KIND"] = kind
+        environment["DQR_APP_EXE"] = str(Path(sys.executable).resolve())
     startup_info = None
     creation_flags = getattr(subprocess, "CREATE_NO_WINDOW", 0)
     if sys.platform == "win32":
@@ -413,9 +517,11 @@ atexit.register(close_backend_log)
 
 
 def main() -> None:
-    global DATA_ROOT
+    global DATA_ROOT, WINDOW
     # Runs under the instance lock: only one copy moves an old library.
     DATA_ROOT = data_root()
+    # An update that was installed (or given up) leaves its download behind.
+    shutil.rmtree(DATA_ROOT / "update", ignore_errors=True)
     # Imported after the instance lock is acquired. The second launch must
     # never unpack assets or spawn a second Node backend.
     try:
@@ -436,13 +542,14 @@ def main() -> None:
 
     start_backend_server()
     try:
-        webview.create_window(
+        WINDOW = webview.create_window(
             title=f"{WINDOW_TITLE_PREFIX}{APP_VERSION}",
             url=f"http://127.0.0.1:{PORT}/session?token={API_TOKEN}",
             width=1180,
             height=760,
             min_size=(900, 600),
             background_color=window_background(),
+            js_api=DesktopApi(),
         )
         if has_fixed_runtime:
             webview.start(gui="edgechromium", debug=False)
@@ -456,6 +563,7 @@ def main() -> None:
 
 def run_desktop() -> None:
     hide_console_window()
+    remove_replaced_exe()
     try:
         # One mutex for every copy of the app. A crash releases it.
         with SingleInstance() as instance:
@@ -477,6 +585,8 @@ def run_desktop() -> None:
                 # Keep the mutex until the Node backend and child game
                 # processes have been shut down.
                 stop_backend_server()
+        # The lock is released: the update may start OrbQuest again.
+        run_pending_update()
     except Exception as error:
         report_startup_error(error)
 
