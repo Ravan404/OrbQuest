@@ -28,6 +28,7 @@ import { getSettings } from '../settingsStore.ts';
 import { writePlaceholderIcon } from '../placeholderIcon.ts';
 import { MANAGED_INSTALL_MARKER } from '../steamLibrarySafety.ts';
 import type { IdParams } from './gameInput.ts';
+import { withoutSecrets } from '../session.ts';
 
 /** Starting a game: writes or repairs its placeholder and starts it with the timer. */
 
@@ -131,8 +132,8 @@ export function launchGame(req: Request<IdParams>, res: Response) {
   game.completed = false;
   const config = BUFFER_PRESET_DURATIONS[prefs.bufferPreset];
   let child: ChildProcess;
-  // The desktop control token must never be inherited by a launched game.
-  const { DQR_SHUTDOWN_TOKEN: _shutdownToken, ...childEnvironment } = process.env;
+  // A launched game never sees the desktop app's tokens.
+  const childEnvironment = withoutSecrets();
   const launchEnv = {
     ...childEnvironment,
     DQR_GAME_NAME: game.name,

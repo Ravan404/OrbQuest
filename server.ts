@@ -1,5 +1,4 @@
 import express from 'express';
-import { timingSafeEqual } from 'node:crypto';
 import path from 'node:path';
 import fs from 'node:fs';
 import { ASSET_ROOT, BIND_HOST, GAMES_DIR, PORT, RATE_LIMIT_MAX_REQUESTS } from './src/server/config.ts';
@@ -12,6 +11,7 @@ import { APP_VERSION } from './src/version.ts';
 import { getGameDatabaseInfo, loadGameDatabase, scheduleGameDatabaseRefresh } from './src/server/gameDatabase.ts';
 import { ICON_CACHE_DIR } from './src/server/iconStore.ts';
 import { getSettings } from './src/server/settingsStore.ts';
+import { requireSession, sameSecret, startSession, withoutSecrets } from './src/server/session.ts';
 import { scheduleUpdateChecks, updateAnswer } from './src/server/updateCheck.ts';
 import { spawn } from 'node:child_process';
 
@@ -96,6 +96,10 @@ const rateLimited = (req: express.Request, res: express.Response, next: express.
 // API Routes
 // ---------------------------------------------------------------
 
+// Only the desktop window may use the API (session.ts).
+app.get('/session', startSession);
+app.use('/api', requireSession);
+
 app.get('/api/profile', (_req, res) => {
   res.json({
     version: APP_VERSION,
@@ -112,7 +116,7 @@ app.post('/api/open-games-folder', rateLimited, (_req, res) => {
   if (process.platform !== 'win32') return res.sendStatus(404);
   try {
     fs.mkdirSync(GAMES_DIR, { recursive: true });
-    spawn('explorer.exe', [GAMES_DIR], { detached: true, stdio: 'ignore' })
+    spawn('explorer.exe', [GAMES_DIR], { detached: true, stdio: 'ignore', env: withoutSecrets() })
       .on('error', () => {})
       .unref();
     res.json({ success: true });
@@ -125,12 +129,9 @@ app.post('/api/open-games-folder', rateLimited, (_req, res) => {
 // ephemeral port for its own backend. Without the token both routes are 404.
 function desktopAuthorized(req: express.Request): boolean {
   const expected = process.env.DQR_SHUTDOWN_TOKEN;
-  const actual = req.get('X-DQR-Shutdown-Token') || '';
   const remote = req.socket.remoteAddress;
   if (!expected || !['127.0.0.1', '::1', '::ffff:127.0.0.1'].includes(remote || '')) return false;
-  const expectedBytes = Buffer.from(expected);
-  const actualBytes = Buffer.from(actual);
-  return actualBytes.length === expectedBytes.length && timingSafeEqual(actualBytes, expectedBytes);
+  return sameSecret(req.get('X-DQR-Shutdown-Token') || '', expected);
 }
 app.get('/api/internal/ready', (req, res) => {
   if (!process.env.DQR_SHUTDOWN_TOKEN) return res.sendStatus(404);

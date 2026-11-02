@@ -18,6 +18,8 @@ from single_instance import SingleInstance, focus_existing_window
 PORT = None
 SERVER_PROCESS = None
 SERVER_SHUTDOWN_TOKEN = None
+# Only the window that opened /session with it may use the API (src/server/session.ts).
+API_TOKEN = None
 SERVER_LOG = None
 # Folder that holds Games/ and icon-cache/; set by main().
 DATA_ROOT = None
@@ -313,9 +315,10 @@ def wait_for_server(timeout: float = 30.0) -> None:
 
 def start_backend_server() -> None:
     """Start the bundled backend on loopback."""
-    global SERVER_PROCESS, PORT, SERVER_SHUTDOWN_TOKEN, SERVER_LOG
+    global SERVER_PROCESS, PORT, SERVER_SHUTDOWN_TOKEN, API_TOKEN, SERVER_LOG
     PORT = choose_port()
     SERVER_SHUTDOWN_TOKEN = secrets.token_urlsafe(32)
+    API_TOKEN = secrets.token_urlsafe(32)
     bundled_server = resource_path("dist", "server.cjs")
     if not bundled_server.is_file():
         raise FileNotFoundError(f"Backend bundle not found: {bundled_server}")
@@ -330,6 +333,7 @@ def start_backend_server() -> None:
             "DQR_ASSET_ROOT": str(asset_root()),
             "DQR_BIND_HOST": "127.0.0.1",
             "DQR_SHUTDOWN_TOKEN": SERVER_SHUTDOWN_TOKEN,
+            "DQR_API_TOKEN": API_TOKEN,
         }
     )
     startup_info = None
@@ -434,7 +438,7 @@ def main() -> None:
     try:
         webview.create_window(
             title=f"{WINDOW_TITLE_PREFIX}{APP_VERSION}",
-            url=f"http://127.0.0.1:{PORT}",
+            url=f"http://127.0.0.1:{PORT}/session?token={API_TOKEN}",
             width=1180,
             height=760,
             min_size=(900, 600),
