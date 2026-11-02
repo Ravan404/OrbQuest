@@ -148,7 +148,7 @@ test('icons come from Discord, or from the website of a program Discord has none
 });
 
 test('a newer GitHub release is offered, anything else is not', async () => {
-  const { availableUpdate, checkForUpdate, isNewerVersion, parseLatestRelease } = await import('../src/server/updateCheck.ts');
+  const { availableUpdate, checkForUpdate, isNewerVersion, parseLatestRelease, updateAnswer } = await import('../src/server/updateCheck.ts');
   const { APP_VERSION } = await import('../src/version.ts');
   assert.ok(isNewerVersion('1.10.0', '1.9.3'));
   assert.ok(isNewerVersion('v2.0.0', '1.4.0'));
@@ -169,4 +169,13 @@ test('a newer GitHub release is offered, anything else is not', async () => {
   assert.deepEqual(availableUpdate(), { version: '99.0.0', url: page });
   await checkForUpdate(answer({ message: 'rate limited' }, 403));
   assert.deepEqual(availableUpdate(), { version: '99.0.0', url: page }, 'a failed check keeps what was found');
+  assert.equal(await checkForUpdate(answer({}, 500)), false, 'a failed check reports it, so it is retried soon');
+
+  // The window's first question waits for a check that is still running.
+  let reply: (response: Response) => void = () => {};
+  const slow = checkForUpdate(() => new Promise<Response>((resolve) => (reply = resolve)));
+  const answerPromise = updateAnswer(5_000);
+  reply(new Response(JSON.stringify({ tag_name: 'v99.1.0', html_url: page }), { status: 200 }));
+  assert.equal(await slow, true);
+  assert.deepEqual(await answerPromise, { version: '99.1.0', url: page });
 });

@@ -91,19 +91,17 @@ export default function App() {
     return () => controller.abort();
   }, [profileAttempt]);
 
-  // The server checks GitHub for a new release every six hours.
+  // The server asks GitHub for a new release at its start and every six
+  // hours; the first answer waits for that first check.
   useEffect(() => {
     const check = () =>
       api
         .update()
         .then((result) => setUpdate(result.update))
         .catch(() => {});
-    const first = window.setTimeout(check, 20_000);
+    check();
     const timer = window.setInterval(check, UPDATE_POLL_MS);
-    return () => {
-      window.clearTimeout(first);
-      window.clearInterval(timer);
-    };
+    return () => window.clearInterval(timer);
   }, []);
 
   const loadGames = useCallback(async (rescan = false): Promise<Game[] | null> => {

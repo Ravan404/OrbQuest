@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+## [1.5.2] — 2026-11-03
+
+### Fixed
+
+- A new release showed up late, sometimes only after five minutes: the window asked once 20 seconds after the start, often before the server had heard back from GitHub, and then only every five minutes. The server now asks GitHub as soon as it starts, the window asks right away and gets the answer of that first check, and a check that failed (no connection yet) is tried again after ten minutes instead of six hours.
+
 ## [1.5.1] — 2026-11-03
 
 ### Changed

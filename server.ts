@@ -27,7 +27,7 @@ import { APP_VERSION } from './src/version.ts';
 import { getGameDatabaseInfo, loadGameDatabase, scheduleGameDatabaseRefresh } from './src/server/gameDatabase.ts';
 import { ICON_CACHE_DIR } from './src/server/iconStore.ts';
 import { getSettings } from './src/server/settingsStore.ts';
-import { availableUpdate, scheduleUpdateChecks } from './src/server/updateCheck.ts';
+import { scheduleUpdateChecks, updateAnswer } from './src/server/updateCheck.ts';
 import { spawn } from 'node:child_process';
 
 const app = express();
@@ -119,8 +119,8 @@ app.get('/api/profile', (_req, res) => {
   });
 });
 // A newer release, found by updateCheck.ts; the window asks now and then.
-app.get('/api/update', (_req, res) => {
-  res.json({ update: availableUpdate() });
+app.get('/api/update', async (_req, res) => {
+  res.json({ update: await updateAnswer() });
 });
 // Opens the library folder in Explorer (Windows only). The path is fixed.
 app.post('/api/open-games-folder', rateLimited, (_req, res) => {
