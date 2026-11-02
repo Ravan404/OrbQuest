@@ -1,6 +1,5 @@
 import React from 'react';
-import { ArrowUpCircle, Monitor, Moon, Plus, RefreshCw, Sun, Volume2, VolumeX } from 'lucide-react';
-import type { ThemeSetting } from '../api';
+import { ArrowUpCircle, Moon, Plus, RefreshCw, Sun, Volume2, VolumeX } from 'lucide-react';
 import type { UpdateInfo } from '../types';
 import { t } from '../strings';
 import { Button, IconButton } from './ui';
@@ -14,21 +13,14 @@ interface TopBarProps {
   view: View;
   onView: (view: View) => void;
   runningCount: number;
-  theme: ThemeSetting;
-  onCycleTheme: () => void;
+  /** The dark theme is on screen. */
+  dark: boolean;
+  onToggleTheme: () => void;
   soundEnabled: boolean;
   onToggleSound: () => void;
   onRescan: () => void;
   onAddGame: () => void;
 }
-
-const THEME_ICON: Record<ThemeSetting, React.ReactNode> = {
-  system: <Monitor className="h-4 w-4" />,
-  light: <Sun className="h-4 w-4" />,
-  dark: <Moon className="h-4 w-4" />,
-};
-
-const THEME_LABEL = { system: 'themeSystem', light: 'themeLight', dark: 'themeDark' } as const;
 
 export const TopBar: React.FC<TopBarProps> = ({
   version,
@@ -36,8 +28,8 @@ export const TopBar: React.FC<TopBarProps> = ({
   view,
   onView,
   runningCount,
-  theme,
-  onCycleTheme,
+  dark,
+  onToggleTheme,
   soundEnabled,
   onToggleSound,
   onRescan,
@@ -94,8 +86,9 @@ export const TopBar: React.FC<TopBarProps> = ({
       </nav>
 
       <div className="ml-auto flex items-center gap-1">
-        <IconButton id="theme-toggle-btn" label={t(THEME_LABEL[theme])} onClick={onCycleTheme}>
-          {THEME_ICON[theme]}
+        {/* Shows the theme a click switches to. */}
+        <IconButton id="theme-toggle-btn" label={dark ? t('themeToLight') : t('themeToDark')} onClick={onToggleTheme}>
+          {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
         </IconButton>
         <IconButton id="sound-toggle-btn" label={soundEnabled ? t('soundOn') : t('soundOff')} aria-pressed={soundEnabled} onClick={onToggleSound}>
           {soundEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}

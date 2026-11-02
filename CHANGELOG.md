@@ -2,6 +2,18 @@
 
 ## [Unreleased]
 
+## [1.5.1] — 2026-11-03
+
+### Changed
+
+- **Start scripts are saved straight to the Downloads folder** as `<Game> - OrbQuest.bat` (or `.ps1`, `.py`), so they are easy to find and not mistaken for the game's own files. Before, the window downloaded them as `run_<id>.bat` to wherever it chose.
+- **The theme button switches between light and dark** and shows the theme it switches to. The app follows Windows until the button is used, then keeps the choice; the saved theme is on the page from the first frame.
+
+### Fixed
+
+- The placeholder window of a Steam quest (EA SPORTS FC 27) had no game icon.
+- A request for one game could reach another: games were also looked up by display name or folder, so of two games with the same name the first one answered. Only the id counts now.
+
 ## [1.5.0] — 2026-11-02
 
 ### Added

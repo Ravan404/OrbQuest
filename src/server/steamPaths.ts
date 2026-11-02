@@ -5,10 +5,10 @@
  * lists.
  */
 
-import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { readRegistryValue } from './windowsRegistry.ts';
 
 export interface SteamPathEnvironment {
   env?: NodeJS.ProcessEnv;
@@ -30,18 +30,8 @@ function uniquePaths(paths: string[]): string[] {
 
 /** `SteamPath` under HKCU\Software\Valve\Steam, or null. */
 function readRegistrySteamPath(): string | null {
-  try {
-    const output = execFileSync('reg', ['query', 'HKCU\\Software\\Valve\\Steam', '/v', 'SteamPath'], {
-      encoding: 'utf8',
-      timeout: 5_000,
-      windowsHide: true,
-      stdio: ['ignore', 'pipe', 'ignore'],
-    });
-    const value = /SteamPath\s+REG_SZ\s+(.+)/i.exec(output)?.[1]?.trim();
-    return value ? path.normalize(value) : null;
-  } catch {
-    return null;
-  }
+  const value = readRegistryValue('HKCU\\Software\\Valve\\Steam', 'SteamPath');
+  return value ? path.normalize(value) : null;
 }
 
 function readLibraryRoots(steamAppsPath: string): string[] {

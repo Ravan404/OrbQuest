@@ -15,9 +15,8 @@ const strings = {
   rescanTitle: 'Look for new or removed game folders',
   soundOn: 'Sounds on',
   soundOff: 'Sounds off',
-  themeSystem: 'Theme: follow Windows',
-  themeLight: 'Theme: light',
-  themeDark: 'Theme: dark',
+  themeToLight: 'Switch to the light theme',
+  themeToDark: 'Switch to the dark theme',
 
   // Status bar
   nothingSelected: 'No game selected',
@@ -123,8 +122,8 @@ const strings = {
   copy: 'Copy',
   copied: 'Copied',
   copyFailed: 'Copy failed. Select the text and copy it.',
-  download: 'Download',
-  downloaded: 'Saved',
+  download: 'Save to Downloads',
+  downloaded: 'Saved to Downloads',
 
   // Notices
   noticeError: 'Something went wrong',

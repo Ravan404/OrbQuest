@@ -320,6 +320,8 @@ test('a Steam quest from the catalog is written into the Steam library with its 
     assert.ok(store.gamesMap.has('steam-4080220'));
     assert.equal(store.gamesMap.get('steam-4080220')!.appId, '1531874756096295054');
 
+    // The placeholder's icon is written next to it on launch; it is ours too.
+    fs.writeFileSync(path.join(installDir, '.game-icon.ico'), 'icon');
     const removed = await call('DELETE', '/api/games/steam-4080220');
     assert.equal(removed.status, 200);
     assert.ok(!fs.existsSync(installDir));
@@ -349,4 +351,33 @@ test('a Steam quest from the catalog is written into the Steam library with its 
   } finally {
     delete process.env.DQR_STEAMAPPS;
   }
+});
+
+test('a start script is saved to the Downloads folder under the game name', async () => {
+  const downloads = path.join(sandboxRoot, 'Downloads');
+  process.env.DQR_DOWNLOADS_DIR = downloads;
+  try {
+    const game = await addGame('Kilo Game', 'kilo.exe');
+    const saved = await call('POST', `/api/games/${game.id}/script`, { kind: 'bat' });
+    assert.equal(saved.status, 200, JSON.stringify(saved.json));
+    assert.equal(saved.json.fileName, 'Kilo Game - OrbQuest.bat');
+    const file = path.join(downloads, 'Kilo Game - OrbQuest.bat');
+    assert.equal(saved.json.path, file);
+    assert.match(fs.readFileSync(file, 'utf8'), /kilo\.exe/);
+    assert.equal((await call('POST', `/api/games/${game.id}/script`, { kind: 'exe' })).status, 400);
+    assert.equal((await call('POST', '/api/games/nope/script', { kind: 'py' })).status, 404);
+  } finally {
+    delete process.env.DQR_DOWNLOADS_DIR;
+  }
+});
+
+test('requests reach a game only by its id, never by its name', async () => {
+  const first = await addGame('Lima', 'lima.exe');
+  const second = await addGame('Lima', 'lima2.exe', { folderPath: 'Lima Two' });
+  assert.notEqual(first.id, second.id);
+  assert.equal((await call('DELETE', '/api/games/Lima%20Two')).json.deleted, false);
+  assert.equal((await call('POST', '/api/games/Lima%20Two/stop')).status, 404, 'a folder name is not an id');
+  assert.ok(store.gamesMap.has(second.id));
+  assert.equal((await call('DELETE', `/api/games/${second.id}`)).status, 200);
+  assert.ok(store.gamesMap.has(first.id));
 });

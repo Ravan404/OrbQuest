@@ -20,13 +20,25 @@ type NoticeTone = NonNullable<ToastNotification['type']>;
 /** How often the window asks the local server whether a new release was found. */
 const UPDATE_POLL_MS = 5 * 60 * 1000;
 
-const NEXT_THEME: Record<ThemeSetting, ThemeSetting> = { system: 'light', light: 'dark', dark: 'system' };
-
 /** Pins the page to a theme; `system` leaves it to the Windows setting. */
 function applyTheme(theme: ThemeSetting) {
   const root = document.documentElement;
   if (theme === 'system') delete root.dataset.theme;
   else root.dataset.theme = theme;
+}
+
+const DARK_QUERY = '(prefers-color-scheme: dark)';
+
+/** Whether Windows uses dark apps; follows changes while the app is open. */
+function useSystemDark(): boolean {
+  const [dark, setDark] = useState(() => window.matchMedia(DARK_QUERY).matches);
+  useEffect(() => {
+    const query = window.matchMedia(DARK_QUERY);
+    const update = () => setDark(query.matches);
+    query.addEventListener('change', update);
+    return () => query.removeEventListener('change', update);
+  }, []);
+  return dark;
 }
 
 export default function App() {
@@ -40,7 +52,11 @@ export default function App() {
   const [view, setView] = useState<View>('library');
 
   const [soundEnabled, setSoundEnabled] = useState(true);
-  const [theme, setTheme] = useState<ThemeSetting>('system');
+  // The server puts the saved theme on the page (server.ts).
+  const [theme, setTheme] = useState<ThemeSetting>(() => {
+    const saved = document.documentElement.dataset.theme;
+    return saved === 'light' || saved === 'dark' ? saved : 'system';
+  });
 
   const [notice, setNotice] = useState<ToastNotification | null>(null);
   const [dialog, setDialog] = useState<{ kind: 'add' } | { kind: 'edit' | 'script'; game: Game } | null>(null);
@@ -145,9 +161,13 @@ export default function App() {
     saveSettings({ soundEnabled: next });
   };
 
-  const cycleTheme = () => {
+  // Until the button is used the app follows Windows. The button switches
+  // to the other theme of the one on screen, and the choice is kept.
+  const systemDark = useSystemDark();
+  const dark = theme === 'dark' || (theme === 'system' && systemDark);
+  const toggleTheme = () => {
     click();
-    const next = NEXT_THEME[theme];
+    const next = dark ? 'light' : 'dark';
     setTheme(next);
     saveSettings({ theme: next });
   };
@@ -301,8 +321,8 @@ export default function App() {
         view={view}
         onView={openView}
         runningCount={runningCount}
-        theme={theme}
-        onCycleTheme={cycleTheme}
+        dark={dark}
+        onToggleTheme={toggleTheme}
         soundEnabled={soundEnabled}
         onToggleSound={toggleSound}
         onRescan={rescan}
