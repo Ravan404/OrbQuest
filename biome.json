@@ -65,6 +65,9 @@
         "rules": {
           "suspicious": {
             "noExplicitAny": "off"
+          },
+          "performance": {
+            "useDomNodeTextContent": "off"
           }
         }
       }

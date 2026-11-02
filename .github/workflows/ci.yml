@@ -50,6 +50,38 @@ jobs:
       - name: Verify the production bundle (versions, offline game database, static guard)
         run: npm run verify:dist
 
+  e2e:
+    name: Browser test (Windows)
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Production build
+        run: npm run build
+
+      # Clicks through the built app in Edge and really starts placeholders.
+      - name: Browser test
+        env:
+          E2E_SCREENSHOTS: e2e-screenshots
+        run: npm run test:e2e
+
+      - name: Upload screenshots
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-screenshots
+          path: e2e-screenshots
+
   placeholder:
     name: Placeholder builds from source
     runs-on: windows-latest
