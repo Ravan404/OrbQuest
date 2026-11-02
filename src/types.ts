@@ -75,6 +75,15 @@ export interface CatalogGame {
   inLibrary: boolean;
   /** `reddit`: Discord's list has no executable for it; the one shown comes from r/DiscordQuests. */
   source?: 'reddit';
+  /** Discord only detects it through Steam: added into the Steam library. */
+  steam?: boolean;
+}
+
+/** A newer OrbQuest release (GET /api/update). */
+export interface UpdateInfo {
+  version: string;
+  /** The release page on GitHub. */
+  url: string;
 }
 
 /** Server profile returned by GET /api/profile. */

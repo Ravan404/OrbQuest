@@ -2,6 +2,23 @@
 
 ## [Unreleased]
 
+## [1.5.0] — 2026-11-02
+
+### Added
+
+- **Steam quests work again.** EA SPORTS FC 27, Marathon, AION 2, Assassin's Creed Black Flag Resynced, MARVEL Tōkon and the Toxic Commando demo are only detected through Steam. Adding one from the catalog (marked Steam) writes the placeholder to `steamapps\common\<game>` of the Steam installation, found through the registry, with the `appmanifest_<id>.acf` the r/DiscordQuests post describes. A real install or manifest of the game is never overwritten, and removing the entry deletes only what the app wrote. 1.4.0 had dropped this.
+- When a new release is out, a link to it appears next to the version at the top of the window. The app asks GitHub every six hours; `DQR_UPDATE_CHECK=0` turns that off.
+- Firefox and Opera GX show their own icon instead of their initials. Discord has none for them, so the app saves their website's icon.
+- An Open folder button on the About page.
+
+### Changed
+
+- The library and the saved icons moved from next to the exe to `%LOCALAPPDATA%\OrbQuest`, where the logs already were. The folder the exe was downloaded to stays clean, and a newer exe downloaded somewhere else finds the same games. The old `Games` and `icon-cache` folders are moved on the first start.
+
+### Fixed
+
+- `DQR_OFFLINE=1` did not stop icon downloads.
+
 ## [1.4.0] — 2026-10-31
 
 ### Changed

@@ -100,6 +100,8 @@ function validDatabase(value: unknown): GameDatabase | null {
         icon_hash: g?.icon,
         source: g?.source,
         url: g?.url,
+        steam: g?.steam,
+        site: g?.site,
         executables: Array.isArray(g?.executables) ? g.executables.map((name) => ({ name, os: 'win32' })) : [],
       });
     })

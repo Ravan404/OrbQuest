@@ -1,7 +1,12 @@
 import React from 'react';
+import { FolderOpen } from 'lucide-react';
 import { AppProfile, BUFFER_PRESET_DURATIONS, FINAL_SAFETY_MARGIN_SECONDS } from '../types';
+import { api } from '../api';
 import { t } from '../strings';
-import { SectionLabel } from '../components/ui';
+import { Button, SectionLabel } from '../components/ui';
+
+/** Explorer can only be opened on Windows. */
+const ON_WINDOWS = typeof navigator !== 'undefined' && /Windows/i.test(navigator.userAgent);
 
 const Section: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => (
   <section className="space-y-2">
@@ -70,6 +75,17 @@ export const AboutView: React.FC<{ profile: AppProfile }> = ({ profile }) => {
             <Fact label={t('aboutDbUpdated')} value={dateOnly(database?.updatedAt)} />
             <Fact label={t('aboutGamesFolder')} value={profile.gamesFolder ?? '-'} />
           </dl>
+          {ON_WINDOWS && profile.gamesFolder && (
+            <Button
+              id="open-games-folder-btn"
+              size="sm"
+              className="mb-1 mt-2"
+              icon={<FolderOpen className="h-3.5 w-3.5" />}
+              onClick={() => void api.openGamesFolder().catch(() => {})}
+            >
+              {t('openFolder')}
+            </Button>
+          )}
         </aside>
       </div>
     </div>

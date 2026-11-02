@@ -1,4 +1,4 @@
-import type { AppProfile, BufferPreset, CatalogGame, Game } from './types';
+import type { AppProfile, BufferPreset, CatalogGame, Game, UpdateInfo } from './types';
 
 export type ThemeSetting = 'system' | 'light' | 'dark';
 
@@ -41,6 +41,8 @@ const gameUrl = (id: string, action = '') => `/api/games/${encodeURIComponent(id
 
 export const api = {
   profile: (signal?: AbortSignal) => request<AppProfile>('/api/profile', { signal }),
+  update: () => request<{ update: UpdateInfo | null }>('/api/update'),
+  openGamesFolder: () => request<{ success: boolean }>('/api/open-games-folder', { method: 'POST' }),
 
   settings: () => request<Partial<AppSettings>>('/api/settings'),
   saveSettings: (patch: Partial<AppSettings>) => request<AppSettings>('/api/settings', { method: 'PUT', json: patch }),

@@ -19,16 +19,22 @@ PORT = None
 SERVER_PROCESS = None
 SERVER_SHUTDOWN_TOKEN = None
 SERVER_LOG = None
+# Folder that holds Games/ and icon-cache/; set by main().
+DATA_ROOT = None
 
 # Application metadata
 APP_NAME = "OrbQuest"
-APP_VERSION = "1.4.0"
+APP_VERSION = "1.5.0"
 # The window title starts with this; single_instance.focus_existing_window
 # looks for it.
 WINDOW_TITLE_PREFIX = f"{APP_NAME} v"
 
 # A backend log larger than this is not kept as backend.log.1.
 BACKEND_LOG_MAX_BYTES = 1024 * 1024
+
+# Files only OrbQuest writes into its Games folder. A Games folder next to the
+# exe without any of them is someone else's and is never moved.
+LIBRARY_FILES = (".state.json", ".settings.json", ".special-games.json", ".game-database.json")
 
 
 def hide_console_window() -> None:
@@ -113,6 +119,52 @@ def log_directory() -> Path:
     return base / "OrbQuest"
 
 
+def move_folder(source: Path, target: Path) -> bool:
+    """Move a folder, also to another drive. On failure the source is kept."""
+    try:
+        target.parent.mkdir(parents=True, exist_ok=True)
+        os.replace(source, target)
+        return True
+    except OSError:
+        pass
+    try:
+        shutil.copytree(source, target)
+    except (OSError, shutil.Error):
+        shutil.rmtree(target, ignore_errors=True)
+        return False
+    shutil.rmtree(source, ignore_errors=True)
+    return True
+
+
+def data_root() -> Path:
+    """Where the library (Games/) and the saved icons (icon-cache/) live.
+
+    The packaged app keeps them in %LOCALAPPDATA%\\OrbQuest, next to its logs,
+    so the folder the exe was downloaded to stays clean and a newer exe
+    downloaded somewhere else finds the same library. Versions before 1.5.0
+    kept both folders next to the exe; they are moved on the first start.
+    If that fails, this run keeps using them where they are.
+    """
+    if os.environ.get("DQR_ROOT"):
+        return Path(os.environ["DQR_ROOT"])
+    old_root = application_root()
+    if not getattr(sys, "frozen", False):
+        return old_root
+    new_root = log_directory()
+    if new_root.resolve() == old_root.resolve():
+        return new_root
+
+    old_games, new_games = old_root / "Games", new_root / "Games"
+    if not new_games.exists() and old_games.is_dir() and any((old_games / name).is_file() for name in LIBRARY_FILES):
+        if not move_folder(old_games, new_games):
+            return old_root
+        old_icons, new_icons = old_root / "icon-cache", new_root / "icon-cache"
+        if old_icons.is_dir():
+            if new_icons.exists() or not move_folder(old_icons, new_icons):
+                shutil.rmtree(old_icons, ignore_errors=True)
+    return new_root
+
+
 def startup_log_path() -> Path:
     return log_directory() / "startup.log"
 
@@ -174,10 +226,10 @@ def window_background() -> str:
     Windows app theme."""
     light, dark = "#fafafa", "#0d0d0d"
     try:
-        settings = json.loads((application_root() / "Games" / ".settings.json").read_text("utf-8"))
+        settings = json.loads((DATA_ROOT / "Games" / ".settings.json").read_text("utf-8"))
         if settings.get("theme") in ("light", "dark"):
             return light if settings["theme"] == "light" else dark
-    except (OSError, ValueError, AttributeError):
+    except (OSError, ValueError, AttributeError, TypeError):
         pass
     if sys.platform == "win32":
         try:
@@ -274,7 +326,7 @@ def start_backend_server() -> None:
         {
             "NODE_ENV": "production",
             "PORT": str(PORT),
-            "DQR_ROOT": str(application_root()),
+            "DQR_ROOT": str(DATA_ROOT),
             "DQR_ASSET_ROOT": str(asset_root()),
             "DQR_BIND_HOST": "127.0.0.1",
             "DQR_SHUTDOWN_TOKEN": SERVER_SHUTDOWN_TOKEN,
@@ -357,6 +409,9 @@ atexit.register(close_backend_log)
 
 
 def main() -> None:
+    global DATA_ROOT
+    # Runs under the instance lock: only one copy moves an old library.
+    DATA_ROOT = data_root()
     # Imported after the instance lock is acquired. The second launch must
     # never unpack assets or spawn a second Node backend.
     try:
