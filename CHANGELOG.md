@@ -2,6 +2,21 @@
 
 ## [Unreleased]
 
+## [1.6.0] — 2026-11-03
+
+### Added
+
+- **An installer**, `OrbQuest-Setup-<version>.exe`: installs OrbQuest for your Windows user without administrator rights, with a Start menu entry and an uninstaller. The installed app starts in about a second; the single exe took about seven, because it unpacks itself on every start.
+- **Updates from inside the app.** When a new release is out, the Update button next to the version downloads it from this repository's releases, checks it against the release's `SHA256SUMS.txt`, closes OrbQuest and opens the new version. The installed app runs the new installer silently; the portable exe is replaced by the new one.
+- The release files carry their version: `OrbQuest-Setup-1.6.0.exe` and the portable `OrbQuest-1.6.0.exe`, with `SHA256SUMS.txt` for both.
+- Only the OrbQuest window can use the app's API: it opens with a token that is new on every start. Another program on the PC can no longer start or remove games through it.
+
+### Changed
+
+- The placeholder build is reproducible, and CI checks that the committed `placeholder_runtime.exe` is exactly what `placeholder_runtime.c` builds to. Placeholders in existing libraries are upgraded to it on the next scan.
+- The browser test, Biome lint and format checks and the Windows packages (installed, started and uninstalled) run in CI.
+- Dependency updates: lucide-react 1.66, Tailwind CSS 4.3.4, the Vite React plugin 6.2 and upload-artifact v7 in the workflows.
+
 ### Fixed
 
 - A new release showed up late, sometimes only after five minutes: the window asked once 20 seconds after the start, often before the server had heard back from GitHub, and then only every five minutes. The server now asks GitHub as soon as it starts, the window asks right away and gets the answer of that first check, and a check that failed (no connection yet) is tried again after ten minutes instead of six hours.

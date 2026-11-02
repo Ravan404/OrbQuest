@@ -174,7 +174,7 @@ const strings = {
     "If you'd rather run the real game, the start script button on a card saves a .bat, .ps1 or .py that starts it and closes it when the same timer is up.",
   aboutFilesTitle: 'Where things are',
   aboutFiles:
-    "The library is in %LOCALAPPDATA%\\OrbQuest\\Games, so OrbQuest.exe can sit anywhere and a newer copy finds the same games. Each game has its own folder; Steam quests are in Steam's own folder instead. Games\\.state.json keeps the times and timer settings, Games\\.settings.json keeps sound and theme, and saved icons are in icon-cache next to Games. Closing the app stops any running timer and remembers where it was.",
+    "The library is in %LOCALAPPDATA%\\OrbQuest\\Games, so the installed app, the portable exe and every update find the same games. Each game has its own folder; Steam quests are in Steam's own folder instead. Games\\.state.json keeps the times and timer settings, Games\\.settings.json keeps sound and theme, and saved icons are in icon-cache next to Games. Closing the app stops any running timer and remembers where it was.",
   aboutLog:
     "If the app won't start, %LOCALAPPDATA%\\OrbQuest\\startup.log says why. Server messages go to backend.log next to it.",
   aboutRemoveTitle: 'Removing a game',

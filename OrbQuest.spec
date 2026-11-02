@@ -11,9 +11,40 @@ import json
 import os
 import shutil
 
+from PyInstaller.utils.win32.versioninfo import (
+    FixedFileInfo,
+    StringFileInfo,
+    StringStruct,
+    StringTable,
+    VarFileInfo,
+    VarStruct,
+    VSVersionInfo,
+)
+
 _NODE_EXE = os.environ.get('DQR_NODE_EXE') or shutil.which('node.exe') or r'C:\Program Files\nodejs\node.exe'
 with open('package.json', encoding='utf-8') as package:
     _VERSION = json.load(package)['version']
+
+# File version shown under Properties > Details.
+_NUMBERS = tuple(int(part) for part in _VERSION.split('.')) + (0,)
+_VERSION_INFO = VSVersionInfo(
+    ffi=FixedFileInfo(filevers=_NUMBERS, prodvers=_NUMBERS),
+    kids=[
+        StringFileInfo([
+            StringTable('040904B0', [
+                StringStruct('CompanyName', 'OrbQuest'),
+                StringStruct('FileDescription', 'OrbQuest'),
+                StringStruct('FileVersion', _VERSION),
+                StringStruct('InternalName', 'OrbQuest'),
+                StringStruct('LegalCopyright', 'Copyright (c) 2026 OrbQuest. MIT License.'),
+                StringStruct('OriginalFilename', 'OrbQuest.exe'),
+                StringStruct('ProductName', 'OrbQuest'),
+                StringStruct('ProductVersion', _VERSION),
+            ])
+        ]),
+        VarFileInfo([VarStruct('Translation', [1033, 1200])]),
+    ],
+)
 
 a = Analysis(
     ['desktop_app.py'],
@@ -32,6 +63,7 @@ pyz = PYZ(a.pure)
 
 _EXE_OPTIONS = dict(
     icon='assets/OrbQuest.ico',
+    version=_VERSION_INFO,
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,

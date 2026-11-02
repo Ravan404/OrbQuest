@@ -22,7 +22,8 @@ body:
     attributes:
       label: How do you run it
       options:
-        - OrbQuest.exe (Windows package)
+        - Installed (OrbQuest-Setup)
+        - Portable exe (OrbQuest-<version>.exe)
         - npm run dev / npm start
     validations:
       required: true
