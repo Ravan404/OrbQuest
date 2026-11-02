@@ -68,7 +68,11 @@ test('adding a game creates the folder, the placeholder and saves its timer', as
 
 test('timer preferences survive a reset and a restart', async () => {
   const game = await addGame('Bravo Game', 'bravo.exe');
-  const timer = await call('PUT', `/api/games/${game.id}/timer`, { targetMinutes: 0, bufferPreset: 'long', autoStop: false });
+  const timer = await call('PUT', `/api/games/${game.id}/timer`, {
+    targetMinutes: 0,
+    bufferPreset: 'long',
+    autoStop: false,
+  });
   assert.equal(timer.status, 200);
   assert.equal(timer.json.game.targetMinutes, 0);
 
@@ -178,7 +182,11 @@ test('changing the executable never overwrites a real file and removes only our 
 });
 
 test('catalog entries accept timer changes only', async () => {
-  const added = await call('POST', '/api/games', { name: 'India Game', executableName: 'india.exe', origin: 'catalog' });
+  const added = await call('POST', '/api/games', {
+    name: 'India Game',
+    executableName: 'india.exe',
+    origin: 'catalog',
+  });
   const game = added.json.game;
   assert.equal((await call('PATCH', `/api/games/${game.id}`, { name: 'Other' })).status, 403);
   assert.equal((await call('PATCH', `/api/games/${game.id}`, { name: 'India Game', targetMinutes: 5 })).status, 200);
@@ -191,13 +199,29 @@ test('Steam installs can be renamed and removed without touching real Steam file
   const installDir = path.join(steamApps, 'common', 'Juliet');
   fs.mkdirSync(installDir, { recursive: true });
   fs.copyFileSync(placeholderPath, path.join(installDir, 'juliet.exe'));
-  fs.writeFileSync(path.join(installDir, '.dqr-managed.json'), JSON.stringify({ managedBy: 'DiscordQuestRun', executable: 'juliet.exe' }));
+  fs.writeFileSync(
+    path.join(installDir, '.dqr-managed.json'),
+    JSON.stringify({ managedBy: 'DiscordQuestRun', executable: 'juliet.exe' })
+  );
   const managedManifest = path.join(steamApps, 'appmanifest_123.acf');
-  fs.writeFileSync(managedManifest, '"AppState"\n{\n\t"appid"\t\t"123"\n\t"name"\t\t"Juliet"\n\t"StateFlags"\t\t"4"\n\t"installdir"\t\t"Juliet"\n}\n');
+  fs.writeFileSync(
+    managedManifest,
+    '"AppState"\n{\n\t"appid"\t\t"123"\n\t"name"\t\t"Juliet"\n\t"StateFlags"\t\t"4"\n\t"installdir"\t\t"Juliet"\n}\n'
+  );
   const realManifest = path.join(steamApps, 'appmanifest_999.acf');
-  fs.writeFileSync(realManifest, '"AppState"\n{\n\t"appid"\t\t"999"\n\t"name"\t\t"Real"\n\t"buildid"\t\t"1"\n\t"installdir"\t\t"Real"\n}\n');
+  fs.writeFileSync(
+    realManifest,
+    '"AppState"\n{\n\t"appid"\t\t"999"\n\t"name"\t\t"Real"\n\t"buildid"\t\t"1"\n\t"installdir"\t\t"Real"\n}\n'
+  );
 
-  store.saveSpecialGame({ id: 'steam-123', rootPath: steamApps, installDir: 'Juliet', executable: 'juliet.exe', name: 'Juliet', steamAppId: 123 });
+  store.saveSpecialGame({
+    id: 'steam-123',
+    rootPath: steamApps,
+    installDir: 'Juliet',
+    executable: 'juliet.exe',
+    name: 'Juliet',
+    steamAppId: 123,
+  });
   await call('POST', '/api/games/rescan');
   assert.ok(store.gamesMap.has('steam-123'));
   // Scanned Steam installs are catalog entries; editing them as custom entries
@@ -329,7 +353,10 @@ test('a Steam quest from the catalog is written into the Steam library with its 
 
     // A real install of the game is never overwritten.
     const realManifest = path.join(steamApps, 'appmanifest_4080220.acf');
-    fs.writeFileSync(realManifest, '"AppState"\n{\n\t"appid"\t\t"4080220"\n\t"buildid"\t\t"7"\n\t"installdir"\t\t"EA SPORTS FC 27"\n}\n');
+    fs.writeFileSync(
+      realManifest,
+      '"AppState"\n{\n\t"appid"\t\t"4080220"\n\t"buildid"\t\t"7"\n\t"installdir"\t\t"EA SPORTS FC 27"\n}\n'
+    );
     const refused = await call('POST', '/api/games', fc27);
     assert.equal(refused.status, 409);
     assert.match(fs.readFileSync(realManifest, 'utf8'), /buildid/);

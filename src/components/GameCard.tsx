@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import type React from 'react';
+import { useState } from 'react';
 import { Clock, Pencil, Play, RotateCcw, Square, Terminal, Trash2 } from 'lucide-react';
-import { Game } from '../types';
-import { computeGameTimerPhase, formatRuntime, GameTimerPhase } from '../utils/timerUtils';
+import type { Game } from '../types';
+import { computeGameTimerPhase, formatRuntime, type GameTimerPhase } from '../utils/timerUtils';
 import { t } from '../strings';
 import { Button, Chip, IconButton } from './ui';
 import { GameIcon } from './GameIcon';
@@ -38,7 +39,12 @@ export function statusChip(game: Game, phase: GameTimerPhase) {
     return <Chip tone="wait">{t('finishing', { n: left })}</Chip>;
   }
   if (phase.phase === 'completed') return <Chip tone="run">{t('done')}</Chip>;
-  if (game.isRunning) return <Chip tone="run" dot>{t('running')}</Chip>;
+  if (game.isRunning)
+    return (
+      <Chip tone="run" dot>
+        {t('running')}
+      </Chip>
+    );
   return <Chip>{t('idle')}</Chip>;
 }
 
@@ -70,11 +76,16 @@ export const GameCard: React.FC<GameCardProps> = ({
   const selectMode = marked !== undefined;
 
   return (
+    // biome-ignore lint/a11y/useKeyWithClickEvents: a click selects the card for the status bar; every action has its own button.
     <article
       id={`game-card-${game.id}`}
       onClick={selectMode ? onMark : onSelect}
       className={`relative flex flex-col overflow-hidden rounded-xl border bg-surface transition-colors ${
-        marked ? 'border-primary' : selected ? 'border-line-strong ring-1 ring-line-strong' : 'border-line hover:border-line-strong'
+        marked
+          ? 'border-primary'
+          : selected
+            ? 'border-line-strong ring-1 ring-line-strong'
+            : 'border-line hover:border-line-strong'
       }`}
     >
       {selectMode && (
@@ -104,6 +115,7 @@ export const GameCard: React.FC<GameCardProps> = ({
         </div>
       </div>
 
+      {/* biome-ignore lint/a11y/useKeyWithClickEvents lint/a11y/noStaticElementInteractions: only keeps button clicks from selecting the card. */}
       <div className="mt-auto flex items-center gap-0.5 px-3 pb-3" onClick={(event) => event.stopPropagation()}>
         {confirmRemove ? (
           <>
@@ -154,7 +166,12 @@ export const GameCard: React.FC<GameCardProps> = ({
             >
               <Pencil className="h-3.5 w-3.5" />
             </IconButton>
-            <IconButton id={`delete-game-btn-${game.id}`} label={t('remove')} tone="danger" onClick={() => setConfirmRemove(true)}>
+            <IconButton
+              id={`delete-game-btn-${game.id}`}
+              label={t('remove')}
+              tone="danger"
+              onClick={() => setConfirmRemove(true)}
+            >
               <Trash2 className="h-3.5 w-3.5" />
             </IconButton>
           </>
@@ -162,7 +179,11 @@ export const GameCard: React.FC<GameCardProps> = ({
       </div>
 
       {hasTime && (
-        <div className="flex items-center gap-2 px-4 pb-2 text-[11px] text-faint" onClick={(event) => event.stopPropagation()}>
+        // biome-ignore lint/a11y/useKeyWithClickEvents lint/a11y/noStaticElementInteractions: only keeps button clicks from selecting the card.
+        <div
+          className="flex items-center gap-2 px-4 pb-2 text-[11px] text-faint"
+          onClick={(event) => event.stopPropagation()}
+        >
           <span className="tabular font-mono">
             {formatRuntime(phase.displayElapsedSeconds)}
             {phase.targetSeconds > 0 && ` / ${formatRuntime(phase.targetSeconds)}`}

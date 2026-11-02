@@ -114,7 +114,8 @@ if (changelog.includes('## [Unreleased]') && !changelog.includes(heading)) {
 } else if (!changelog.includes(heading)) {
   const section = `${heading} — ${today}\n\n- (describe the changes)\n\n`;
   const marker = changelog.indexOf('## [');
-  const updated = marker === -1 ? `${changelog}\n${section}` : `${changelog.slice(0, marker)}${section}${changelog.slice(marker)}`;
+  const updated =
+    marker === -1 ? `${changelog}\n${section}` : `${changelog.slice(0, marker)}${section}${changelog.slice(marker)}`;
   fs.writeFileSync(changelogPath, updated, 'utf8');
   console.log(`  added a CHANGELOG section for ${next} - replace the placeholder text before release`);
 }

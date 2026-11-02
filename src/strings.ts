@@ -95,7 +95,8 @@ const strings = {
   fromReddit: 'r/DiscordQuests',
   fromRedditTitle: "Discord's list has no executable for this; this one comes from r/DiscordQuests posts.",
   needsSteam: 'Steam',
-  needsSteamTitle: 'Discord only detects this through Steam. Steam must be installed; the stand-in goes into its steamapps folder.',
+  needsSteamTitle:
+    'Discord only detects this through Steam. Steam must be installed; the stand-in goes into its steamapps folder.',
   inLibrary: 'In library',
   add: 'Add',
   adding: 'Adding…',
@@ -118,7 +119,8 @@ const strings = {
 
   // Script dialog
   scriptTitle: 'Start script',
-  scriptHelp: "Asks for the real game's .exe and starts it. With Stop at the end on, it closes the game when the same timer is up.",
+  scriptHelp:
+    "Asks for the real game's .exe and starts it. With Stop at the end on, it closes the game when the same timer is up.",
   copy: 'Copy',
   copied: 'Copied',
   copyFailed: 'Copy failed. Select the text and copy it.',

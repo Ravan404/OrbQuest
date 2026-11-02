@@ -1,10 +1,10 @@
 import { BUFFER_PRESET_DURATIONS, type GameOrigin } from '../../types.ts';
 import { computeGameTimerPhase } from '../../utils/timerUtils.ts';
-import { Router, Request, Response } from 'express';
-import fs from 'fs';
-import path from 'path';
-import { spawn, ChildProcess } from 'child_process';
-import { ASSET_ROOT, GAMES_DIR, PLACEHOLDER_EXE, StoredGame } from '../config.ts';
+import { Router, type Request, type Response } from 'express';
+import fs from 'node:fs';
+import path from 'node:path';
+import { spawn, type ChildProcess } from 'node:child_process';
+import { ASSET_ROOT, GAMES_DIR, PLACEHOLDER_EXE, type StoredGame } from '../config.ts';
 import { isPathInside, isSafeExecutablePath, isSafeFileName, libraryFolderName } from '../security.ts';
 import {
   gamesMap,
@@ -77,7 +77,8 @@ function parseExecutableName(value: unknown): { value: string } | { error: strin
   const requested = typeof value === 'string' ? value.trim().replace(/\\/g, '/').replace(/^\/+/, '') : '';
   if (!requested) return { error: 'Executable name is required' };
   if (!requested.toLowerCase().endsWith('.exe')) return { error: 'Executable must end with .exe' };
-  if (!isSafeExecutablePath(requested)) return { error: 'Executable must be a safe file name or path inside the game folder.' };
+  if (!isSafeExecutablePath(requested))
+    return { error: 'Executable must be a safe file name or path inside the game folder.' };
   return { value: requested };
 }
 
@@ -151,7 +152,12 @@ router.post('/:id/launch', (req: Request<IdParams>, res: Response) => {
 
   if (isManagedDirectory) {
     const knownExe = inferKnownExecutableForGame(game.name, game.folder, game.appId);
-    const fallbackExe = `${path.basename(game.folder).toLowerCase().replace(/[^a-z0-9_-]/g, '') || 'game'}.exe`;
+    const fallbackExe = `${
+      path
+        .basename(game.folder)
+        .toLowerCase()
+        .replace(/[^a-z0-9_-]/g, '') || 'game'
+    }.exe`;
     if (
       knownExe &&
       game.executable.toLowerCase() === fallbackExe.toLowerCase() &&
@@ -377,7 +383,8 @@ router.patch('/:id', (req: Request<IdParams>, res: Response) => {
   let nextFolder = game.folder;
   if (body.folderPath !== undefined && body.folderPath !== null && body.folderPath !== '') {
     const requested = typeof body.folderPath === 'string' ? body.folderPath.trim().replace(/[\\/]+$/, '') : '';
-    const sameFolder = (a: string, b: string) => a.replace(/[\\/]+/g, '/').toLowerCase() === b.replace(/[\\/]+/g, '/').toLowerCase();
+    const sameFolder = (a: string, b: string) =>
+      a.replace(/[\\/]+/g, '/').toLowerCase() === b.replace(/[\\/]+/g, '/').toLowerCase();
     if (!sameFolder(requested, game.folder)) {
       if (!requested || requested.toLowerCase() === 'not found') {
         return res.status(400).json({ error: 'Folder name is required' });
@@ -398,7 +405,8 @@ router.patch('/:id', (req: Request<IdParams>, res: Response) => {
   }
   if (isSteamInstall && (exeChanged || folderChanged)) {
     return res.status(409).json({
-      error: 'A Steam install keeps the folder and executable from its manifest. Only the name and timer can be changed.',
+      error:
+        'A Steam install keeps the folder and executable from its manifest. Only the name and timer can be changed.',
     });
   }
 

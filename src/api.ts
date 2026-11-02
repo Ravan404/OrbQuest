@@ -65,9 +65,11 @@ export const api = {
   stop: (id: string) => request<{ game: Game }>(gameUrl(id, 'stop'), { method: 'POST' }),
   stopAll: () => request<{ stoppedCount?: number }>('/api/games/stop-all', { method: 'POST' }),
   resetTimer: (id: string) => request<{ game: Game }>(gameUrl(id, 'reset-timer'), { method: 'POST' }),
-  setTimer: (id: string, timer: TimerSettings) => request<{ game: Game }>(gameUrl(id, 'timer'), { method: 'PUT', json: timer }),
+  setTimer: (id: string, timer: TimerSettings) =>
+    request<{ game: Game }>(gameUrl(id, 'timer'), { method: 'PUT', json: timer }),
 
-  add: (draft: GameDraft) => request<{ game?: Game }>('/api/games', { method: 'POST', json: { ...draft, origin: 'custom' } }),
+  add: (draft: GameDraft) =>
+    request<{ game?: Game }>('/api/games', { method: 'POST', json: { ...draft, origin: 'custom' } }),
   /** Adds a catalog game with one of the executables Discord lists for it. */
   addFromCatalog: (game: CatalogGame, executable: string) =>
     request<{ game?: Game }>('/api/games', {

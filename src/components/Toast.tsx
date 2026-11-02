@@ -1,6 +1,7 @@
-import React, { useEffect } from 'react';
+import type React from 'react';
+import { useEffect } from 'react';
 import { X } from 'lucide-react';
-import { ToastNotification } from '../types';
+import type { ToastNotification } from '../types';
 import { IconButton, popClass } from './ui';
 
 const DOT: Record<NonNullable<ToastNotification['type']>, string> = {

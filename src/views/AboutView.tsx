@@ -1,6 +1,6 @@
-import React from 'react';
+import type React from 'react';
 import { FolderOpen } from 'lucide-react';
-import { AppProfile, BUFFER_PRESET_DURATIONS, FINAL_SAFETY_MARGIN_SECONDS } from '../types';
+import { type AppProfile, BUFFER_PRESET_DURATIONS, FINAL_SAFETY_MARGIN_SECONDS } from '../types';
 import { api } from '../api';
 import { t } from '../strings';
 import { Button, SectionLabel } from '../components/ui';

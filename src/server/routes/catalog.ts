@@ -1,4 +1,4 @@
-import { Router, Request, Response } from 'express';
+import { Router, type Request, type Response } from 'express';
 import type { CatalogGame } from '../../types.ts';
 import { getFeaturedGames, getGameById, searchGames, type DatabaseGame } from '../gameDatabase.ts';
 import { databaseGameFor, gamesMap } from '../gameStore.ts';

@@ -1,7 +1,8 @@
 import type { CatalogGame } from '../types';
 
 /** Helper programs a game ships next to the game itself. */
-const HELPER = /(?:^|[-_ ./])(test|crash|crashreport|report|setup|install|uninstall|unins\d*|updater?|patcher|launcher|benchmark|server|editor|config|settings)(?:[-_ ./]|\.exe$)/i;
+const HELPER =
+  /(?:^|[-_ ./])(test|crash|crashreport|report|setup|install|uninstall|unins\d*|updater?|patcher|launcher|benchmark|server|editor|config|settings)(?:[-_ ./]|\.exe$)/i;
 /** Other builds of the game: a demo, a beta or test realm, an event build, an anti-cheat wrapper. */
 const VARIANT = /demo|beta|ptr|event|(?:^|[-_ ./])(be|eac|easyanticheat|egs)(?:[-_ ./]|\.exe$)/i;
 
@@ -17,7 +18,10 @@ export function preferredExecutable(game: Pick<CatalogGame, 'name' | 'executable
   const nameKey = game.name.toLowerCase().replace(/[^a-z0-9]/g, '');
   const score = (exe: string): number => {
     const file = exe.split('/').pop() ?? exe;
-    const fileKey = file.replace(/\.exe$/i, '').toLowerCase().replace(/[^a-z0-9]/g, '');
+    const fileKey = file
+      .replace(/\.exe$/i, '')
+      .toLowerCase()
+      .replace(/[^a-z0-9]/g, '');
     let value = 0;
     if (HELPER.test(file)) value -= 10;
     if (VARIANT.test(exe)) value -= 5;

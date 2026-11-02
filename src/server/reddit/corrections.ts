@@ -133,7 +133,8 @@ export const REDDIT_ENTRY_FIXES: Record<string, RedditEntryFix> = {
     executableName: 'StreetFighter6.exe',
     folderPath: '..\\Street Fighter 6',
     aliases: ['Capcom TGS Deals'],
-    notes: 'For the Capcom TGS Deals quest. Monster Hunter Stories works as well (..\\Monster Hunter Stories\\MHST.exe).',
+    notes:
+      'For the Capcom TGS Deals quest. Monster Hunter Stories works as well (..\\Monster Hunter Stories\\MHST.exe).',
   },
   // "Capcom TGS Deals Quest"
   '1wa7p56': {
@@ -178,7 +179,12 @@ export const REDDIT_POST_SUPPLEMENTS: Record<string, Array<Omit<RedditCacheEntry
     { gameName: 'Hunt: Showdown 1896', executableName: 'HuntGame.exe', folderPath: 'win_x64', confidence: 'medium' },
     { gameName: 'Fallout 76', executableName: 'Fallout76.exe', folderPath: 'Fallout76', confidence: 'medium' },
     { gameName: 'RAID: Shadow Legends', executableName: 'Raid.exe', folderPath: 'build', confidence: 'medium' },
-    { gameName: 'Blue Protocol: Star Resonance', executableName: 'bpsr.exe', folderPath: 'Win64', confidence: 'medium' },
+    {
+      gameName: 'Blue Protocol: Star Resonance',
+      executableName: 'bpsr.exe',
+      folderPath: 'Win64',
+      confidence: 'medium',
+    },
     {
       gameName: '2XKO',
       executableName: 'Lion-Win64-Shipping.exe',

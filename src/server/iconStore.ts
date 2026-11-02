@@ -66,11 +66,7 @@ function detectImageExtension(bytes: Buffer, contentType: string): string | unde
   }
 
   // WebP: RIFF....WEBP
-  if (
-    bytes.length >= 12 &&
-    bytes.toString('ascii', 0, 4) === 'RIFF' &&
-    bytes.toString('ascii', 8, 12) === 'WEBP'
-  ) {
+  if (bytes.length >= 12 && bytes.toString('ascii', 0, 4) === 'RIFF' && bytes.toString('ascii', 8, 12) === 'WEBP') {
     return 'webp';
   }
 
@@ -201,7 +197,7 @@ export function createIconStore(options: IconStoreOptions): IconStore {
         const temp = `${target}.${process.pid}.tmp`;
         fs.writeFileSync(temp, bytes);
         fs.renameSync(temp, target);
-        const url = CACHED_ICON_URL_PREFIX + `${key}.${extension}`;
+        const url = `${CACHED_ICON_URL_PREFIX}${key}.${extension}`;
         getIndex().set(key, url);
         if (failures?.has(key)) {
           failures.delete(key);

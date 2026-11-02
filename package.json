@@ -1,6 +1,6 @@
 {
   "name": "orbquest",
-  "version": "1.5.2",
+  "version": "1.5.1",
   "private": true,
   "type": "module",
   "description": "Local timer for Discord's play-a-game Quests on Windows. Uses Discord's own list of detectable games; never logs into Discord.",
@@ -31,6 +31,8 @@
     "build": "vite build && esbuild server.ts --bundle --platform=node --format=cjs --external:vite --sourcemap --outfile=dist/server.cjs",
     "start": "node dist/server.cjs",
     "typecheck": "tsc --noEmit",
+    "lint": "biome check .",
+    "format": "biome format --write .",
     "test": "node scripts/run-tests.mjs",
     "clean": "node -e \"for (const p of ['dist','node_modules/.vite']) require('fs').rmSync(p,{recursive:true,force:true})\"",
     "update-database": "tsx scripts/update-game-database.ts",
@@ -44,6 +46,7 @@
     "react-dom": "^19.3.1"
   },
   "devDependencies": {
+    "@biomejs/biome": "2.6.4",
     "@tailwindcss/vite": "^4.0.9",
     "@types/express": "^5.0.6",
     "@types/node": "^24.19.2",

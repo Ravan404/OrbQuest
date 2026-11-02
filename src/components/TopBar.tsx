@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 import { ArrowUpCircle, Moon, Plus, RefreshCw, Sun, Volume2, VolumeX } from 'lucide-react';
 import type { UpdateInfo } from '../types';
 import { t } from '../strings';
@@ -77,7 +77,9 @@ export const TopBar: React.FC<TopBarProps> = ({
             >
               {tab.label}
               {tab.id === 'library' && runningCount > 0 && (
-                <span className="tabular rounded-full bg-run/15 px-1.5 text-[11px] font-semibold text-run">{runningCount}</span>
+                <span className="tabular rounded-full bg-run/15 px-1.5 text-[11px] font-semibold text-run">
+                  {runningCount}
+                </span>
               )}
               {active && <span className="absolute inset-x-3 bottom-0 h-0.5 rounded-full bg-text" />}
             </button>
@@ -90,13 +92,30 @@ export const TopBar: React.FC<TopBarProps> = ({
         <IconButton id="theme-toggle-btn" label={dark ? t('themeToLight') : t('themeToDark')} onClick={onToggleTheme}>
           {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
         </IconButton>
-        <IconButton id="sound-toggle-btn" label={soundEnabled ? t('soundOn') : t('soundOff')} aria-pressed={soundEnabled} onClick={onToggleSound}>
+        <IconButton
+          id="sound-toggle-btn"
+          label={soundEnabled ? t('soundOn') : t('soundOff')}
+          aria-pressed={soundEnabled}
+          onClick={onToggleSound}
+        >
           {soundEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
         </IconButton>
-        <Button id="header-refresh-btn" variant="ghost" title={t('rescanTitle')} icon={<RefreshCw className="h-3.5 w-3.5" />} onClick={onRescan}>
+        <Button
+          id="header-refresh-btn"
+          variant="ghost"
+          title={t('rescanTitle')}
+          icon={<RefreshCw className="h-3.5 w-3.5" />}
+          onClick={onRescan}
+        >
           {t('rescan')}
         </Button>
-        <Button id="header-add-game-btn" variant="primary" className="ml-1" icon={<Plus className="h-3.5 w-3.5" />} onClick={onAddGame}>
+        <Button
+          id="header-add-game-btn"
+          variant="primary"
+          className="ml-1"
+          icon={<Plus className="h-3.5 w-3.5" />}
+          onClick={onAddGame}
+        >
           {t('addGame')}
         </Button>
       </div>

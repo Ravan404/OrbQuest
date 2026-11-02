@@ -1,11 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { AppProfile, Game, ToastNotification, UpdateInfo } from './types';
-import { api, GameDraft, ThemeSetting, TimerSettings } from './api';
+import type { AppProfile, Game, ToastNotification, UpdateInfo } from './types';
+import { api, type GameDraft, type ThemeSetting, type TimerSettings } from './api';
 import { t } from './strings';
 import { useGamePoller } from './hooks/useGamePoller';
-import { migrateLegacyBrowserSettings } from './utils/legacySettings';
 import { playClickSound, playLaunchSound, playStopSound } from './utils/audio';
-import { TopBar, View } from './components/TopBar';
+import { TopBar, type View } from './components/TopBar';
 import { StatusBar } from './components/StatusBar';
 import { Toast } from './components/Toast';
 import { Button } from './components/ui';
@@ -77,6 +76,7 @@ export default function App() {
 
   useEffect(() => applyTheme(theme), [theme]);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: profileAttempt is the Retry button's trigger.
   useEffect(() => {
     const controller = new AbortController();
     setProfileFailed(false);
@@ -116,8 +116,7 @@ export default function App() {
     }
   }, []);
 
-  // First load: settings, games, and a one-time move of settings that
-  // versions up to 1.2.25 kept in this browser's storage.
+  // First load: settings, then the games.
   useEffect(() => {
     let cancelled = false;
     (async () => {
@@ -126,12 +125,7 @@ export default function App() {
         if (typeof settings.soundEnabled === 'boolean') setSoundEnabled(settings.soundEnabled);
         if (settings.theme) setTheme(settings.theme);
       }
-      const loaded = await loadGames();
-      if (cancelled || !loaded) return;
-      const migrated = await migrateLegacyBrowserSettings(loaded);
-      if (cancelled) return;
-      if (migrated.soundEnabled !== undefined) setSoundEnabled(migrated.soundEnabled);
-      if (migrated.gamesChanged) loadGames();
+      if (!cancelled) await loadGames();
     })();
     return () => {
       cancelled = true;
@@ -147,7 +141,8 @@ export default function App() {
   const selectedGame = useMemo(() => games.find((game) => game.id === selectedGameId) ?? null, [games, selectedGameId]);
   const runningCount = useMemo(() => games.filter((game) => game.isRunning).length, [games]);
 
-  const fail = (error: unknown) => showNotice(t('noticeError'), (error as Error)?.message || t('updateFailed'), 'warning');
+  const fail = (error: unknown) =>
+    showNotice(t('noticeError'), (error as Error)?.message || t('updateFailed'), 'warning');
 
   const saveSettings = (patch: Parameters<typeof api.saveSettings>[0]) =>
     api.saveSettings(patch).catch((error) => console.warn('Could not save settings', error));
@@ -249,7 +244,14 @@ export default function App() {
 
   /** Runs `action` for every id and returns the ids it worked for. */
   const forEachId = async (ids: string[], action: (id: string) => Promise<unknown>) => {
-    const results = await Promise.all(ids.map((id) => action(id).then(() => true, () => false)));
+    const results = await Promise.all(
+      ids.map((id) =>
+        action(id).then(
+          () => true,
+          () => false
+        )
+      )
+    );
     return ids.filter((_, index) => results[index]);
   };
 
@@ -383,7 +385,11 @@ export default function App() {
 
       {dialog?.kind === 'add' && <GameDialog onClose={() => setDialog(null)} onSubmit={addGame} />}
       {dialog?.kind === 'edit' && (
-        <GameDialog game={dialog.game} onClose={() => setDialog(null)} onSubmit={(draft) => editGame(dialog.game, draft)} />
+        <GameDialog
+          game={dialog.game}
+          onClose={() => setDialog(null)}
+          onSubmit={(draft) => editGame(dialog.game, draft)}
+        />
       )}
       {dialog?.kind === 'script' && (
         <ScriptDialog

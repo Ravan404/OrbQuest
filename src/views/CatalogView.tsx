@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import type React from 'react';
+import { useEffect, useState } from 'react';
 import { Check, Loader2, Plus } from 'lucide-react';
-import { CatalogGame } from '../types';
+import type { CatalogGame } from '../types';
 import { api } from '../api';
 import { t } from '../strings';
 import { preferredExecutable } from '../utils/executables';
@@ -98,6 +99,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({ databaseSize, onAdded,
   const [loading, setLoading] = useState(false);
   const [refresh, setRefresh] = useState(0);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: refresh reloads the list after a game was added.
   useEffect(() => {
     const controller = new AbortController();
     api
@@ -107,6 +109,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({ databaseSize, onAdded,
     return () => controller.abort();
   }, [refresh]);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: refresh runs the search again after a game was added.
   useEffect(() => {
     const trimmed = query.trim();
     if (trimmed.length < MIN_QUERY_LENGTH) {
@@ -174,7 +177,13 @@ export const CatalogView: React.FC<CatalogViewProps> = ({ databaseSize, onAdded,
         ) : (
           <>
             <div className="mb-3 flex items-baseline gap-3">
-              <SectionLabel>{!typed ? t('catalogFeatured') : shown.length === 1 ? t('catalogResultOne') : t('catalogResults', { n: shown.length })}</SectionLabel>
+              <SectionLabel>
+                {!typed
+                  ? t('catalogFeatured')
+                  : shown.length === 1
+                    ? t('catalogResultOne')
+                    : t('catalogResults', { n: shown.length })}
+              </SectionLabel>
             </div>
             <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-2">
               {shown.map((game) => (

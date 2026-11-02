@@ -6,14 +6,10 @@ import {
 import { performance } from 'node:perf_hooks';
 import { BUFFER_PRESET_DURATIONS, MAX_QUEST_TARGET_MINUTES, type BufferPreset } from '../types.ts';
 import { computeGameTimerPhase } from '../utils/timerUtils.ts';
-import fs from 'fs';
-import path from 'path';
-import { spawn } from 'child_process';
-import {
-  GAMES_DIR,
-  PLACEHOLDER_EXE,
-  StoredGame,
-} from './config.ts';
+import fs from 'node:fs';
+import path from 'node:path';
+import { spawn } from 'node:child_process';
+import { GAMES_DIR, PLACEHOLDER_EXE, type StoredGame } from './config.ts';
 import { isPathInside, isSafeExecutablePath } from './security.ts';
 import { cacheGameIcon, discordIconUrl, localGameIcon, remoteIconUrl } from './iconStore.ts';
 import { findGameByExecutable, findGameByName, getGameById, type DatabaseGame } from './gameDatabase.ts';
@@ -64,7 +60,11 @@ export interface GameMeta {
  * used when a managed game folder's `.exe` was removed by an antivirus scan.
  * The game is found by its Discord id, its name or its folder name.
  */
-export function inferKnownExecutableForGame(displayName: string, folderName: string, appId?: string): string | undefined {
+export function inferKnownExecutableForGame(
+  displayName: string,
+  folderName: string,
+  appId?: string
+): string | undefined {
   const game = getGameById(appId) ?? findGameByName(displayName) ?? findGameByName(path.basename(folderName.trim()));
   return game?.executables[0];
 }
@@ -82,7 +82,11 @@ function isStableGameId(value: string): boolean {
  * is kept so the disambiguated id survives a restart.
  */
 export function allocateLibraryId(folderName: string, preferred?: string): string {
-  const base = folderName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9._-]/g, '') || 'game';
+  const base =
+    folderName
+      .toLowerCase()
+      .replace(/\s+/g, '-')
+      .replace(/[^a-z0-9._-]/g, '') || 'game';
   const takenByOther = (id: string) => {
     const existing = gamesMap.get(id);
     return Boolean(existing && existing.folder !== folderName);
@@ -112,7 +116,10 @@ export function readGameMeta(folder: string): GameMeta {
       addedAt: typeof parsed.addedAt === 'string' ? parsed.addedAt : undefined,
       specialRootPath: typeof parsed.specialRootPath === 'string' ? parsed.specialRootPath : undefined,
       steamAppId: Number.isSafeInteger(parsed.steamAppId) ? parsed.steamAppId : undefined,
-      appId: typeof parsed.appId === 'string' && /^(?:\d{5,25}|r-[a-z0-9]{1,60})$/.test(parsed.appId) ? parsed.appId : undefined,
+      appId:
+        typeof parsed.appId === 'string' && /^(?:\d{5,25}|r-[a-z0-9]{1,60})$/.test(parsed.appId)
+          ? parsed.appId
+          : undefined,
     };
   } catch {
     return {};
@@ -302,7 +309,10 @@ export function saveSpecialGame(record: SpecialGameRecord): void {
 export function removeSpecialGame(id: string): void {
   try {
     if (!fs.existsSync(SPECIAL_GAMES_FILE())) return;
-    writeJsonAtomic(SPECIAL_GAMES_FILE(), readSpecialGames().filter((item) => item.id !== id));
+    writeJsonAtomic(
+      SPECIAL_GAMES_FILE(),
+      readSpecialGames().filter((item) => item.id !== id)
+    );
   } catch (error) {
     console.warn('Could not update simulated Steam game registry:', error);
   }
@@ -443,7 +453,11 @@ async function scanGamesDir(): Promise<void> {
       const displayName = meta.name || storedName || findGameByExecutable(exeName)?.name || folder.name;
 
       const id = allocateLibraryId(folder.name, meta.id);
-      const defaultId = folder.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9._-]/g, '') || 'game';
+      const defaultId =
+        folder.name
+          .toLowerCase()
+          .replace(/\s+/g, '-')
+          .replace(/[^a-z0-9._-]/g, '') || 'game';
       // Persist disambiguated id and executable name so folder metadata survives AV quarantine.
       if ((id !== defaultId && meta.id !== id) || meta.executable !== exeName) {
         writeGameMeta(folder.name, { ...(id !== defaultId ? { id } : {}), executable: exeName });
@@ -492,7 +506,10 @@ async function scanGamesDir(): Promise<void> {
           if (!executable) {
             const recoveredExe =
               meta.executable || inferKnownExecutableForGame(meta.name || manifest.name, manifest.installDir);
-            if (recoveredExe && ensureManagedPlaceholderExecutable(path.join(folderPath, recoveredExe), PLACEHOLDER_EXE)) {
+            if (
+              recoveredExe &&
+              ensureManagedPlaceholderExecutable(path.join(folderPath, recoveredExe), PLACEHOLDER_EXE)
+            ) {
               executable = recoveredExe;
             }
           } else {
@@ -579,7 +596,12 @@ export function updateGameElapsed(game: StoredGame, now = performance.now()): vo
   const seconds = Math.max(0, Math.floor((now - started) / 1000));
   game.warmupRemainingSeconds = Math.max(0, warmup - seconds);
   game.elapsedSeconds = base + (resumed ? Math.max(0, seconds - warmup) : seconds);
-  const phase = computeGameTimerPhase(game.elapsedSeconds, game.targetMinutes, game.bufferPreset, game.warmupRemainingSeconds);
+  const phase = computeGameTimerPhase(
+    game.elapsedSeconds,
+    game.targetMinutes,
+    game.bufferPreset,
+    game.warmupRemainingSeconds
+  );
   if (phase.phase === 'completed') {
     game.completed = true;
     if (game.autoStop !== false) game.elapsedSeconds = phase.totalDurationSeconds;
@@ -644,11 +666,8 @@ export function stopAllRunningGames(): number {
   return count;
 }
 
-export function toPublicGame(
-  game: StoredGame
-): Omit<StoredGame, 'process' | 'session' | 'logoPromise'> {
-  const { process: _process, session: _session, logoPromise: _logoPromise, ...publicGame } =
-    game;
+export function toPublicGame(game: StoredGame): Omit<StoredGame, 'process' | 'session' | 'logoPromise'> {
+  const { process: _process, session: _session, logoPromise: _logoPromise, ...publicGame } = game;
   return publicGame;
 }
 
@@ -672,4 +691,3 @@ export function findGameById(id: string): { key: string; game: StoredGame } | nu
   }
   return null;
 }
-

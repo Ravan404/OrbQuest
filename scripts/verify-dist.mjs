@@ -150,7 +150,9 @@ async function main() {
       'searching "valorant" finds VALORANT with its Discord executable path and icon'
     );
 
-    const firefox = ((await getJson(base, '/api/catalog?q=firefox')).json || []).find((game) => game.name === 'Firefox');
+    const firefox = ((await getJson(base, '/api/catalog?q=firefox')).json || []).find(
+      (game) => game.name === 'Firefox'
+    );
     check(
       firefox?.source === 'reddit' && firefox.executables?.includes('firefox.exe'),
       'an app Discord gives no executable for (Firefox) comes from r/DiscordQuests'
@@ -182,7 +184,13 @@ async function main() {
       },
     });
     const addedId = added.json?.game?.id;
-    const addedExePath = path.join(dataRoot, 'Games', added.json?.game?.folder || 'VALORANT', 'win64', 'valorant-win64-shipping.exe');
+    const addedExePath = path.join(
+      dataRoot,
+      'Games',
+      added.json?.game?.folder || 'VALORANT',
+      'win64',
+      'valorant-win64-shipping.exe'
+    );
     check(
       added.status === 200 && fs.existsSync(addedExePath),
       'adding VALORANT from the catalog creates Games/VALORANT/win64/valorant-win64-shipping.exe'
@@ -223,10 +231,7 @@ async function main() {
       'timer preferences are saved to Games/.state.json'
     );
     const settings = await getJson(base, '/api/settings', { method: 'PUT', body: { soundEnabled: false } });
-    check(
-      settings.status === 200 && settings.json?.soundEnabled === false,
-      'the sound setting is saved by the server'
-    );
+    check(settings.status === 200 && settings.json?.soundEnabled === false, 'the sound setting is saved by the server');
     const removed = await getJson(base, `/api/games/${encodeURIComponent(addedId)}`, { method: 'DELETE' });
     check(
       stopped.status === 200 &&

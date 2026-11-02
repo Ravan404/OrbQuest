@@ -1,6 +1,6 @@
-import path from 'path';
+import path from 'node:path';
 import type { BufferPreset, GameOrigin } from '../types.ts';
-import { ChildProcess } from 'child_process';
+import type { ChildProcess } from 'node:child_process';
 
 /**
  * Runtime settings. Override with environment variables:
