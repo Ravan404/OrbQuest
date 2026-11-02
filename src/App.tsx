@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { AppProfile, Game, ToastNotification } from './types';
+import { AppProfile, Game, ToastNotification, UpdateInfo } from './types';
 import { api, GameDraft, ThemeSetting, TimerSettings } from './api';
 import { t } from './strings';
 import { useGamePoller } from './hooks/useGamePoller';
@@ -17,6 +17,9 @@ import { ScriptDialog } from './dialogs/ScriptDialog';
 
 type NoticeTone = NonNullable<ToastNotification['type']>;
 
+/** How often the window asks the local server whether a new release was found. */
+const UPDATE_POLL_MS = 5 * 60 * 1000;
+
 const NEXT_THEME: Record<ThemeSetting, ThemeSetting> = { system: 'light', light: 'dark', dark: 'system' };
 
 /** Pins the page to a theme; `system` leaves it to the Windows setting. */
@@ -30,6 +33,7 @@ export default function App() {
   const [profile, setProfile] = useState<AppProfile | null>(null);
   const [profileFailed, setProfileFailed] = useState(false);
   const [profileAttempt, setProfileAttempt] = useState(0);
+  const [update, setUpdate] = useState<UpdateInfo | null>(null);
 
   const [games, setGames] = useState<Game[]>([]);
   const [selectedGameId, setSelectedGameId] = useState<string | null>(null);
@@ -70,6 +74,21 @@ export default function App() {
       });
     return () => controller.abort();
   }, [profileAttempt]);
+
+  // The server checks GitHub for a new release every six hours.
+  useEffect(() => {
+    const check = () =>
+      api
+        .update()
+        .then((result) => setUpdate(result.update))
+        .catch(() => {});
+    const first = window.setTimeout(check, 20_000);
+    const timer = window.setInterval(check, UPDATE_POLL_MS);
+    return () => {
+      window.clearTimeout(first);
+      window.clearInterval(timer);
+    };
+  }, []);
 
   const loadGames = useCallback(async (rescan = false): Promise<Game[] | null> => {
     try {
@@ -278,6 +297,7 @@ export default function App() {
     <div className="flex h-full flex-col overflow-hidden">
       <TopBar
         version={profile.version}
+        update={update}
         view={view}
         onView={openView}
         runningCount={runningCount}

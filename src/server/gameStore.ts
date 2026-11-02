@@ -15,7 +15,7 @@ import {
   StoredGame,
 } from './config.ts';
 import { isPathInside, isSafeExecutablePath } from './security.ts';
-import { cacheGameIcon, discordIconUrl, localGameIcon } from './iconStore.ts';
+import { cacheGameIcon, discordIconUrl, localGameIcon, remoteIconUrl } from './iconStore.ts';
 import { findGameByExecutable, findGameByName, getGameById, type DatabaseGame } from './gameDatabase.ts';
 import { isGameOrigin, type GameOrigin } from '../types.ts';
 import { readSimulatedSteamManifest } from './steamManifest.ts';
@@ -152,6 +152,8 @@ export interface SpecialGameRecord {
   executable: string;
   name: string;
   steamAppId: number;
+  /** Discord application id of the catalog game. */
+  appId?: string;
 }
 let lastStateSave = 0;
 
@@ -328,8 +330,9 @@ export function kickoffLogo(game: StoredGame): void {
     game.logoUrl = local;
     return;
   }
+  // A website icon (Firefox) shows once the server has saved it.
   game.logoUrl = discordIconUrl(match);
-  if (!game.logoUrl) return;
+  if (!remoteIconUrl(match)) return;
   game.logoPromise = cacheGameIcon(match).then((url) => {
     game.logoPromise = undefined;
     if (url) game.logoUrl = url;
@@ -373,6 +376,7 @@ async function scanGamesDir(): Promise<void> {
         origin: 'catalog',
         specialRootPath: record.rootPath,
         steamAppId: record.steamAppId,
+        ...(typeof record.appId === 'string' ? { appId: record.appId } : {}),
       });
     }
     const folders = fs.readdirSync(GAMES_DIR, { withFileTypes: true });

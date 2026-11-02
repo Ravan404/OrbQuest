@@ -23,6 +23,8 @@ export interface RedditEntryFix {
    * used (e.g. a title that names two games or only the quest).
    */
   aliases?: string[];
+  /** Steam app id of a quest the post sets up with a Steam manifest only described in prose. */
+  steamAppId?: number;
 }
 
 export const REDDIT_ENTRY_FIXES: Record<string, RedditEntryFix> = {
@@ -99,7 +101,8 @@ export const REDDIT_ENTRY_FIXES: Record<string, RedditEntryFix> = {
   },
   // "Method for completing the quests for "Marathon" and "Toxic Commando""
   '1rhvwn9': {
-    reason: 'Setup instructions from the post.',
+    reason: 'The post describes the Steam manifests in prose; 4354730 is the Toxic Commando Demo on Steam.',
+    steamAppId: 4354730,
     notes:
       'Steam-only quest: put appmanifest_3065800.acf and appmanifest_4354730.acf into SteamLibrary\\steamapps (copy any existing .acf file and rename it), then restart Discord before running the executable.',
   },
@@ -202,6 +205,8 @@ export const REDDIT_POST_SUPPLEMENTS: Record<string, Array<Omit<RedditCacheEntry
       executableName: 'Marathon.exe',
       folderPath: 'SteamLibrary\\steamapps\\common\\Marathon Server Slam',
       confidence: 'medium',
+      questMethod: 'steam-manifest',
+      steamAppId: 3065800,
       notes:
         'Steam-only quest: put appmanifest_3065800.acf and appmanifest_4354730.acf into SteamLibrary\\steamapps (copy any existing .acf file and rename it), then restart Discord before running the executable.',
     },
@@ -222,6 +227,7 @@ export function applyRedditEntryFix<T extends RedditCacheEntry>(entry: T): T {
   // Aliases are applied by dataset.ts when the name is finalized.
   const { reason: _reason, aliases: _aliases, ...values } = fix;
   const fixed = { ...entry, ...values };
+  if (values.steamAppId) fixed.questMethod = 'steam-manifest';
   if (values.folderPath && fixed.confidence === 'experimental' && !values.confidence) {
     fixed.confidence = 'medium';
   }

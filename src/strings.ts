@@ -95,6 +95,8 @@ const strings = {
   executable: 'Executable',
   fromReddit: 'r/DiscordQuests',
   fromRedditTitle: "Discord's list has no executable for this; this one comes from r/DiscordQuests posts.",
+  needsSteam: 'Steam',
+  needsSteamTitle: 'Discord only detects this through Steam. Steam must be installed; the stand-in goes into its steamapps folder.',
   inLibrary: 'In library',
   add: 'Add',
   adding: 'Adding…',
@@ -166,17 +168,20 @@ const strings = {
     'Discord needs a moment to notice a new game, so the count starts after a short wait: {fast}, {normal} or {long} seconds for Fast, Normal and Long, none for Off. Once the target is reached the stand-in keeps running for another {end} seconds so the last minute isn\'t cut short, then it stops. Untick "Stop at the end" if you want it to stay open.',
   aboutAddTitle: 'Getting games in',
   aboutAdd:
-    "The catalog is Discord's own list of games it can detect, so the stand-in gets exactly the name and folder Discord looks for (for VALORANT that is win64\\valorant-win64-shipping.exe). The list is updated every six hours. A few quest programs Discord lists without an executable, such as Firefox, come from r/DiscordQuests and are marked that way. Anything else can be added by hand with Add game.",
+    "The catalog is Discord's own list of games it can detect, so the stand-in gets exactly the name and folder Discord looks for (for VALORANT that is win64\\valorant-win64-shipping.exe). The list is updated every six hours. A few quest programs Discord lists without an executable, such as Firefox, come from r/DiscordQuests and are marked that way. Some quests, such as EA SPORTS FC 27, are only detected through Steam: those are marked Steam, and the stand-in goes into Steam's steamapps\\common folder with a small manifest file, so Steam has to be installed. Restart Steam and Discord if the quest doesn't notice it at first. Anything else can be added by hand with Add game.",
   aboutScript:
     "If you'd rather run the real game, the start script button on a card saves a .bat, .ps1 or .py that starts it and closes it when the same timer is up.",
   aboutFilesTitle: 'Where things are',
   aboutFiles:
-    "Everything sits in the Games folder next to the app. Each game has its own folder. Games\\.state.json keeps the times and timer settings, Games\\.settings.json keeps sound and theme. Closing the app stops any running timer and remembers where it was.",
+    "The library is in %LOCALAPPDATA%\\OrbQuest\\Games, so OrbQuest.exe can sit anywhere and a newer copy finds the same games. Each game has its own folder; Steam quests are in Steam's own folder instead. Games\\.state.json keeps the times and timer settings, Games\\.settings.json keeps sound and theme, and saved icons are in icon-cache next to Games. Closing the app stops any running timer and remembers where it was.",
   aboutLog:
     "If the app won't start, %LOCALAPPDATA%\\OrbQuest\\startup.log says why. Server messages go to backend.log next to it.",
   aboutRemoveTitle: 'Removing a game',
   aboutRemove:
-    "Remove deletes the game's folder under Games. A real Steam install is never deleted; it only comes off the list.",
+    "Remove deletes the game's folder under Games. For a Steam quest it deletes the stand-in and the manifest the app wrote. A real Steam install is never deleted; it only comes off the list.",
+  updateAvailable: 'Update {version}',
+  updateTitle: 'OrbQuest {version} is out. Opens the release page, where the new OrbQuest.exe can be downloaded.',
+  openFolder: 'Open folder',
   aboutFacts: 'On this PC',
   aboutVersion: 'Version',
   aboutDbGames: 'Games in the database',

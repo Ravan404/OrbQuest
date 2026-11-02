@@ -32,13 +32,19 @@ const CatalogTile: React.FC<{
     <div className="flex min-w-0 items-center gap-3 rounded-lg border border-line bg-surface px-3 py-2.5">
       <GameIcon name={game.name} src={game.icon} size="md" />
       <div className="min-w-0 flex-1">
-        <p className="flex min-w-0 items-center gap-1.5">
-          <span className="truncate text-[13px] font-medium text-text" title={game.name}>
+        {/* The labels wrap under a long name instead of squeezing it away. */}
+        <p className="flex min-w-0 flex-wrap items-center gap-x-1.5 gap-y-0.5">
+          <span className="max-w-full truncate text-[13px] font-medium text-text" title={game.name}>
             {game.name}
           </span>
           {game.source === 'reddit' && (
             <span className="shrink-0" title={t('fromRedditTitle')}>
               <Chip>{t('fromReddit')}</Chip>
+            </span>
+          )}
+          {game.steam && (
+            <span className="shrink-0" title={t('needsSteamTitle')}>
+              <Chip>{t('needsSteam')}</Chip>
             </span>
           )}
         </p>

@@ -37,7 +37,16 @@ import { parseSimulatedSteamManifest } from '../steamManifest.ts';
 import { getSettings } from '../settingsStore.ts';
 import { writePlaceholderIcon } from '../placeholderIcon.ts';
 import { getGameById } from '../gameDatabase.ts';
-import { MANAGED_INSTALL_MARKER, planSteamRemoval } from '../steamLibrarySafety.ts';
+import type { DatabaseGame, SteamQuest } from '../gameDatabaseSource.ts';
+import {
+  MANAGED_INSTALL_MARKER,
+  buildSimulatedManifest,
+  canReplaceManifest,
+  installDirectoryIsForeign,
+  planSteamRemoval,
+  writeManagedMarker,
+} from '../steamLibrarySafety.ts';
+import { findSteamAppsPath } from '../steamPaths.ts';
 
 /** How long a launch may wait for the child `spawn` event before failing the request. */
 const LAUNCH_SPAWN_TIMEOUT_MS = 15_000;
@@ -129,6 +138,11 @@ router.post('/:id/launch', (req: Request<IdParams>, res: Response) => {
   const isManagedDirectory =
     isPathInside(GAMES_DIR, executablePath) ||
     fs.existsSync(path.join(workingDirectory, MANAGED_INSTALL_MARKER)) ||
+    // A Steam quest's marker is in its install folder, the executable can be deeper.
+    Boolean(
+      game.specialRootPath &&
+        fs.existsSync(path.join(game.specialRootPath, 'common', path.basename(game.folder), MANAGED_INSTALL_MARKER))
+    ) ||
     fs.existsSync(path.join(workingDirectory, '.game-meta.json')) ||
     fs.existsSync(path.join(workingDirectory, '.game-name.txt'));
 
@@ -586,6 +600,8 @@ router.post('/', (req: Request, res: Response) => {
       return res.status(400).json({ error: 'That executable is not one Discord lists for this game.' });
     }
     appId = known.id;
+    if (!fs.existsSync(PLACEHOLDER_EXE)) return res.status(500).json({ error: 'App files are missing.' });
+    if (known.steam) return addSteamQuest(res, known, known.steam, displayName, cleanExe.toLowerCase(), prefs);
   }
 
   if (!fs.existsSync(PLACEHOLDER_EXE)) {
@@ -661,5 +677,79 @@ router.post('/', (req: Request, res: Response) => {
   kickoffLogo(newGame);
   res.json({ success: true, game: toPublicGame(newGame) });
 });
+
+/**
+ * A quest Discord only detects through Steam (EA SPORTS FC 27): the
+ * placeholder goes to `steamapps/common/<installDir>/` of the Steam library
+ * and a minimal `appmanifest_<appId>.acf` next to it, as the r/DiscordQuests
+ * post describes. A real install or a real manifest of that game is never
+ * overwritten.
+ */
+function addSteamQuest(
+  res: Response,
+  known: DatabaseGame,
+  steam: SteamQuest,
+  displayName: string,
+  executable: string,
+  prefs: TimerPreferences
+) {
+  const id = `steam-${steam.appId}`;
+  if (gamesMap.has(id)) return res.status(409).json({ error: 'This game is already in the library.' });
+  const steamAppsPath = findSteamAppsPath();
+  if (!steamAppsPath) {
+    return res.status(404).json({ error: `${known.name} needs Steam, and no Steam installation was found.` });
+  }
+
+  const commonDir = path.join(steamAppsPath, 'common');
+  const targetDir = path.join(commonDir, steam.installDir);
+  const targetExecutable = path.join(targetDir, executable);
+  const manifestPath = path.join(steamAppsPath, `appmanifest_${steam.appId}.acf`);
+  if (!isPathInside(commonDir, targetDir) || !isPathInside(targetDir, targetExecutable)) {
+    return res.status(400).json({ error: 'Invalid folder path' });
+  }
+  if (installDirectoryIsForeign(targetDir, executable) || !canReplaceManifest(manifestPath)) {
+    return res.status(409).json({ error: `${known.name} is already installed on Steam; its files were left alone.` });
+  }
+
+  try {
+    fs.mkdirSync(path.dirname(targetExecutable), { recursive: true });
+    if (!fs.existsSync(targetExecutable)) fs.copyFileSync(PLACEHOLDER_EXE, targetExecutable);
+    else upgradeLegacyPlaceholder(targetExecutable, PLACEHOLDER_EXE);
+    fs.writeFileSync(path.join(targetDir, '.game-name.txt'), displayName, 'utf-8');
+    writeManagedMarker(targetDir, { appId: steam.appId, executable });
+    fs.writeFileSync(manifestPath, buildSimulatedManifest(steam.appId, displayName, steam.installDir), 'utf-8');
+  } catch (error) {
+    console.warn('Could not write the Steam quest files', error);
+    return res.status(500).json({ error: 'Could not write to the Steam folder.' });
+  }
+
+  const newGame: StoredGame = {
+    id,
+    name: displayName,
+    folder: path.join('special', steam.installDir),
+    executable,
+    isRunning: false,
+    elapsedSeconds: 0,
+    origin: 'catalog',
+    addedAt: new Date().toISOString(),
+    specialRootPath: steamAppsPath,
+    steamAppId: steam.appId,
+    appId: known.id,
+  };
+  applyTimerPreferences(newGame, prefs);
+  gamesMap.set(id, newGame);
+  saveSpecialGame({
+    id,
+    rootPath: steamAppsPath,
+    installDir: steam.installDir,
+    executable,
+    name: displayName,
+    steamAppId: steam.appId,
+    appId: known.id,
+  });
+  savePersistedState(true);
+  kickoffLogo(newGame);
+  return res.json({ success: true, game: toPublicGame(newGame) });
+}
 
 export default router;

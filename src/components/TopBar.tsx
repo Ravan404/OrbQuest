@@ -1,6 +1,7 @@
 import React from 'react';
-import { Monitor, Moon, Plus, RefreshCw, Sun, Volume2, VolumeX } from 'lucide-react';
+import { ArrowUpCircle, Monitor, Moon, Plus, RefreshCw, Sun, Volume2, VolumeX } from 'lucide-react';
 import type { ThemeSetting } from '../api';
+import type { UpdateInfo } from '../types';
 import { t } from '../strings';
 import { Button, IconButton } from './ui';
 
@@ -8,6 +9,8 @@ export type View = 'library' | 'catalog' | 'about';
 
 interface TopBarProps {
   version: string;
+  /** A newer release, shown as a link to its page. */
+  update: UpdateInfo | null;
   view: View;
   onView: (view: View) => void;
   runningCount: number;
@@ -29,6 +32,7 @@ const THEME_LABEL = { system: 'themeSystem', light: 'themeLight', dark: 'themeDa
 
 export const TopBar: React.FC<TopBarProps> = ({
   version,
+  update,
   view,
   onView,
   runningCount,
@@ -50,6 +54,19 @@ export const TopBar: React.FC<TopBarProps> = ({
       <div className="mr-5 flex items-baseline gap-2">
         <span className="text-[14px] font-semibold tracking-tight text-text">{t('appTitle')}</span>
         <span className="tabular text-[11px] text-faint">{version}</span>
+        {update && (
+          <a
+            id="update-available-link"
+            href={update.url}
+            target="_blank"
+            rel="noreferrer"
+            title={t('updateTitle', { version: update.version })}
+            className="flex items-center gap-1 self-center rounded-full bg-primary px-2 py-0.5 text-[11px] font-medium text-on-primary hover:bg-primary-hover"
+          >
+            <ArrowUpCircle className="h-3 w-3" />
+            {t('updateAvailable', { version: update.version })}
+          </a>
+        )}
       </div>
 
       <nav className="flex h-full items-stretch" aria-label="Views">

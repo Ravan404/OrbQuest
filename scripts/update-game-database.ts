@@ -95,7 +95,13 @@ async function run(): Promise<void> {
   const entries = buildDatabaseEntries(loadDataset(snapshots).posts);
   const supplement = buildRedditSupplement(entries, discordList, discord.games);
   console.log(`r/DiscordQuests adds ${supplement.length} program(s) Discord gives no executable for:`);
-  for (const game of supplement) console.log(`  ${game.name} [${game.executables.join(', ')}]${game.icon ? '' : ' (no Discord icon)'}`);
+  for (const game of supplement) {
+    const notes = [
+      game.steam ? `Steam app ${game.steam.appId}, steamapps/common/${game.steam.installDir}` : '',
+      game.icon ? '' : game.site ? `icon from ${game.site}` : 'no icon',
+    ].filter(Boolean);
+    console.log(`  ${game.name} [${game.executables.join(', ')}]${notes.length ? ` (${notes.join('; ')})` : ''}`);
+  }
 
   const next: GameDatabase = { ...discord, games: sortGames([...discord.games, ...supplement]) };
   const current: GameDatabase | null = fs.existsSync(FILE) ? JSON.parse(fs.readFileSync(FILE, 'utf8')) : null;

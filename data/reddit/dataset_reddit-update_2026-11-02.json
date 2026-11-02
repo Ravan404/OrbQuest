@@ -1,0 +1,38 @@
+{
+  "source": "arctic-shift",
+  "subreddit": "DiscordQuests",
+  "fetchedAt": "2026-11-02T16:55:19.241Z",
+  "checkedThrough": "2026-11-02T14:53:50.000Z",
+  "textFormat": "markdown",
+  "note": "Written by scripts/update-game-database.ts: the r/DiscordQuests posts created after the previous snapshots.",
+  "posts": [
+    {
+      "id": "1xl9m0p",
+      "title": "Discord Quest completion without playing games ( very simple )",
+      "selfText": "# I recently explored an app in deskstop named iamlaunch which launches fake games in our pc which could discord detect without installing games on our pc it has 100+ apps and most of discord apps.\n\n# Disclaimer: this app isn't mine I just reviewed it , try on your own risk.\n\n# Security/privacy: at first I think it has trojan cuz my windows security detected but when I off real time protection and download it , I didn't feel any suspicious but try on your own risk.\n\n# App link: iamlaunch.com",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1xl9m0p/",
+      "createdAt": "2026-11-01T17:54:25.000Z"
+    },
+    {
+      "id": "1xljg15",
+      "title": "How much Orbs do you need to buy the full store? (or money)",
+      "selfText": "i have been thinking about this a little time so, why not ask in reddit? \n\nhttps://i.redd.it/r48u079kj3zh1.png\n\ni think abt 500k or 1 thousand dollars idk",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1xljg15/how_much_orbs_do_you_need_to_buy_the_full_store/",
+      "createdAt": "2026-11-02T00:48:03.000Z"
+    },
+    {
+      "id": "1xlv9dx",
+      "title": "Resident Evil sale",
+      "selfText": " anyone have discord quest share please.",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1xlv9dx/resident_evil_sale/",
+      "createdAt": "2026-11-02T11:59:09.000Z"
+    },
+    {
+      "id": "1xlzauj",
+      "title": "RESIDENT EVIL QUEST 700 orbs",
+      "selfText": "..../RESIDENT EVIL 7 biohazard/re7.exe",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1xlzauj/resident_evil_quest_700_orbs/",
+      "createdAt": "2026-11-02T14:53:50.000Z"
+    }
+  ]
+}
