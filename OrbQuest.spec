@@ -1,15 +1,19 @@
 # -*- mode: python ; coding: utf-8 -*-
-# PyInstaller recipe for OrbQuest.exe.
-# build_windows_exe.bat resolves node.exe (DQR_NODE_EXE -> PATH -> default
-# install), checks it, exports it as DQR_NODE_EXE and then runs this spec:
-#     python -m PyInstaller --noconfirm --clean OrbQuest.spec
-# The Node.js runtime location below is therefore resolved at build time;
-# the C:\ path is only a last-resort fallback for manual runs.
+# PyInstaller recipe for the Windows packages. build_windows_exe.bat resolves
+# node.exe (DQR_NODE_EXE -> PATH -> default install), checks it, exports it as
+# DQR_NODE_EXE and then runs:
+#     python -m PyInstaller --noconfirm --clean --distpath release OrbQuest.spec
+# It makes two packages from one analysis:
+#   release\OrbQuest\                the folder the installer (installer\OrbQuest.iss) installs;
+#                                    it starts quickly because nothing is unpacked
+#   release\OrbQuest-<version>.exe   the portable single file, unpacked to %TEMP% on every start
+import json
 import os
 import shutil
 
 _NODE_EXE = os.environ.get('DQR_NODE_EXE') or shutil.which('node.exe') or r'C:\Program Files\nodejs\node.exe'
-
+with open('package.json', encoding='utf-8') as package:
+    _VERSION = json.load(package)['version']
 
 a = Analysis(
     ['desktop_app.py'],
@@ -26,24 +30,33 @@ a = Analysis(
 )
 pyz = PYZ(a.pure)
 
-exe = EXE(
-    pyz,
-    a.scripts,
-    a.binaries,
-    a.datas,
-    [],
-    name='OrbQuest',
+_EXE_OPTIONS = dict(
     icon='assets/OrbQuest.ico',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
     upx=False,
-    upx_exclude=[],
-    runtime_tmpdir=None,
     console=False,
     disable_windowed_traceback=False,
     argv_emulation=False,
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
+)
+
+# Installed package: OrbQuest.exe next to its files.
+installed = EXE(pyz, a.scripts, [], exclude_binaries=True, name='OrbQuest', **_EXE_OPTIONS)
+COLLECT(installed, a.binaries, a.datas, strip=False, upx=False, name='OrbQuest')
+
+# Portable package: one file.
+EXE(
+    pyz,
+    a.scripts,
+    a.binaries,
+    a.datas,
+    [],
+    name=f'OrbQuest-{_VERSION}',
+    upx_exclude=[],
+    runtime_tmpdir=None,
+    **_EXE_OPTIONS,
 )

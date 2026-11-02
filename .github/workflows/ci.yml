@@ -82,25 +82,70 @@ jobs:
           name: e2e-screenshots
           path: e2e-screenshots
 
-  placeholder:
-    name: Placeholder builds from source
+  packages:
+    name: Windows packages (installer and portable exe)
     runs-on: windows-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v7
 
-      - name: Setup MinGW-w64
-        id: msys2
-        uses: msys2/setup-msys2@v2
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
         with:
-          msystem: MINGW64
-          install: mingw-w64-x86_64-gcc
+          node-version: 22
+          cache: npm
 
-      - name: Build placeholder_runtime.exe from placeholder_runtime.c
+      - name: Setup Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: '3.13'
+
+      - name: Install Inno Setup
+        run: choco install innosetup --no-progress -y
+
+      - name: Build the installer and the portable exe
+        shell: cmd
+        run: .\build_windows_exe.bat
+
+      - name: Install, start and uninstall the packages
+        shell: pwsh
+        run: ./scripts/smoke-test-package.ps1
+
+  placeholder:
+    name: Placeholder matches its source
+    runs-on: windows-latest
+    env:
+      # The pinned toolchain of scripts/build-placeholder.bat; its build is
+      # byte-for-byte reproducible, so the result must equal the committed exe.
+      WINLIBS_URL: https://github.com/brechtsanders/winlibs_mingw/releases/download/16.2.0posix-23.1.3-14.0.0-ucrt-r3/winlibs-x86_64-posix-seh-gcc-16.2.0-mingw-w64ucrt-14.0.0-r3.7z
+      WINLIBS_SHA256: db014a73b71907c6c778fd1c938056cddcae9023f89f8dfff7783d9e45baf975
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Cache the toolchain
+        id: winlibs
+        uses: actions/cache@v4
+        with:
+          path: ${{ runner.temp }}\winlibs
+          key: winlibs-${{ env.WINLIBS_SHA256 }}
+
+      - name: Download WinLibs GCC 16.2.0 UCRT r3
+        if: steps.winlibs.outputs.cache-hit != 'true'
         shell: pwsh
         run: |
-          $env:PATH = "${{ steps.msys2.outputs.msys2-location }}\mingw64\bin;$env:PATH"
-          cmd /c scripts\build-placeholder.bat
+          $archive = Join-Path $env:RUNNER_TEMP 'winlibs.7z'
+          Invoke-WebRequest $env:WINLIBS_URL -OutFile $archive
+          $hash = (Get-FileHash $archive -Algorithm SHA256).Hash.ToLower()
+          if ($hash -ne $env:WINLIBS_SHA256) { throw "Unexpected toolchain archive: $hash" }
+          7z x $archive "-o$env:RUNNER_TEMP\winlibs" | Out-Null
+
+      - name: Build placeholder_runtime.exe and compare it with the committed one
+        shell: pwsh
+        run: |
+          $env:PATH = "$env:RUNNER_TEMP\winlibs\mingw64\bin;$env:PATH"
+          gcc --version | Select-Object -First 1
+          cmd /c scripts\build-placeholder.bat --check
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
       - name: Check the result is a 64-bit Windows GUI program

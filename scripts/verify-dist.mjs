@@ -6,8 +6,8 @@
  *   npm run verify:dist
  *
  * It verifies that:
- *   1. the version number is the same in package.json, desktop_app.py,
- *      build_windows_exe.bat and placeholder_runtime.rc;
+ *   1. the version number is the same in package.json, desktop_app.py
+ *      and build_windows_exe.bat;
  *   2. `dist/server.cjs` starts in production mode (with a throw-away data
  *      folder, no background database update);
  *   3. the bundled game database is the one in the repository and answers
@@ -82,8 +82,6 @@ async function main() {
   const batVersion = /Version: (\S+)/.exec(read('build_windows_exe.bat'))?.[1];
   check(desktopVersion === version, `desktop_app.py APP_VERSION is ${version} (found ${desktopVersion})`);
   check(batVersion === version, `build_windows_exe.bat shows version ${version} (found ${batVersion})`);
-  const rcVersion = /VALUE "ProductVersion",\s*"(\d+\.\d+\.\d+)\.0\\0"/.exec(read('placeholder_runtime.rc'))?.[1];
-  check(rcVersion === version, `placeholder_runtime.rc ProductVersion is ${version} (found ${rcVersion})`);
 
   if (!fs.existsSync(serverBundle)) {
     check(false, 'dist/server.cjs exists (run "npm run build" first)');

@@ -4,8 +4,9 @@
  *
  * Writes one version number into every file that carries it:
  *   package.json, package-lock.json (two fields), src/version.ts,
- *   desktop_app.py (APP_VERSION), build_windows_exe.bat (the "Version:" banner),
- *   placeholder_runtime.rc (version resource of the placeholder exe).
+ *   desktop_app.py (APP_VERSION), build_windows_exe.bat (the "Version:" banner).
+ * placeholder_runtime.rc keeps its own version: the placeholder exe only
+ * changes when placeholder_runtime.c does (scripts/build-placeholder.bat).
  * The CHANGELOG [Unreleased] heading becomes the new version (an empty section
  * is added when there is none).
  *
@@ -71,18 +72,6 @@ const edits = [
     file: 'build_windows_exe.bat',
     check: read('build_windows_exe.bat').includes(`Version: ${current}`),
     apply: (text) => text.replace(`Version: ${current}`, `Version: ${next}`),
-  },
-  {
-    // Version resource of placeholder_runtime.exe. The exe itself only changes
-    // when it is rebuilt (scripts/build-placeholder.bat).
-    file: 'placeholder_runtime.rc',
-    check: read('placeholder_runtime.rc').includes(`"${current}.0\\0"`),
-    apply: (text) => {
-      const [major, minor, patch] = next.split('.');
-      return text
-        .replace(/(FILEVERSION|PRODUCTVERSION)(\s+)\d+,\d+,\d+,0/g, `$1$2${major},${minor},${patch},0`)
-        .replaceAll(`"${current}.0\\0"`, `"${next}.0\\0"`);
-    },
   },
 ];
 

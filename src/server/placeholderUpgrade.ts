@@ -20,6 +20,8 @@ const LEGACY_SHA256_HASHES = new Set([
   'e7d27966f385b0eb5d84b1487a95dac3db1f2db3f96d3f22c214ed9bc45c6407',
   // 1.2.26, before the rename to OrbQuest.
   '92124328d85a53c07fd589011d9111f81faaaacd201765ab4e54a32a7dc8b528',
+  // 1.3.0 to 1.5.1, before the build was made reproducible.
+  '864c229bc1d242bde03b8c9f0cebe26e9b00bebb0415bf422e8d955a1841e8e3',
 ]);
 
 /**
