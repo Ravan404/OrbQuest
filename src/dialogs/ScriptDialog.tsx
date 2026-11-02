@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { Clipboard, Download } from 'lucide-react';
 import { Game } from '../types';
+import { api } from '../api';
 import { t } from '../strings';
 import { buildStartScripts, ScriptKind, SCRIPT_LABELS, scriptFileName } from '../utils/startScripts';
 import { Button, Dialog, Segmented } from '../components/ui';
@@ -25,14 +26,17 @@ export const ScriptDialog: React.FC<ScriptDialogProps> = ({ game, onClose, onNot
     }
   };
 
-  const download = () => {
-    const url = URL.createObjectURL(new Blob([scripts[kind]], { type: 'text/plain;charset=utf-8' }));
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = fileName;
-    link.click();
-    URL.revokeObjectURL(url);
-    onNotice(t('downloaded'), fileName);
+  const [saving, setSaving] = useState(false);
+  const download = async () => {
+    setSaving(true);
+    try {
+      const saved = await api.saveScript(game.id, kind);
+      onNotice(t('downloaded'), saved.path);
+    } catch (error) {
+      onNotice(t('noticeError'), error instanceof Error ? error.message : String(error), 'warning');
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -47,7 +51,7 @@ export const ScriptDialog: React.FC<ScriptDialogProps> = ({ game, onClose, onNot
           <Button icon={<Clipboard className="h-3.5 w-3.5" />} onClick={copy}>
             {t('copy')}
           </Button>
-          <Button variant="primary" icon={<Download className="h-3.5 w-3.5" />} onClick={download}>
+          <Button variant="primary" icon={<Download className="h-3.5 w-3.5" />} disabled={saving} onClick={() => void download()}>
             {t('download')}
           </Button>
         </>

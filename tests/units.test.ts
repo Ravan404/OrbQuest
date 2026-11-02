@@ -90,7 +90,8 @@ test('start scripts close the game after the card timer and escape the game name
   assert.ok(scripts.ps1.includes('Start-Sleep -Seconds 618'));
   assert.ok(scripts.py.includes('time.sleep(618)'));
   assert.ok(scripts.py.includes('"Full path to ab.exe: "'));
-  assert.equal(scriptFileName({ id: 'my-game' }, 'ps1'), 'run_my-game.ps1');
+  assert.equal(scriptFileName({ name: 'EA SPORTS FC 27' }, 'ps1'), 'EA SPORTS FC 27 - OrbQuest.ps1');
+  assert.equal(scriptFileName({ name: 'Who: "Me"?' }, 'bat'), 'Who Me - OrbQuest.bat', 'characters Windows refuses are dropped');
 
   // No limit, or "Stop at the end" off: the scripts only start the game.
   for (const untimed of [{ targetMinutes: 0 }, { targetMinutes: 10, autoStop: false }]) {

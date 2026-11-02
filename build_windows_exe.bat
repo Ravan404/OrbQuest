@@ -1,6 +1,6 @@
 @echo off
 title Build OrbQuest.exe
-echo Building OrbQuest.exe, Version: 1.5.0
+echo Building OrbQuest.exe, Version: 1.5.1
 echo.
 
 set "ROOT=%~dp0"

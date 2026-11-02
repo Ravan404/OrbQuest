@@ -1,5 +1,5 @@
 import { BUFFER_PRESET_DURATIONS, Game } from '../types';
-import { escapeBatch, escapeBatchQuoted, escapePowerShell, safeScriptId } from './scriptEscape';
+import { escapeBatch, escapeBatchQuoted, escapePowerShell } from './scriptEscape';
 
 export type ScriptKind = 'bat' | 'ps1' | 'py';
 
@@ -9,8 +9,19 @@ export const SCRIPT_LABELS: Record<ScriptKind, string> = {
   py: 'Python (.py)',
 };
 
-export function scriptFileName(game: Pick<Game, 'id'>, kind: ScriptKind): string {
-  return `run_${safeScriptId(game.id)}.${kind}`;
+/**
+ * `VALORANT - OrbQuest.bat`: the game's name, so the file is easy to find in
+ * Downloads, and OrbQuest, so it is not mistaken for the game's own.
+ */
+export function scriptFileName(game: Pick<Game, 'name'>, kind: ScriptKind): string {
+  const name =
+    game.name
+      .replace(/[<>:"/\\|?*\x00-\x1f]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .slice(0, 80)
+      .replace(/[. ]+$/, '') || 'Game';
+  return `${name} - OrbQuest.${kind}`;
 }
 
 /**

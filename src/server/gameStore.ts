@@ -656,43 +656,19 @@ export function toPublicGame(
 // Lookup
 // ---------------------------------------------------------------
 
-/** Finds a game by id, folder or display name. */
-export function findGameById(rawId: string): { key: string; game: StoredGame } | null {
-  if (!rawId || typeof rawId !== 'string') return null;
-  const raw = String(rawId).trim();
-  // Prevent path traversal attacks
-  if (raw.includes('..') || raw.includes('/') || raw.includes('\\')) return null;
-
-  let decoded = raw;
-  try {
-    decoded = decodeURIComponent(raw).trim();
-    // Additional check after decoding
-    if (decoded.includes('..') || decoded.includes('/') || decoded.includes('\\')) return null;
-  } catch {}
-
-  const lowerRaw = raw.toLowerCase();
-  const lowerDecoded = decoded.toLowerCase();
-
-  // 1. Direct match
-  if (gamesMap.has(raw)) return { key: raw, game: gamesMap.get(raw)! };
-  if (gamesMap.has(decoded)) return { key: decoded, game: gamesMap.get(decoded)! };
-  if (gamesMap.has(lowerRaw)) return { key: lowerRaw, game: gamesMap.get(lowerRaw)! };
-  if (gamesMap.has(lowerDecoded)) return { key: lowerDecoded, game: gamesMap.get(lowerDecoded)! };
-
-  // 2. Scan all entries for matches on id, folder, or name
-  for (const [key, g] of gamesMap.entries()) {
-    if (
-      key.toLowerCase() === lowerRaw ||
-      key.toLowerCase() === lowerDecoded ||
-      g.id.toLowerCase() === lowerRaw ||
-      g.id.toLowerCase() === lowerDecoded ||
-      g.folder.toLowerCase() === lowerRaw ||
-      g.folder.toLowerCase() === lowerDecoded ||
-      g.name.toLowerCase() === lowerRaw ||
-      g.name.toLowerCase() === lowerDecoded
-    ) {
-      return { key, game: g };
-    }
+/**
+ * Finds a game by its id (Express has already decoded the URL part). Only
+ * the id counts: two games may share a name, and a request must never reach
+ * the wrong one.
+ */
+export function findGameById(id: string): { key: string; game: StoredGame } | null {
+  if (typeof id !== 'string' || !id.trim()) return null;
+  const wanted = id.trim();
+  const exact = gamesMap.get(wanted);
+  if (exact) return { key: wanted, game: exact };
+  const lower = wanted.toLowerCase();
+  for (const [key, game] of gamesMap.entries()) {
+    if (key.toLowerCase() === lower || game.id.toLowerCase() === lower) return { key, game };
   }
   return null;
 }

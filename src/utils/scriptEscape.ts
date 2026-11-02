@@ -23,6 +23,3 @@ export const escapeBatch = (value: string) =>
 
 /** Text inside double quotes: only % expands there, and a quote would end the string. */
 export const escapeBatchQuoted = (value: string) => stripControlChars(value).replace(/%/g, '%%').replace(/"/g, '');
-
-/** File-name part of a downloaded script. */
-export const safeScriptId = (value: string) => value.replace(/[^a-zA-Z0-9_-]/g, '_') || 'game';

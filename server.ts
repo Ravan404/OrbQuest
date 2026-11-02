@@ -26,6 +26,7 @@ import settingsRouter from './src/server/routes/settings.ts';
 import { APP_VERSION } from './src/version.ts';
 import { getGameDatabaseInfo, loadGameDatabase, scheduleGameDatabaseRefresh } from './src/server/gameDatabase.ts';
 import { ICON_CACHE_DIR } from './src/server/iconStore.ts';
+import { getSettings } from './src/server/settingsStore.ts';
 import { availableUpdate, scheduleUpdateChecks } from './src/server/updateCheck.ts';
 import { spawn } from 'node:child_process';
 
@@ -222,19 +223,21 @@ async function startServer() {
         }
         next();
       });
-      app.use(express.static(distPath, { dotfiles: 'deny' }));
+      app.use(express.static(distPath, { dotfiles: 'deny', index: false }));
     }
     // Express 5 path syntax: a bare '*' is no longer valid; '/{*splat}' also matches '/'.
     app.get('/{*splat}', (_req, res) => {
-      if (fs.existsSync(indexPath)) {
-        res.sendFile(indexPath, { dotfiles: 'deny' }, (err) => {
-          if (err && !res.headersSent) {
-            res.status(404).send('Not Found');
-          }
-        });
-      } else {
-        res.status(404).send('Application build not found');
+      let html: string;
+      try {
+        html = fs.readFileSync(indexPath, 'utf8');
+      } catch {
+        return res.status(404).send('Application build not found');
       }
+      // The saved theme is on the page before the app starts, so the window
+      // never shows the other one first.
+      const { theme } = getSettings();
+      if (theme === 'light' || theme === 'dark') html = html.replace('<html lang="en">', `<html lang="en" data-theme="${theme}">`);
+      res.type('html').send(html);
     });
   }
 
