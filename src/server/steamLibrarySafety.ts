@@ -14,6 +14,7 @@ export const MANAGED_INSTALL_MARKER = '.dqr-managed.json';
 const METADATA_FILES = new Set([
   '.game-name.txt',
   '.game-meta.json',
+  '.game-icon.ico',
   MANAGED_INSTALL_MARKER,
 ]);
 

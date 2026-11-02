@@ -42,6 +42,9 @@ const gameUrl = (id: string, action = '') => `/api/games/${encodeURIComponent(id
 export const api = {
   profile: (signal?: AbortSignal) => request<AppProfile>('/api/profile', { signal }),
   update: () => request<{ update: UpdateInfo | null }>('/api/update'),
+  /** Saves a game's start script to the Downloads folder. */
+  saveScript: (id: string, kind: 'bat' | 'ps1' | 'py') =>
+    request<{ fileName: string; path: string }>(gameUrl(id, 'script'), { method: 'POST', json: { kind } }),
   openGamesFolder: () => request<{ success: boolean }>('/api/open-games-folder', { method: 'POST' }),
 
   settings: () => request<Partial<AppSettings>>('/api/settings'),

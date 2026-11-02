@@ -47,6 +47,9 @@ import {
   writeManagedMarker,
 } from '../steamLibrarySafety.ts';
 import { findSteamAppsPath } from '../steamPaths.ts';
+import { downloadsFolder } from '../downloads.ts';
+import { writeFileAtomic } from '../fsUtil.ts';
+import { buildStartScripts, scriptFileName } from '../../utils/startScripts.ts';
 
 /** How long a launch may wait for the child `spawn` event before failing the request. */
 const LAUNCH_SPAWN_TIMEOUT_MS = 15_000;
@@ -176,9 +179,9 @@ router.post('/:id/launch', (req: Request<IdParams>, res: Response) => {
     } else {
       ensureManagedPlaceholderExecutable(executablePath, PLACEHOLDER_EXE);
     }
-    // The placeholder window shows the game's icon. Only inside Games/: a
-    // Steam library gets nothing but the placeholder itself.
-    if (isPathInside(GAMES_DIR, executablePath)) {
+    // The placeholder window shows the game's icon. In a Steam library only
+    // next to our own placeholder, never into a real game's folder.
+    if (isPathInside(GAMES_DIR, executablePath) || hasPlaceholderRuntimeSignature(executablePath)) {
       writePlaceholderIcon(path.dirname(executablePath), game.logoUrl);
     }
   }
@@ -571,6 +574,32 @@ router.delete('/:id', (req: Request<IdParams>, res: Response) => {
     id: game.id,
     ...(preservedSteamInstall ? { preservedSteamInstall: true } : {}),
   });
+});
+
+// POST /api/games/:id/script { kind: 'bat' | 'ps1' | 'py' }
+//
+// Saves the start script of a game to the user's Downloads folder as
+// `<Game> - OrbQuest.<kind>`. The script is built here from the game, so a
+// request only chooses the kind.
+router.post('/:id/script', (req: Request<IdParams>, res: Response) => {
+  const match = findGameById(req.params.id);
+  if (!match) return res.status(404).json({ error: 'Game not found' });
+  const kind = (req.body as Record<string, unknown> | undefined)?.kind;
+  if (kind !== 'bat' && kind !== 'ps1' && kind !== 'py') {
+    return res.status(400).json({ error: 'kind must be bat, ps1 or py.' });
+  }
+  const game = toPublicGame(match.game);
+  const folder = downloadsFolder();
+  const fileName = scriptFileName(game, kind);
+  const target = path.join(folder, fileName);
+  try {
+    fs.mkdirSync(folder, { recursive: true });
+    writeFileAtomic(target, buildStartScripts(game)[kind]);
+  } catch (error) {
+    console.warn('Could not save the start script', error);
+    return res.status(500).json({ error: `Could not save ${fileName} to ${folder}.` });
+  }
+  res.json({ success: true, fileName, path: target });
 });
 
 // POST /api/games
