@@ -15,6 +15,7 @@
 
 - The placeholder build is reproducible, and CI checks that the committed `placeholder_runtime.exe` is exactly what `placeholder_runtime.c` builds to. Placeholders in existing libraries are upgraded to it on the next scan.
 - The browser test, Biome lint and format checks and the Windows packages (installed, started and uninstalled) run in CI.
+- A game icon is only saved when its bytes are a real PNG, JPEG, WebP, GIF or ICO image, never SVG; before, a download only had to claim an image type.
 - Dependency updates: lucide-react 1.66, Tailwind CSS 4.3.4, the Vite React plugin 6.2 and upload-artifact v7 in the workflows.
 
 ### Fixed

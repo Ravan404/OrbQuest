@@ -220,3 +220,31 @@ test('a newer GitHub release is offered, anything else is not', async () => {
   assert.equal(await slow, true);
   assert.deepEqual(await answerPromise, { version: '99.1.0', url: page });
 });
+
+test('the icon cache keeps real images only: no SVG, no page that claims to be one', async () => {
+  const fs = await import('node:fs');
+  const os = await import('node:os');
+  const { createIconStore } = await import('../src/server/iconStore.ts');
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'dqr-icons-'));
+  const store = createIconStore({ cacheDir: dir });
+  const png = Buffer.concat([Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]), Buffer.alloc(100)]);
+  const answers: Record<string, [Buffer | string, string]> = {
+    'https://x.test/real.png': [png, 'image/png'],
+    'https://x.test/drawing.svg': [`<svg xmlns="http://www.w3.org/2000/svg">${' '.repeat(100)}</svg>`, 'image/svg+xml'],
+    'https://x.test/page.png': [`<html><script>alert(1)</script>${' '.repeat(100)}</html>`, 'image/png'],
+  };
+  const realFetch = globalThis.fetch;
+  globalThis.fetch = (async (url: string) => {
+    const [body, type] = answers[url];
+    return new Response(typeof body === 'string' ? body : new Uint8Array(body), { headers: { 'content-type': type } });
+  }) as typeof fetch;
+  try {
+    assert.equal(await store.saveRemoteIcon('real', 'https://x.test/real.png'), '/game-icons-cache/real.png');
+    assert.equal(await store.saveRemoteIcon('drawing', 'https://x.test/drawing.svg'), undefined);
+    assert.equal(await store.saveRemoteIcon('page', 'https://x.test/page.png'), undefined);
+    assert.deepEqual(fs.readdirSync(dir), ['real.png']);
+  } finally {
+    globalThis.fetch = realFetch;
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});

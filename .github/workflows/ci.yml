@@ -101,7 +101,7 @@ jobs:
           python-version: '3.13'
 
       - name: Install Inno Setup
-        run: choco install innosetup --no-progress -y
+        run: choco install innosetup --version 6.7.1 --no-progress -y
 
       - name: Build the installer and the portable exe
         shell: cmd
