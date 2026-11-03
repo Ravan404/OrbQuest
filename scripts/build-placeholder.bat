@@ -45,8 +45,8 @@ gcc -O2 -municode -mwindows -nostdlib -ffreestanding -fno-builtin ^
   -lkernel32 -luser32 -lgdi32 -lgcc
 if errorlevel 1 exit /b 1
 
-for /f "tokens=*" %%h in ('certutil -hashfile placeholder_runtime.exe SHA256 ^| findstr /v ":"') do set "OLD_HASH=%%h"
-for /f "tokens=*" %%h in ('certutil -hashfile build\placeholder_runtime.exe SHA256 ^| findstr /v ":"') do set "NEW_HASH=%%h"
+for /f %%h in ('powershell -NoProfile -Command "(Get-FileHash placeholder_runtime.exe -Algorithm SHA256).Hash.ToLower()"') do set "OLD_HASH=%%h"
+for /f %%h in ('powershell -NoProfile -Command "(Get-FileHash build\placeholder_runtime.exe -Algorithm SHA256).Hash.ToLower()"') do set "NEW_HASH=%%h"
 if /i "%~1"=="--check" (
   if /i "%OLD_HASH%"=="%NEW_HASH%" (
     echo placeholder_runtime.exe matches its source: %NEW_HASH%

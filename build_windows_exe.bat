@@ -109,12 +109,8 @@ if errorlevel 1 (
 
 :checksums
 rem SHA256SUMS.txt lists every release file; the in-app update checks its download against it.
-pushd release
-if exist SHA256SUMS.txt del /q SHA256SUMS.txt
-for %%f in (OrbQuest-*.exe) do (
-  for /f "tokens=*" %%h in ('certutil -hashfile "%%f" SHA256 ^| findstr /v ":"') do echo %%h  %%f>>SHA256SUMS.txt
-)
-popd
+powershell -NoProfile -Command "Get-ChildItem release\OrbQuest-*.exe | ForEach-Object { '{0}  {1}' -f (Get-FileHash $_.FullName -Algorithm SHA256).Hash.ToLower(), $_.Name } | Set-Content -Encoding ascii release\SHA256SUMS.txt"
+if errorlevel 1 exit /b 1
 
 echo.
 echo Done:
