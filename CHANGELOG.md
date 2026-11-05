@@ -9,10 +9,12 @@
 - **An installer**, `OrbQuest-Setup-<version>.exe`: installs OrbQuest for your Windows user without administrator rights, with a Start menu entry and an uninstaller. The installed app starts in about a second; the single exe took about seven, because it unpacks itself on every start.
 - **Updates from inside the app.** When a new release is out, the Update button next to the version downloads it from this repository's releases, checks it against the release's `SHA256SUMS.txt`, closes OrbQuest and opens the new version. The installed app runs the new installer silently; the portable exe is replaced by the new one.
 - The release files carry their version: `OrbQuest-Setup-1.6.0.exe` and the portable `OrbQuest-1.6.0.exe`, with `SHA256SUMS.txt` for both.
+- A privacy policy (`PRIVACY.md`) and a code signing policy in the README.
 - Only the OrbQuest window can use the app's API: it opens with a token that is new on every start. Another program on the PC can no longer start or remove games through it.
 
 ### Changed
 
+- Adding a Steam quest asks first: it says that files go into Steam's folder, and writes them on the second click.
 - The placeholder build is reproducible, and CI checks that the committed `placeholder_runtime.exe` is exactly what `placeholder_runtime.c` builds to. Placeholders in existing libraries are upgraded to it on the next scan.
 - The browser test, Biome lint and format checks and the Windows packages (installed, started and uninstalled) run in CI.
 - A game icon is only saved when its bytes are a real PNG, JPEG, WebP, GIF or ICO image, never SVG; before, a download only had to claim an image type.

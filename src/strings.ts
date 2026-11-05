@@ -95,6 +95,9 @@ const strings = {
   fromReddit: 'r/DiscordQuests',
   fromRedditTitle: "Discord's list has no executable for this; this one comes from r/DiscordQuests posts.",
   needsSteam: 'Steam',
+  steamConfirm:
+    "This writes a stand-in and a small manifest into Steam's folder. Removing the game takes them out again.",
+  confirm: 'Confirm',
   needsSteamTitle:
     'Discord only detects this through Steam. Steam must be installed; the stand-in goes into its steamapps folder.',
   inLibrary: 'In library',

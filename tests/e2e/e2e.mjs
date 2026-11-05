@@ -460,6 +460,13 @@ try {
     ok('Steam quests are marked in the catalog', /EA SPORTS FC 27/.test(txt) && /\bSteam\b/.test(txt));
     await shot('catalog-steam');
     await click('Add', { nth: 0 });
+    await sleep(500);
+    ok(
+      'a Steam quest asks first and writes nothing yet',
+      /into Steam's folder/.test(await bodyText()) && !fs.existsSync(path.join(STEAMAPPS, 'appmanifest_4080220.acf'))
+    );
+    await shot('catalog-steam-confirm');
+    await click('Confirm');
     await sleep(1500);
     const games = await api('/api/games');
     ok(

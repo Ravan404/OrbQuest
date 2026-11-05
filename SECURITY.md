@@ -17,6 +17,8 @@ OrbQuest runs a local HTTP server and starts programs on your PC, so these matte
 
 ## What it does not do
 
+The [privacy policy](PRIVACY.md) has the same list for users.
+
 It never logs in to Discord, never reads your token and never changes the Discord client. It sends no data about you; these are the only hosts it asks for anything:
 
 | Purpose | Hosts |

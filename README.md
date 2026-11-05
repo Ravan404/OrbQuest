@@ -20,7 +20,7 @@ Each [release](https://github.com/Ravan404/OrbQuest/releases/latest) has two fil
 - **`OrbQuest-Setup-<version>.exe`**: installs OrbQuest for your Windows user, without administrator rights, into `%LOCALAPPDATA%\Programs\OrbQuest`, with a Start menu entry. It starts in about a second. Uninstall it from Installed apps.
 - **`OrbQuest-<version>.exe`**: the portable version, one file that runs from any folder. It unpacks itself to `%TEMP%` on every start, so it takes a few seconds longer.
 
-Both keep the library in `%LOCALAPPDATA%\OrbQuest`, so switching between them, or uninstalling, keeps your games. When a new release is out, an Update button appears next to the version at the top of the window: OrbQuest downloads the new version from this repository's releases, checks it against `SHA256SUMS.txt`, closes, and opens again with the new version. `SHA256SUMS.txt` also lets you check a download yourself.
+Both keep the library in `%LOCALAPPDATA%\OrbQuest`, so switching between them, or uninstalling, keeps your games. When a new release is out, an Update button appears next to the version at the top of the window: OrbQuest downloads the new version from this repository's releases, checks it against `SHA256SUMS.txt`, closes, and opens again with the new version. `SHA256SUMS.txt` also lets you check a download yourself. See the [code signing policy](#code-signing-policy) and the [privacy policy](PRIVACY.md).
 
 The files are not code-signed, so Windows SmartScreen may say they are from an unknown publisher (More info → Run anyway). Some antivirus programs also flag the placeholder because it is a tiny program that runs under another game's name. The source of both is in this repository, and the release is built by GitHub Actions from it.
 
@@ -170,6 +170,14 @@ docs/                      Screenshot for this README
 - File writes stay inside `Games/` and `icon-cache/`, for a Steam quest inside that game's folder and manifest in Steam's `steamapps`, and a start script only as `<Game> - OrbQuest.<bat|ps1|py>` in Downloads. An executable path from a request or from Discord's list must stay inside its game folder (no `..`, drive letters or absolute paths).
 - Images are only loaded from the app itself and `cdn.discordapp.com`. A website icon is downloaded by the server and served from `icon-cache/`.
 - An update is only downloaded from this repository's releases, must match the SHA-256 in the release's `SHA256SUMS.txt`, and is checked again by the desktop app before it runs.
+
+## Code signing policy
+
+The Windows files are not code-signed yet. Every release file is built from a tag of this repository by the [Release workflow](.github/workflows/release.yml), and each release is reviewed and published by hand.
+
+- Committers and reviewers: [Ravan404](https://github.com/Ravan404)
+- Approvers: [Ravan404](https://github.com/Ravan404)
+- Privacy: see the [privacy policy](PRIVACY.md).
 
 ## Contributing
 

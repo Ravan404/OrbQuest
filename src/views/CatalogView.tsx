@@ -27,67 +27,77 @@ const CatalogTile: React.FC<{
 }> = ({ game, onAdd }) => {
   const [executable, setExecutable] = useState(() => preferredExecutable(game));
   const [busy, setBusy] = useState(false);
+  // A Steam quest writes into Steam's folder, so the first click says so.
+  const [confirmSteam, setConfirmSteam] = useState(false);
   const exeId = `exe-${game.id}`;
 
   return (
-    <div className="flex min-w-0 items-center gap-3 rounded-lg border border-line bg-surface px-3 py-2.5">
-      <GameIcon name={game.name} src={game.icon} size="md" />
-      <div className="min-w-0 flex-1">
-        {/* The labels wrap under a long name instead of squeezing it away. */}
-        <p className="flex min-w-0 flex-wrap items-center gap-x-1.5 gap-y-0.5">
-          <span className="max-w-full truncate text-[13px] font-medium text-text" title={game.name}>
-            {game.name}
-          </span>
-          {game.source === 'reddit' && (
-            <span className="shrink-0" title={t('fromRedditTitle')}>
-              <Chip>{t('fromReddit')}</Chip>
+    <div className="min-w-0 rounded-lg border border-line bg-surface px-3 py-2.5">
+      <div className="flex min-w-0 items-center gap-3">
+        <GameIcon name={game.name} src={game.icon} size="md" />
+        <div className="min-w-0 flex-1">
+          {/* The labels wrap under a long name instead of squeezing it away. */}
+          <p className="flex min-w-0 flex-wrap items-center gap-x-1.5 gap-y-0.5">
+            <span className="max-w-full truncate text-[13px] font-medium text-text" title={game.name}>
+              {game.name}
             </span>
-          )}
-          {game.steam && (
-            <span className="shrink-0" title={t('needsSteamTitle')}>
-              <Chip>{t('needsSteam')}</Chip>
-            </span>
-          )}
-        </p>
-        {game.executables.length > 1 ? (
-          <select
-            id={exeId}
-            aria-label={t('executable')}
-            value={executable}
-            onChange={(event) => setExecutable(event.target.value)}
-            className="mt-0.5 w-full max-w-full truncate rounded border border-line bg-surface font-mono text-[11px] text-faint focus:border-primary focus:outline-none"
-          >
-            {game.executables.map((exe) => (
-              <option key={exe} value={exe}>
-                {exe}
-              </option>
-            ))}
-          </select>
-        ) : (
-          <p className="truncate font-mono text-[11px] text-faint" title={executable}>
-            {executable}
+            {game.source === 'reddit' && (
+              <span className="shrink-0" title={t('fromRedditTitle')}>
+                <Chip>{t('fromReddit')}</Chip>
+              </span>
+            )}
+            {game.steam && (
+              <span className="shrink-0" title={t('needsSteamTitle')}>
+                <Chip>{t('needsSteam')}</Chip>
+              </span>
+            )}
           </p>
+          {game.executables.length > 1 ? (
+            <select
+              id={exeId}
+              aria-label={t('executable')}
+              value={executable}
+              onChange={(event) => setExecutable(event.target.value)}
+              className="mt-0.5 w-full max-w-full truncate rounded border border-line bg-surface font-mono text-[11px] text-faint focus:border-primary focus:outline-none"
+            >
+              {game.executables.map((exe) => (
+                <option key={exe} value={exe}>
+                  {exe}
+                </option>
+              ))}
+            </select>
+          ) : (
+            <p className="truncate font-mono text-[11px] text-faint" title={executable}>
+              {executable}
+            </p>
+          )}
+        </div>
+        {game.inLibrary ? (
+          <Chip tone="run">
+            <Check className="h-3 w-3" />
+            {t('inLibrary')}
+          </Chip>
+        ) : (
+          <Button
+            size="sm"
+            icon={busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Plus className="h-3.5 w-3.5" />}
+            disabled={busy}
+            onClick={async () => {
+              if (game.steam && !confirmSteam) {
+                setConfirmSteam(true);
+                return;
+              }
+              setBusy(true);
+              await onAdd(game, executable);
+              setBusy(false);
+              setConfirmSteam(false);
+            }}
+          >
+            {busy ? t('adding') : confirmSteam ? t('confirm') : t('add')}
+          </Button>
         )}
       </div>
-      {game.inLibrary ? (
-        <Chip tone="run">
-          <Check className="h-3 w-3" />
-          {t('inLibrary')}
-        </Chip>
-      ) : (
-        <Button
-          size="sm"
-          icon={busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Plus className="h-3.5 w-3.5" />}
-          disabled={busy}
-          onClick={async () => {
-            setBusy(true);
-            await onAdd(game, executable);
-            setBusy(false);
-          }}
-        >
-          {busy ? t('adding') : t('add')}
-        </Button>
-      )}
+      {confirmSteam && <p className="mt-2 text-[12px] text-muted">{t('steamConfirm')}</p>}
     </div>
   );
 };

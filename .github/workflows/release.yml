@@ -78,7 +78,7 @@ jobs:
           $notes = @"
           **OrbQuest-Setup-$version.exe** installs OrbQuest for your Windows user (no administrator rights) with a Start menu entry; OrbQuest then updates itself. **OrbQuest-$version.exe** is the portable version: one file that runs from any folder.
 
-          See [CHANGELOG.md](https://github.com/${{ github.repository }}/blob/${{ github.ref_name }}/CHANGELOG.md) for what changed. SHA256SUMS.txt lists the SHA-256 of both files.
+          See [CHANGELOG.md](https://github.com/${{ github.repository }}/blob/${{ github.ref_name }}/CHANGELOG.md) for what changed. SHA256SUMS.txt lists the SHA-256 of both files. [Code signing policy](https://github.com/${{ github.repository }}#code-signing-policy), [privacy policy](https://github.com/${{ github.repository }}/blob/${{ github.ref_name }}/PRIVACY.md).
           "@
           gh release create '${{ github.ref_name }}' release/OrbQuest-Setup-$version.exe release/OrbQuest-$version.exe release/SHA256SUMS.txt `
             --draft --title 'OrbQuest ${{ github.ref_name }}' --notes $notes
