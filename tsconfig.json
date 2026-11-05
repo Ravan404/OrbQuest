@@ -14,8 +14,8 @@
     "jsx": "react-jsx",
     "types": ["node", "vite/client"],
     "strict": true,
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
   "include": ["src", "server.ts", "tests", "scripts/*.ts"]

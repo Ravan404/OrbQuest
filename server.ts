@@ -1,25 +1,9 @@
 import express from 'express';
-import { timingSafeEqual } from 'node:crypto';
-import path from 'path';
-import fs from 'fs';
-import {
-  ASSET_ROOT,
-  BIND_HOST,
-  GAMES_DIR,
-  PORT,
-  RATE_LIMIT_MAX_REQUESTS,
-} from './src/server/config.ts';
-import {
-  createRateLimiter,
-  isAllowedOriginForMethod,
-  isAllowedRequestHost,
-} from './src/server/security.ts';
-import {
-  initGameStore,
-  startElapsedTicker,
-  stopAllRunningGames,
-  savePersistedState,
-} from './src/server/gameStore.ts';
+import path from 'node:path';
+import fs from 'node:fs';
+import { ASSET_ROOT, BIND_HOST, GAMES_DIR, PORT, RATE_LIMIT_MAX_REQUESTS } from './src/server/config.ts';
+import { createRateLimiter, isAllowedOriginForMethod, isAllowedRequestHost } from './src/server/security.ts';
+import { initGameStore, startElapsedTicker, stopAllRunningGames, savePersistedState } from './src/server/gameStore.ts';
 import gamesRouter from './src/server/routes/games.ts';
 import catalogRouter from './src/server/routes/catalog.ts';
 import settingsRouter from './src/server/routes/settings.ts';
@@ -27,7 +11,9 @@ import { APP_VERSION } from './src/version.ts';
 import { getGameDatabaseInfo, loadGameDatabase, scheduleGameDatabaseRefresh } from './src/server/gameDatabase.ts';
 import { ICON_CACHE_DIR } from './src/server/iconStore.ts';
 import { getSettings } from './src/server/settingsStore.ts';
-import { availableUpdate, scheduleUpdateChecks } from './src/server/updateCheck.ts';
+import { requireSession, sameSecret, startSession, withoutSecrets } from './src/server/session.ts';
+import { scheduleUpdateChecks, updateAnswer } from './src/server/updateCheck.ts';
+import { canInstall, downloadState, startUpdateDownload } from './src/server/updateInstall.ts';
 import { spawn } from 'node:child_process';
 
 const app = express();
@@ -111,6 +97,10 @@ const rateLimited = (req: express.Request, res: express.Response, next: express.
 // API Routes
 // ---------------------------------------------------------------
 
+// Only the desktop window may use the API (session.ts).
+app.get('/session', startSession);
+app.use('/api', requireSession);
+
 app.get('/api/profile', (_req, res) => {
   res.json({
     version: APP_VERSION,
@@ -119,15 +109,26 @@ app.get('/api/profile', (_req, res) => {
   });
 });
 // A newer release, found by updateCheck.ts; the window asks now and then.
-app.get('/api/update', (_req, res) => {
-  res.json({ update: availableUpdate() });
+app.get('/api/update', async (_req, res) => {
+  const update = await updateAnswer();
+  res.json({
+    update: update ? { version: update.version, url: update.url } : null,
+    installable: canInstall(update),
+    download: downloadState(),
+  });
+});
+// Downloads and checks the update; the desktop app installs it (updateInstall.ts).
+app.post('/api/update/download', rateLimited, (_req, res) => {
+  res.json(startUpdateDownload());
 });
 // Opens the library folder in Explorer (Windows only). The path is fixed.
 app.post('/api/open-games-folder', rateLimited, (_req, res) => {
   if (process.platform !== 'win32') return res.sendStatus(404);
   try {
     fs.mkdirSync(GAMES_DIR, { recursive: true });
-    spawn('explorer.exe', [GAMES_DIR], { detached: true, stdio: 'ignore' }).on('error', () => {}).unref();
+    spawn('explorer.exe', [GAMES_DIR], { detached: true, stdio: 'ignore', env: withoutSecrets() })
+      .on('error', () => {})
+      .unref();
     res.json({ success: true });
   } catch {
     res.status(500).json({ error: 'Could not open the folder.' });
@@ -138,12 +139,9 @@ app.post('/api/open-games-folder', rateLimited, (_req, res) => {
 // ephemeral port for its own backend. Without the token both routes are 404.
 function desktopAuthorized(req: express.Request): boolean {
   const expected = process.env.DQR_SHUTDOWN_TOKEN;
-  const actual = req.get('X-DQR-Shutdown-Token') || '';
   const remote = req.socket.remoteAddress;
   if (!expected || !['127.0.0.1', '::1', '::ffff:127.0.0.1'].includes(remote || '')) return false;
-  const expectedBytes = Buffer.from(expected);
-  const actualBytes = Buffer.from(actual);
-  return actualBytes.length === expectedBytes.length && timingSafeEqual(actualBytes, expectedBytes);
+  return sameSecret(req.get('X-DQR-Shutdown-Token') || '', expected);
 }
 app.get('/api/internal/ready', (req, res) => {
   if (!process.env.DQR_SHUTDOWN_TOKEN) return res.sendStatus(404);
@@ -174,10 +172,7 @@ async function startServer() {
   scheduleUpdateChecks();
 
   // Game icons saved from Discord's CDN (see iconStore.ts).
-  app.use(
-    '/game-icons-cache',
-    express.static(ICON_CACHE_DIR, { dotfiles: 'deny', maxAge: '7d', fallthrough: false })
-  );
+  app.use('/game-icons-cache', express.static(ICON_CACHE_DIR, { dotfiles: 'deny', maxAge: '7d', fallthrough: false }));
 
   if (process.env.NODE_ENV !== 'production') {
     const { createServer: createViteServer } = await import('vite');
@@ -210,7 +205,8 @@ async function startServer() {
       return [requestPath, decoded].some((candidate) => {
         const withoutQuery = candidate.split('?')[0].split('#')[0];
         if (withoutQuery.startsWith('/.')) return true; // dotfiles
-        if (/(?:^|\/)(?:gameDatabase|featuredGames|redditCache|discordIconCatalog)\.json$/i.test(withoutQuery)) return true;
+        if (/(?:^|\/)(?:gameDatabase|featuredGames|redditCache|discordIconCatalog)\.json$/i.test(withoutQuery))
+          return true;
         const fileName = withoutQuery.replace(/\/+$/, '').split('/').pop() ?? '';
         return /\.(?:cjs|mjs|map)$/i.test(fileName);
       });
@@ -236,14 +232,16 @@ async function startServer() {
       // The saved theme is on the page before the app starts, so the window
       // never shows the other one first.
       const { theme } = getSettings();
-      if (theme === 'light' || theme === 'dark') html = html.replace('<html lang="en">', `<html lang="en" data-theme="${theme}">`);
+      if (theme === 'light' || theme === 'dark')
+        html = html.replace('<html lang="en">', `<html lang="en" data-theme="${theme}">`);
       res.type('html').send(html);
     });
   }
 
   // Error handling middleware to catch any stream or route errors
-  app.use((err: any, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
-    if (err && (err.status === 404 || err.statusCode === 404)) {
+  app.use((err: unknown, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
+    const status = (err as { status?: number; statusCode?: number } | null) ?? {};
+    if (status.status === 404 || status.statusCode === 404) {
       return res.status(404).send('Not Found');
     }
     console.error('Server error:', err);
@@ -256,9 +254,7 @@ async function startServer() {
   // the 'error' handler below reports it.
   const server = app.listen(PORT, BIND_HOST, (error?: Error) => {
     if (error) return;
-    console.log(
-      `Server running at http://${BIND_HOST === '0.0.0.0' ? 'localhost' : BIND_HOST}:${PORT}`
-    );
+    console.log(`Server running at http://${BIND_HOST === '0.0.0.0' ? 'localhost' : BIND_HOST}:${PORT}`);
   });
   server.on('error', (error: NodeJS.ErrnoException) => {
     if (error.code === 'EADDRINUSE') {

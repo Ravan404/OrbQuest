@@ -1,4 +1,4 @@
-import { BUFFER_PRESET_DURATIONS, Game } from '../types';
+import { BUFFER_PRESET_DURATIONS, type Game } from '../types';
 import { escapeBatch, escapeBatchQuoted, escapePowerShell } from './scriptEscape';
 
 export type ScriptKind = 'bat' | 'ps1' | 'py';

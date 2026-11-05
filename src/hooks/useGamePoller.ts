@@ -1,5 +1,5 @@
-import { useEffect, MutableRefObject } from 'react';
-import { Game } from '../types';
+import { useEffect, type MutableRefObject } from 'react';
+import type { Game } from '../types';
 import { playMilestoneSound } from '../utils/audio';
 import { t } from '../strings';
 
@@ -79,6 +79,9 @@ export function useGamePoller({
       }
     };
     timer = setTimeout(poll, 1000);
-    return () => { cancelled = true; clearTimeout(timer); };
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
   }, [setGames, celebratedGamesRef, bufferResetTriggersRef, soundEnabled, showToast]);
 }

@@ -1,4 +1,4 @@
-import path from 'path';
+import path from 'node:path';
 import { ALLOWED_HOSTS, RATE_LIMIT_WINDOW } from './config.ts';
 
 /**
@@ -38,7 +38,9 @@ export function isSafeExecutablePath(value: string): boolean {
   const segments = value.split(/[\\/]/);
   return (
     segments.length <= 8 &&
-    segments.every((segment) => segment !== '.' && segment !== '..' && !/[. ]$/.test(segment) && isSafeFileName(segment))
+    segments.every(
+      (segment) => segment !== '.' && segment !== '..' && !/[. ]$/.test(segment) && isSafeFileName(segment)
+    )
   );
 }
 
@@ -78,7 +80,10 @@ export function libraryFolderName(folderPath: string | undefined, fallback: stri
   // A generic tail (Win64, Binaries, game) is not a library name. Use the
   // display name so two Unreal games do not both become a folder called Win64.
   const chosen = last && !GENERIC_FOLDER_SEGMENTS.has(last.toLowerCase()) ? last : fallback;
-  const cleaned = chosen.replace(/[<>:"|?*]/g, '_').replace(/[. ]+$/g, '').trim();
+  const cleaned = chosen
+    .replace(/[<>:"|?*]/g, '_')
+    .replace(/[. ]+$/g, '')
+    .trim();
   return cleaned && isSafeFileName(cleaned) ? cleaned : 'Game';
 }
 

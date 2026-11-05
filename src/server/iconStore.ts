@@ -35,15 +35,15 @@ const IMAGE_TYPES: Record<string, string> = {
   'image/gif': 'gif',
   'image/x-icon': 'ico',
   'image/vnd.microsoft.icon': 'ico',
-  'image/svg+xml': 'svg',
 };
-const ICON_FILE = /^([a-z0-9]+)\.(png|jpg|webp|gif|ico|svg)$/;
+// No SVG: it can carry script, and the cache is served from the app's own origin.
+const ICON_FILE = /^([a-z0-9]+)\.(png|jpg|webp|gif|ico)$/;
 
 /**
- * Inspects magic bytes so corrupt responses or HTML error pages served with an
- * image content-type are never persisted into `icon-cache/`.
+ * The image type by its first bytes, so corrupt responses or HTML error pages
+ * served with an image content-type are never saved into `icon-cache/`.
  */
-function detectImageExtension(bytes: Buffer, contentType: string): string | undefined {
+function detectImageExtension(bytes: Buffer): string | undefined {
   if (bytes.length < MIN_ICON_BYTES) return undefined;
 
   // PNG: 89 50 4E 47 0D 0A 1A 0A
@@ -66,11 +66,7 @@ function detectImageExtension(bytes: Buffer, contentType: string): string | unde
   }
 
   // WebP: RIFF....WEBP
-  if (
-    bytes.length >= 12 &&
-    bytes.toString('ascii', 0, 4) === 'RIFF' &&
-    bytes.toString('ascii', 8, 12) === 'WEBP'
-  ) {
+  if (bytes.length >= 12 && bytes.toString('ascii', 0, 4) === 'RIFF' && bytes.toString('ascii', 8, 12) === 'WEBP') {
     return 'webp';
   }
 
@@ -83,12 +79,6 @@ function detectImageExtension(bytes: Buffer, contentType: string): string | unde
   // ICO: 00 00 01 00
   if (bytes[0] === 0x00 && bytes[1] === 0x00 && bytes[2] === 0x01 && bytes[3] === 0x00) {
     return 'ico';
-  }
-
-  // SVG: starts with XML/SVG tag and declared as image/svg+xml
-  if (contentType === 'image/svg+xml') {
-    const head = bytes.subarray(0, 256).toString('utf8').trimStart();
-    if (head.startsWith('<svg') || head.startsWith('<?xml')) return 'svg';
   }
 
   return undefined;
@@ -189,11 +179,11 @@ export function createIconStore(options: IconStoreOptions): IconStore {
         const declared = Number(response.headers.get('content-length') || 0);
         if (declared > MAX_ICON_BYTES) return undefined;
         const type = (response.headers.get('content-type') || '').split(';')[0].trim().toLowerCase();
-        if (!IMAGE_TYPES[type] && !type.startsWith('image/')) return undefined;
+        if (!IMAGE_TYPES[type]) return undefined;
         const bytes = Buffer.from(await response.arrayBuffer());
         if (bytes.length < MIN_ICON_BYTES || bytes.length > MAX_ICON_BYTES) return undefined;
 
-        const extension = detectImageExtension(bytes, type) ?? IMAGE_TYPES[type];
+        const extension = detectImageExtension(bytes);
         if (!extension) return undefined;
 
         fs.mkdirSync(options.cacheDir, { recursive: true });
@@ -201,7 +191,7 @@ export function createIconStore(options: IconStoreOptions): IconStore {
         const temp = `${target}.${process.pid}.tmp`;
         fs.writeFileSync(temp, bytes);
         fs.renameSync(temp, target);
-        const url = CACHED_ICON_URL_PREFIX + `${key}.${extension}`;
+        const url = `${CACHED_ICON_URL_PREFIX}${key}.${extension}`;
         getIndex().set(key, url);
         if (failures?.has(key)) {
           failures.delete(key);

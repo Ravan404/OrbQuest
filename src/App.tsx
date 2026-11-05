@@ -1,11 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { AppProfile, Game, ToastNotification, UpdateInfo } from './types';
-import { api, GameDraft, ThemeSetting, TimerSettings } from './api';
+import type { AppProfile, Game, ToastNotification, UpdateStatus } from './types';
+import { api, type GameDraft, type ThemeSetting, type TimerSettings } from './api';
 import { t } from './strings';
 import { useGamePoller } from './hooks/useGamePoller';
-import { migrateLegacyBrowserSettings } from './utils/legacySettings';
 import { playClickSound, playLaunchSound, playStopSound } from './utils/audio';
-import { TopBar, View } from './components/TopBar';
+import { TopBar, type View } from './components/TopBar';
 import { StatusBar } from './components/StatusBar';
 import { Toast } from './components/Toast';
 import { Button } from './components/ui';
@@ -14,6 +13,7 @@ import { CatalogView } from './views/CatalogView';
 import { AboutView } from './views/AboutView';
 import { GameDialog } from './dialogs/GameDialog';
 import { ScriptDialog } from './dialogs/ScriptDialog';
+import { UpdateDialog } from './dialogs/UpdateDialog';
 
 type NoticeTone = NonNullable<ToastNotification['type']>;
 
@@ -45,7 +45,7 @@ export default function App() {
   const [profile, setProfile] = useState<AppProfile | null>(null);
   const [profileFailed, setProfileFailed] = useState(false);
   const [profileAttempt, setProfileAttempt] = useState(0);
-  const [update, setUpdate] = useState<UpdateInfo | null>(null);
+  const [updateStatus, setUpdateStatus] = useState<UpdateStatus | null>(null);
 
   const [games, setGames] = useState<Game[]>([]);
   const [selectedGameId, setSelectedGameId] = useState<string | null>(null);
@@ -59,7 +59,9 @@ export default function App() {
   });
 
   const [notice, setNotice] = useState<ToastNotification | null>(null);
-  const [dialog, setDialog] = useState<{ kind: 'add' } | { kind: 'edit' | 'script'; game: Game } | null>(null);
+  const [dialog, setDialog] = useState<{ kind: 'add' | 'update' } | { kind: 'edit' | 'script'; game: Game } | null>(
+    null
+  );
 
   // Games that already showed their "timer finished" notice, and games whose
   // notice may fire again after a reset or a new launch.
@@ -77,6 +79,7 @@ export default function App() {
 
   useEffect(() => applyTheme(theme), [theme]);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: profileAttempt is the Retry button's trigger.
   useEffect(() => {
     const controller = new AbortController();
     setProfileFailed(false);
@@ -91,19 +94,17 @@ export default function App() {
     return () => controller.abort();
   }, [profileAttempt]);
 
-  // The server checks GitHub for a new release every six hours.
+  // The server asks GitHub for a new release at its start and every six
+  // hours; the first answer waits for that first check.
   useEffect(() => {
     const check = () =>
       api
         .update()
-        .then((result) => setUpdate(result.update))
+        .then(setUpdateStatus)
         .catch(() => {});
-    const first = window.setTimeout(check, 20_000);
+    check();
     const timer = window.setInterval(check, UPDATE_POLL_MS);
-    return () => {
-      window.clearTimeout(first);
-      window.clearInterval(timer);
-    };
+    return () => window.clearInterval(timer);
   }, []);
 
   const loadGames = useCallback(async (rescan = false): Promise<Game[] | null> => {
@@ -118,8 +119,7 @@ export default function App() {
     }
   }, []);
 
-  // First load: settings, games, and a one-time move of settings that
-  // versions up to 1.2.25 kept in this browser's storage.
+  // First load: settings, then the games.
   useEffect(() => {
     let cancelled = false;
     (async () => {
@@ -128,12 +128,7 @@ export default function App() {
         if (typeof settings.soundEnabled === 'boolean') setSoundEnabled(settings.soundEnabled);
         if (settings.theme) setTheme(settings.theme);
       }
-      const loaded = await loadGames();
-      if (cancelled || !loaded) return;
-      const migrated = await migrateLegacyBrowserSettings(loaded);
-      if (cancelled) return;
-      if (migrated.soundEnabled !== undefined) setSoundEnabled(migrated.soundEnabled);
-      if (migrated.gamesChanged) loadGames();
+      if (!cancelled) await loadGames();
     })();
     return () => {
       cancelled = true;
@@ -149,7 +144,8 @@ export default function App() {
   const selectedGame = useMemo(() => games.find((game) => game.id === selectedGameId) ?? null, [games, selectedGameId]);
   const runningCount = useMemo(() => games.filter((game) => game.isRunning).length, [games]);
 
-  const fail = (error: unknown) => showNotice(t('noticeError'), (error as Error)?.message || t('updateFailed'), 'warning');
+  const fail = (error: unknown) =>
+    showNotice(t('noticeError'), (error as Error)?.message || t('updateFailed'), 'warning');
 
   const saveSettings = (patch: Parameters<typeof api.saveSettings>[0]) =>
     api.saveSettings(patch).catch((error) => console.warn('Could not save settings', error));
@@ -251,7 +247,14 @@ export default function App() {
 
   /** Runs `action` for every id and returns the ids it worked for. */
   const forEachId = async (ids: string[], action: (id: string) => Promise<unknown>) => {
-    const results = await Promise.all(ids.map((id) => action(id).then(() => true, () => false)));
+    const results = await Promise.all(
+      ids.map((id) =>
+        action(id).then(
+          () => true,
+          () => false
+        )
+      )
+    );
     return ids.filter((_, index) => results[index]);
   };
 
@@ -317,7 +320,9 @@ export default function App() {
     <div className="flex h-full flex-col overflow-hidden">
       <TopBar
         version={profile.version}
-        update={update}
+        update={updateStatus?.update ?? null}
+        installable={Boolean(updateStatus?.installable)}
+        onInstallUpdate={() => setDialog({ kind: 'update' })}
         view={view}
         onView={openView}
         runningCount={runningCount}
@@ -385,7 +390,11 @@ export default function App() {
 
       {dialog?.kind === 'add' && <GameDialog onClose={() => setDialog(null)} onSubmit={addGame} />}
       {dialog?.kind === 'edit' && (
-        <GameDialog game={dialog.game} onClose={() => setDialog(null)} onSubmit={(draft) => editGame(dialog.game, draft)} />
+        <GameDialog
+          game={dialog.game}
+          onClose={() => setDialog(null)}
+          onSubmit={(draft) => editGame(dialog.game, draft)}
+        />
       )}
       {dialog?.kind === 'script' && (
         <ScriptDialog
@@ -393,6 +402,9 @@ export default function App() {
           onClose={() => setDialog(null)}
           onNotice={(title, text, tone) => showNotice(title, text, tone === 'warning' ? 'warning' : 'success')}
         />
+      )}
+      {dialog?.kind === 'update' && updateStatus?.update && (
+        <UpdateDialog update={updateStatus.update} onClose={() => setDialog(null)} />
       )}
     </div>
   );

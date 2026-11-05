@@ -1,8 +1,4 @@
-import {
-  BufferPreset,
-  BUFFER_PRESET_DURATIONS,
-  MAX_QUEST_TARGET_MINUTES,
-} from '../types';
+import { type BufferPreset, BUFFER_PRESET_DURATIONS, MAX_QUEST_TARGET_MINUTES } from '../types';
 
 /** Custom timer entry. Presets may still use 0 for unlimited. */
 export function clampTargetMinutes(value: number): number {
@@ -34,7 +30,7 @@ export function computeGameTimerPhase(
   elapsedSeconds: number,
   targetMinutes = 15,
   bufferPreset: BufferPreset = 'normal',
-  warmupRemainingSeconds = 0,
+  warmupRemainingSeconds = 0
 ): GameTimerPhase {
   const config = BUFFER_PRESET_DURATIONS[bufferPreset] || BUFFER_PRESET_DURATIONS.normal;
   const elapsed = Math.max(0, Math.floor(elapsedSeconds));
@@ -50,10 +46,14 @@ export function computeGameTimerPhase(
     phase,
     displayElapsedSeconds: targetSeconds ? Math.min(active, targetSeconds) : active,
     targetSeconds,
-    progressPct: completed ? 100 : targetSeconds ? Math.min(99, Math.floor(active / targetSeconds * 100)) : 0,
-    statusMessage: detecting ? `Detection allowance (${remainingBeforeActive}s)`
-      : completed ? 'Local timer completed' : reached ? `Final safety margin (${Math.max(0, totalDurationSeconds - elapsed)}s)`
-      : 'Quest timer active',
+    progressPct: completed ? 100 : targetSeconds ? Math.min(99, Math.floor((active / targetSeconds) * 100)) : 0,
+    statusMessage: detecting
+      ? `Detection allowance (${remainingBeforeActive}s)`
+      : completed
+        ? 'Local timer completed'
+        : reached
+          ? `Final safety margin (${Math.max(0, totalDurationSeconds - elapsed)}s)`
+          : 'Quest timer active',
     isMilestoneReached: completed,
     secondsRemainingInQuest: targetSeconds ? Math.max(0, targetSeconds - active) : 0,
     totalDurationSeconds,

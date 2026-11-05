@@ -11,12 +11,7 @@ import { hasPlaceholderRuntimeSignature } from './placeholderUpgrade.ts';
 /** Written next to a placeholder so a later delete can recognise our install. */
 export const MANAGED_INSTALL_MARKER = '.dqr-managed.json';
 
-const METADATA_FILES = new Set([
-  '.game-name.txt',
-  '.game-meta.json',
-  '.game-icon.ico',
-  MANAGED_INSTALL_MARKER,
-]);
+const METADATA_FILES = new Set(['.game-name.txt', '.game-meta.json', '.game-icon.ico', MANAGED_INSTALL_MARKER]);
 
 /** A placeholder install is a handful of files. Stop walking long before a real library. */
 const MAX_INSPECTED_FILES = 200;
@@ -25,7 +20,11 @@ const MANAGED_MANIFEST_KEYS = new Set(['appid', 'name', 'stateflags', 'installdi
 
 /** The manifest this app writes. Steam's own manifests contain many more keys. */
 export function buildSimulatedManifest(appId: number, name: string, installDir: string): string {
-  const safe = (value: string) => value.replace(/[\r\n"]/g, ' ').replace(/\s+/g, ' ').trim();
+  const safe = (value: string) =>
+    value
+      .replace(/[\r\n"]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
   return `"AppState"
 {
 \t"appid"\t\t"${appId}"

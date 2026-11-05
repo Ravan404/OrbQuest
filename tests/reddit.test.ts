@@ -13,7 +13,13 @@ const discordList = [
     executables: [{ os: 'win32', name: 'win64/valorant-win64-shipping.exe', is_launcher: false }],
   },
   { id: '1442729602559643668', name: 'Firefox', aliases: [], icon_hash: null, executables: [] },
-  { id: '1450685090098315376', name: 'Comet', aliases: [], icon_hash: 'bd866e2c67c057ab1c8a8b6a39520052', executables: [] },
+  {
+    id: '1450685090098315376',
+    name: 'Comet',
+    aliases: [],
+    icon_hash: 'bd866e2c67c057ab1c8a8b6a39520052',
+    executables: [],
+  },
 ];
 const discord = buildGameDatabase(discordList, '2026-01-01T00:00:00.000Z');
 
@@ -73,13 +79,25 @@ test('r/DiscordQuests entries survive the file format and the published download
     source: 'reddit',
     url: 'https://www.reddit.com/r/DiscordQuests/comments/abc123/x/',
   });
-  const foreignUrl = toDatabaseGame({ id: 'r-x', name: 'X', source: 'reddit', url: 'https://evil.example/', executables: [{ os: 'win32', name: 'x.exe' }] });
+  const foreignUrl = toDatabaseGame({
+    id: 'r-x',
+    name: 'X',
+    source: 'reddit',
+    url: 'https://evil.example/',
+    executables: [{ os: 'win32', name: 'x.exe' }],
+  });
   assert.equal(foreignUrl?.url, undefined, 'only reddit.com links are kept');
   assert.equal(toDatabaseGame({ id: 'r-../x', name: 'X', executables: [{ os: 'win32', name: 'x.exe' }] }), null);
 });
 
 test('a Steam-manifest quest keeps its Steam app id, folder and the executable inside it', () => {
-  const steamEntry = (gameName: string, executableName: string, folderPath: string, steamAppId: number, manifestContent?: string) => ({
+  const steamEntry = (
+    gameName: string,
+    executableName: string,
+    folderPath: string,
+    steamAppId: number,
+    manifestContent?: string
+  ) => ({
     ...entry(gameName, executableName),
     folderPath,
     questMethod: 'steam-manifest' as const,
@@ -89,8 +107,19 @@ test('a Steam-manifest quest keeps its Steam app id, folder and the executable i
   const [fc27, demo] = buildRedditSupplement(
     [
       entry('EA SPORTS FC 27', 'fc27.exe'),
-      steamEntry('EA SPORTS FC 27', 'fc27.exe', 'steamapps/common/EA SPORTS FC 27', 4080220, '"AppState"\n{\n "appid" "4080220"\n "installdir" "EA SPORTS FC 27"\n}'),
-      steamEntry('Toxic Commando Demo', 'Toxic Commando.exe', 'SteamLibrary/steamapps/common/Toxic Commando Demo/client_pc/bin', 4354730),
+      steamEntry(
+        'EA SPORTS FC 27',
+        'fc27.exe',
+        'steamapps/common/EA SPORTS FC 27',
+        4080220,
+        '"AppState"\n{\n "appid" "4080220"\n "installdir" "EA SPORTS FC 27"\n}'
+      ),
+      steamEntry(
+        'Toxic Commando Demo',
+        'Toxic Commando.exe',
+        'SteamLibrary/steamapps/common/Toxic Commando Demo/client_pc/bin',
+        4354730
+      ),
     ],
     discordList,
     discord.games
@@ -104,10 +133,17 @@ test('a Steam-manifest quest keeps its Steam app id, folder and the executable i
 test('Steam and website fields are checked when a database is read', async () => {
   const { toDatabaseGame } = await import('../src/server/gameDatabaseSource.ts');
   const base = { id: 'r-x', name: 'X', source: 'reddit', executables: [{ os: 'win32', name: 'x.exe' }] };
-  assert.deepEqual(toDatabaseGame({ ...base, steam: { appId: 5, installDir: 'X Game' }, site: 'x.com' })?.steam, { appId: 5, installDir: 'X Game' });
+  assert.deepEqual(toDatabaseGame({ ...base, steam: { appId: 5, installDir: 'X Game' }, site: 'x.com' })?.steam, {
+    appId: 5,
+    installDir: 'X Game',
+  });
   assert.equal(toDatabaseGame({ ...base, site: 'x.com' })?.site, 'x.com');
   assert.equal(toDatabaseGame({ ...base, steam: { appId: 5, installDir: '../Windows' } })?.steam, undefined);
   assert.equal(toDatabaseGame({ ...base, steam: { appId: -1, installDir: 'X' } })?.steam, undefined);
   assert.equal(toDatabaseGame({ ...base, site: 'https://evil.example/x' })?.site, undefined);
-  assert.equal(toDatabaseGame({ ...base, source: undefined, steam: { appId: 5, installDir: 'X' } })?.steam, undefined, "only r/DiscordQuests entries");
+  assert.equal(
+    toDatabaseGame({ ...base, source: undefined, steam: { appId: 5, installDir: 'X' } })?.steam,
+    undefined,
+    'only r/DiscordQuests entries'
+  );
 });

@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 import { ArrowUpCircle, Moon, Plus, RefreshCw, Sun, Volume2, VolumeX } from 'lucide-react';
 import type { UpdateInfo } from '../types';
 import { t } from '../strings';
@@ -6,10 +6,15 @@ import { Button, IconButton } from './ui';
 
 export type View = 'library' | 'catalog' | 'about';
 
+const UPDATE_PILL =
+  'flex items-center gap-1 self-center rounded-full bg-primary px-2 py-0.5 text-[11px] font-medium text-on-primary hover:bg-primary-hover';
+
 interface TopBarProps {
   version: string;
-  /** A newer release, shown as a link to its page. */
+  /** A newer release: a button when the app installs it itself, else a link to its page. */
   update: UpdateInfo | null;
+  installable: boolean;
+  onInstallUpdate: () => void;
   view: View;
   onView: (view: View) => void;
   runningCount: number;
@@ -25,6 +30,8 @@ interface TopBarProps {
 export const TopBar: React.FC<TopBarProps> = ({
   version,
   update,
+  installable,
+  onInstallUpdate,
   view,
   onView,
   runningCount,
@@ -46,14 +53,26 @@ export const TopBar: React.FC<TopBarProps> = ({
       <div className="mr-5 flex items-baseline gap-2">
         <span className="text-[14px] font-semibold tracking-tight text-text">{t('appTitle')}</span>
         <span className="tabular text-[11px] text-faint">{version}</span>
-        {update && (
+        {update && installable && (
+          <button
+            id="update-available-link"
+            type="button"
+            onClick={onInstallUpdate}
+            title={t('updateInstallTitle', { version: update.version })}
+            className={UPDATE_PILL}
+          >
+            <ArrowUpCircle className="h-3 w-3" />
+            {t('updateAvailable', { version: update.version })}
+          </button>
+        )}
+        {update && !installable && (
           <a
             id="update-available-link"
             href={update.url}
             target="_blank"
             rel="noreferrer"
             title={t('updateTitle', { version: update.version })}
-            className="flex items-center gap-1 self-center rounded-full bg-primary px-2 py-0.5 text-[11px] font-medium text-on-primary hover:bg-primary-hover"
+            className={UPDATE_PILL}
           >
             <ArrowUpCircle className="h-3 w-3" />
             {t('updateAvailable', { version: update.version })}
@@ -77,7 +96,9 @@ export const TopBar: React.FC<TopBarProps> = ({
             >
               {tab.label}
               {tab.id === 'library' && runningCount > 0 && (
-                <span className="tabular rounded-full bg-run/15 px-1.5 text-[11px] font-semibold text-run">{runningCount}</span>
+                <span className="tabular rounded-full bg-run/15 px-1.5 text-[11px] font-semibold text-run">
+                  {runningCount}
+                </span>
               )}
               {active && <span className="absolute inset-x-3 bottom-0 h-0.5 rounded-full bg-text" />}
             </button>
@@ -90,13 +111,30 @@ export const TopBar: React.FC<TopBarProps> = ({
         <IconButton id="theme-toggle-btn" label={dark ? t('themeToLight') : t('themeToDark')} onClick={onToggleTheme}>
           {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
         </IconButton>
-        <IconButton id="sound-toggle-btn" label={soundEnabled ? t('soundOn') : t('soundOff')} aria-pressed={soundEnabled} onClick={onToggleSound}>
+        <IconButton
+          id="sound-toggle-btn"
+          label={soundEnabled ? t('soundOn') : t('soundOff')}
+          aria-pressed={soundEnabled}
+          onClick={onToggleSound}
+        >
           {soundEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
         </IconButton>
-        <Button id="header-refresh-btn" variant="ghost" title={t('rescanTitle')} icon={<RefreshCw className="h-3.5 w-3.5" />} onClick={onRescan}>
+        <Button
+          id="header-refresh-btn"
+          variant="ghost"
+          title={t('rescanTitle')}
+          icon={<RefreshCw className="h-3.5 w-3.5" />}
+          onClick={onRescan}
+        >
           {t('rescan')}
         </Button>
-        <Button id="header-add-game-btn" variant="primary" className="ml-1" icon={<Plus className="h-3.5 w-3.5" />} onClick={onAddGame}>
+        <Button
+          id="header-add-game-btn"
+          variant="primary"
+          className="ml-1"
+          icon={<Plus className="h-3.5 w-3.5" />}
+          onClick={onAddGame}
+        >
           {t('addGame')}
         </Button>
       </div>

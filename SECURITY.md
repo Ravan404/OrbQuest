@@ -11,9 +11,13 @@ OrbQuest runs a local HTTP server and starts programs on your PC, so these matte
 - a web page or another machine reaching the local API (it should accept loopback only);
 - writing or deleting files outside the `Games` folder and the Steam quest folders it creates, or overwriting or deleting a real Steam install or manifest;
 - starting a program other than the placeholder or the executable you chose;
-- anything that reads a Discord token, logs in to Discord or sends anything about you. The app must never do this; it only downloads public data.
+- anything that reads a Discord token, logs in to Discord or sends anything about you. The app must never do this; it only downloads public data;
+- another program or web page using the desktop app's API without its window's session token;
+- an update that is installed although it does not come from this repository's releases or does not match the release's `SHA256SUMS.txt`.
 
 ## What it does not do
+
+The [privacy policy](PRIVACY.md) has the same list for users.
 
 It never logs in to Discord, never reads your token and never changes the Discord client. It sends no data about you; these are the only hosts it asks for anything:
 
@@ -21,7 +25,8 @@ It never logs in to Discord, never reads your token and never changes the Discor
 |---|---|
 | Game database updates (every six hours) | `raw.githubusercontent.com/Ravan404/OrbQuest`, `cdn.jsdelivr.net/gh/Ravan404/OrbQuest` (the published database). Only if both fail for a day: `discord.com` (Discord's public list of detectable games) |
 | Game icons | `cdn.discordapp.com`; for the few programs Discord has no icon for, `www.google.com/s2/favicons` (their website's icon) |
-| New release check (every six hours) | `api.github.com` (the latest OrbQuest release; `DQR_UPDATE_CHECK=0` turns it off) |
+| New release check (at the start and every six hours) | `api.github.com` (the latest OrbQuest release; `DQR_UPDATE_CHECK=0` turns it off) |
+| Installing an update, only when you click Install | `github.com/Ravan404/OrbQuest/releases/download/` (GitHub serves the file from `objects.githubusercontent.com`) |
 
 `DQR_OFFLINE=1` turns all of them off; the bundled database and saved icons keep working.
 

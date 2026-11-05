@@ -13,7 +13,11 @@ const bundled = (await import('../src/server/gameDatabase.json', { with: { type:
 };
 
 const localFile = path.join(gamesDir, '.game-database.json');
-const newGame = { id: '99999999999999999', name: 'Published Test Game', executables: ['win64/publishedtest-win64-shipping.exe'] };
+const newGame = {
+  id: '99999999999999999',
+  name: 'Published Test Game',
+  executables: ['win64/publishedtest-win64-shipping.exe'],
+};
 const later = new Date(Date.parse(bundled.generatedAt) + 86_400_000).toISOString();
 const published = { source: 'test', generatedAt: later, games: [...bundled.games, newGame] };
 const hasNewGame = () => Boolean(db.getGameById(newGame.id));
@@ -32,7 +36,8 @@ function fakeFetch(body: unknown, options: { etag?: string; discord?: unknown; p
     if (url.startsWith('https://discord.com/')) {
       return options.discord ? new Response(JSON.stringify(options.discord)) : new Response('down', { status: 503 });
     }
-    if (options.publishedDown || url.includes('raw.githubusercontent.com')) return new Response('busy', { status: 503 });
+    if (options.publishedDown || url.includes('raw.githubusercontent.com'))
+      return new Response('busy', { status: 503 });
     if (ifNoneMatch === etag) return new Response(null, { status: 304 });
     return new Response(JSON.stringify(body), { status: 200, headers: { etag } });
   }) as typeof fetch;
@@ -57,7 +62,14 @@ test("Discord's list is reduced to Windows games with safe executable paths", ()
     { id: '700136079562375258', name: 'Duplicate id', executables: [{ os: 'win32', name: 'dup.exe' }] },
     { id: '1', name: 'Bad id', executables: [{ os: 'win32', name: 'x.exe' }] },
     { id: '123456789012', name: 'Mac only', executables: [{ os: 'darwin', name: 'game.app' }] },
-    { id: '223456789012', name: 'Unsafe', executables: [{ os: 'win32', name: '../evil.exe' }, { os: 'win32', name: 'c:/x.exe' }] },
+    {
+      id: '223456789012',
+      name: 'Unsafe',
+      executables: [
+        { os: 'win32', name: '../evil.exe' },
+        { os: 'win32', name: 'c:/x.exe' },
+      ],
+    },
     { id: '323456789012', name: 'Source', executables: [{ os: 'win32', name: '>hl2.exe' }] },
   ];
   const database = buildGameDatabase(raw, '2026-01-01T00:00:00.000Z');
@@ -83,7 +95,11 @@ test('search and executable lookups use the bundled database', () => {
 
   assert.equal(db.findGameByExecutable('win64/valorant-win64-shipping.exe')?.name, 'VALORANT');
   assert.equal(db.findGameByExecutable('Games/VALORANT/Win64/VALORANT-Win64-Shipping.exe')?.name, 'VALORANT');
-  assert.equal(db.findGameByExecutable('VALORANT-Win64-Shipping.exe')?.name, 'VALORANT', 'a unique file name is enough');
+  assert.equal(
+    db.findGameByExecutable('VALORANT-Win64-Shipping.exe')?.name,
+    'VALORANT',
+    'a unique file name is enough'
+  );
   assert.equal(db.findGameByExecutable('game.exe'), undefined, 'a file name many games use says nothing');
   assert.equal(db.findGameByName('roblox')?.name, 'ROBLOX');
 
@@ -92,7 +108,10 @@ test('search and executable lookups use the bundled database', () => {
   assert.ok(featured.some((game) => game.name === 'VALORANT'));
   const firefox = db.findGameByExecutable('firefox.exe');
   assert.equal(firefox?.source, 'reddit', 'a program Discord gives no executable for comes from r/DiscordQuests');
-  assert.ok(featured.some((game) => game.id === firefox?.id), 'and is on the catalog page');
+  assert.ok(
+    featured.some((game) => game.id === firefox?.id),
+    'and is on the catalog page'
+  );
 });
 
 test('a newer published database replaces the bundled one and survives a restart', async () => {
@@ -122,7 +141,9 @@ test('a newer published database replaces the bundled one and survives a restart
 test('a published database older than the bundled one is ignored', async () => {
   fs.rmSync(localFile, { force: true });
   db.loadGameDatabase();
-  await db.refreshGameDatabase(fakeFetch({ ...published, generatedAt: '2020-01-01T00:00:00.000Z' }, { etag: '"old"' }).impl);
+  await db.refreshGameDatabase(
+    fakeFetch({ ...published, generatedAt: '2020-01-01T00:00:00.000Z' }, { etag: '"old"' }).impl
+  );
   assert.equal(hasNewGame(), false);
   assert.equal(db.getGameDatabaseInfo().from, 'bundled');
 });
@@ -137,7 +158,10 @@ test("Discord's own list is read only when the published one is unreachable, at 
   assert.equal(firefoxBefore?.source, 'reddit');
   const first = fakeFetch(null, { publishedDown: true, discord });
   await db.refreshGameDatabase(first.impl);
-  assert.ok(first.requests.some((r) => r.url.startsWith('https://discord.com/')), 'Discord was asked');
+  assert.ok(
+    first.requests.some((r) => r.url.startsWith('https://discord.com/')),
+    'Discord was asked'
+  );
   assert.ok(hasNewGame(), "Discord's list is used");
   assert.equal(db.findGameByExecutable('firefox.exe')?.id, firefoxBefore?.id, 'r/DiscordQuests entries are kept');
 
@@ -153,7 +177,8 @@ test('a broken, oversized or unreachable download is not used', async () => {
   assert.equal((await fetchPublishedDatabase('', urls, answer('not json'))).status, 'failed');
   assert.equal((await fetchPublishedDatabase('', urls, answer('{"games":"no"}'))).status, 'failed');
   assert.equal(
-    (await fetchPublishedDatabase('', urls, answer('{"games":[]}', { 'content-length': String(32 * 1024 * 1024) }))).status,
+    (await fetchPublishedDatabase('', urls, answer('{"games":[]}', { 'content-length': String(32 * 1024 * 1024) })))
+      .status,
     'failed'
   );
   const down = (async () => {

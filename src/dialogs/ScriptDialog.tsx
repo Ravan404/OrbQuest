@@ -1,9 +1,10 @@
-import React, { useMemo, useState } from 'react';
+import type React from 'react';
+import { useMemo, useState } from 'react';
 import { Clipboard, Download } from 'lucide-react';
-import { Game } from '../types';
+import type { Game } from '../types';
 import { api } from '../api';
 import { t } from '../strings';
-import { buildStartScripts, ScriptKind, SCRIPT_LABELS, scriptFileName } from '../utils/startScripts';
+import { buildStartScripts, type ScriptKind, SCRIPT_LABELS, scriptFileName } from '../utils/startScripts';
 import { Button, Dialog, Segmented } from '../components/ui';
 
 interface ScriptDialogProps {
@@ -51,7 +52,12 @@ export const ScriptDialog: React.FC<ScriptDialogProps> = ({ game, onClose, onNot
           <Button icon={<Clipboard className="h-3.5 w-3.5" />} onClick={copy}>
             {t('copy')}
           </Button>
-          <Button variant="primary" icon={<Download className="h-3.5 w-3.5" />} disabled={saving} onClick={() => void download()}>
+          <Button
+            variant="primary"
+            icon={<Download className="h-3.5 w-3.5" />}
+            disabled={saving}
+            onClick={() => void download()}
+          >
             {t('download')}
           </Button>
         </>

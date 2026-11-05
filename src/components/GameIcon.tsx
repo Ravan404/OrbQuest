@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import type React from 'react';
+import { useEffect, useState } from 'react';
 
 const SIZES = {
   sm: 'h-7 w-7 rounded-md text-[10px]',
@@ -7,7 +8,10 @@ const SIZES = {
 };
 
 function initials(name: string): string {
-  const parts = name.trim().split(/[\s:-]+/).filter(Boolean);
+  const parts = name
+    .trim()
+    .split(/[\s:-]+/)
+    .filter(Boolean);
   if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
   return name.slice(0, 2).toUpperCase() || '?';
 }
@@ -20,6 +24,7 @@ export const GameIcon: React.FC<{ name: string; src?: string; size?: keyof typeo
   className = '',
 }) => {
   const [failed, setFailed] = useState(false);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: a new address gets a new try.
   useEffect(() => setFailed(false), [src]);
 
   const base = `${SIZES[size]} shrink-0 overflow-hidden ${className}`;

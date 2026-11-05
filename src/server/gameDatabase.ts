@@ -81,14 +81,17 @@ let _refreshTimer: NodeJS.Timeout | undefined;
 // ---------------------------------------------------------------------------
 
 function isNewer(candidate: string | undefined, than: string): boolean {
-  return Boolean(candidate) && !Number.isNaN(Date.parse(candidate!)) && (!than || Date.parse(candidate!) > Date.parse(than));
+  return (
+    Boolean(candidate) && !Number.isNaN(Date.parse(candidate!)) && (!than || Date.parse(candidate!) > Date.parse(than))
+  );
 }
 
 /** Untrusted input (a download, the local file) as a database, or null. */
 function validDatabase(value: unknown): GameDatabase | null {
   if (!value || typeof value !== 'object') return null;
   const raw = value as Partial<GameDatabase>;
-  if (!Array.isArray(raw.games) || typeof raw.generatedAt !== 'string' || Number.isNaN(Date.parse(raw.generatedAt))) return null;
+  if (!Array.isArray(raw.games) || typeof raw.generatedAt !== 'string' || Number.isNaN(Date.parse(raw.generatedAt)))
+    return null;
   // The compact form uses the same field names as Discord's, so it goes through the same checks.
   const games = raw.games
     .map((game) => {
@@ -107,10 +110,14 @@ function validDatabase(value: unknown): GameDatabase | null {
     })
     .filter((game): game is DatabaseGame => Boolean(game));
   if (games.length === 0) return null;
-  return { source: typeof raw.source === 'string' ? raw.source : DISCORD_DETECTABLE_URL, generatedAt: raw.generatedAt, games };
+  return {
+    source: typeof raw.source === 'string' ? raw.source : DISCORD_DETECTABLE_URL,
+    generatedAt: raw.generatedAt,
+    games,
+  };
 }
 
-function useDatabase(database: GameDatabase): void {
+function applyDatabase(database: GameDatabase): void {
   _database = database;
   _byId = new Map(database.games.map((game) => [game.id, game]));
   _byFile = new Map();
@@ -144,7 +151,7 @@ export function loadGameDatabase(): void {
   const bundled = bundledDatabase as GameDatabase;
   _bundledAt = bundled.generatedAt;
   _downloaded = false;
-  useDatabase(bundled);
+  applyDatabase(bundled);
   _checkedAt = _etag = '';
   try {
     if (fs.existsSync(LOCAL_FILE)) {
@@ -153,7 +160,7 @@ export function loadGameDatabase(): void {
       _etag = typeof local.etag === 'string' ? local.etag : '';
       const downloaded = validDatabase(local.database);
       if (downloaded && isNewer(downloaded.generatedAt, _bundledAt)) {
-        useDatabase(downloaded);
+        applyDatabase(downloaded);
         _downloaded = true;
       }
     }
@@ -272,7 +279,7 @@ function isOlderThan(timestamp: string, ms: number): boolean {
 
 function adopt(database: GameDatabase): boolean {
   if (!isNewer(database.generatedAt, _database.generatedAt) || sameGames(database, _database)) return false;
-  useDatabase(database);
+  applyDatabase(database);
   _downloaded = true;
   return true;
 }
@@ -301,7 +308,9 @@ async function readDiscordDirectly(fetchImpl: typeof fetch): Promise<GameDatabas
  */
 function withRedditEntries(direct: GameDatabase): GameDatabase {
   const files = new Set(direct.games.flatMap((game) => game.executables.map(executableFileName)));
-  const names = new Set(direct.games.flatMap((game) => [game.name, ...(game.aliases ?? [])].map((name) => normalizeGameKey(name))));
+  const names = new Set(
+    direct.games.flatMap((game) => [game.name, ...(game.aliases ?? [])].map((name) => normalizeGameKey(name)))
+  );
   const kept = _database.games.filter(
     (game) =>
       game.source === 'reddit' &&
@@ -339,7 +348,9 @@ export async function refreshGameDatabase(fetchImpl: typeof fetch = fetch): Prom
   const changed = adopt(withRedditEntries(direct));
   _checkedAt = now;
   saveLocal();
-  console.log(`[GameDatabase] Discord's list read directly (${changed ? `${_database.games.length} games` : 'unchanged'}).`);
+  console.log(
+    `[GameDatabase] Discord's list read directly (${changed ? `${_database.games.length} games` : 'unchanged'}).`
+  );
 }
 
 /**

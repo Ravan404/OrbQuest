@@ -1,4 +1,4 @@
-import type { AppProfile, BufferPreset, CatalogGame, Game, UpdateInfo } from './types';
+import type { AppProfile, BufferPreset, CatalogGame, Game, UpdateDownload, UpdateStatus } from './types';
 
 export type ThemeSetting = 'system' | 'light' | 'dark';
 
@@ -41,7 +41,9 @@ const gameUrl = (id: string, action = '') => `/api/games/${encodeURIComponent(id
 
 export const api = {
   profile: (signal?: AbortSignal) => request<AppProfile>('/api/profile', { signal }),
-  update: () => request<{ update: UpdateInfo | null }>('/api/update'),
+  update: () => request<UpdateStatus>('/api/update'),
+  /** Starts downloading the update; GET /api/update follows it. */
+  downloadUpdate: () => request<UpdateDownload>('/api/update/download', { method: 'POST' }),
   /** Saves a game's start script to the Downloads folder. */
   saveScript: (id: string, kind: 'bat' | 'ps1' | 'py') =>
     request<{ fileName: string; path: string }>(gameUrl(id, 'script'), { method: 'POST', json: { kind } }),
@@ -65,9 +67,11 @@ export const api = {
   stop: (id: string) => request<{ game: Game }>(gameUrl(id, 'stop'), { method: 'POST' }),
   stopAll: () => request<{ stoppedCount?: number }>('/api/games/stop-all', { method: 'POST' }),
   resetTimer: (id: string) => request<{ game: Game }>(gameUrl(id, 'reset-timer'), { method: 'POST' }),
-  setTimer: (id: string, timer: TimerSettings) => request<{ game: Game }>(gameUrl(id, 'timer'), { method: 'PUT', json: timer }),
+  setTimer: (id: string, timer: TimerSettings) =>
+    request<{ game: Game }>(gameUrl(id, 'timer'), { method: 'PUT', json: timer }),
 
-  add: (draft: GameDraft) => request<{ game?: Game }>('/api/games', { method: 'POST', json: { ...draft, origin: 'custom' } }),
+  add: (draft: GameDraft) =>
+    request<{ game?: Game }>('/api/games', { method: 'POST', json: { ...draft, origin: 'custom' } }),
   /** Adds a catalog game with one of the executables Discord lists for it. */
   addFromCatalog: (game: CatalogGame, executable: string) =>
     request<{ game?: Game }>('/api/games', {

@@ -49,7 +49,14 @@ interface IconButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> 
 }
 
 /** Square icon-only button. `label` becomes its tooltip and accessible name. */
-export const IconButton: React.FC<IconButtonProps> = ({ label, tone = 'default', className = '', children, type = 'button', ...rest }) => (
+export const IconButton: React.FC<IconButtonProps> = ({
+  label,
+  tone = 'default',
+  className = '',
+  children,
+  type = 'button',
+  ...rest
+}) => (
   <button
     type={type}
     title={label}
@@ -96,6 +103,7 @@ export function Segmented<T extends string | number>({
   className?: string;
 }) {
   return (
+    // biome-ignore lint/a11y/useSemanticElements: a row of toggle buttons; a fieldset would bring its own layout.
     <div className={`inline-flex rounded-md bg-sunken p-0.5 ${className}`} role="group">
       {options.map((option) => {
         const active = option.value === value;
@@ -107,7 +115,9 @@ export function Segmented<T extends string | number>({
             aria-pressed={active}
             onClick={() => onChange(option.value)}
             className={`flex-1 whitespace-nowrap rounded px-2.5 py-1 text-[12px] transition-colors ${
-              active ? 'bg-surface font-medium text-text shadow-[0_1px_2px_var(--c-shadow)]' : 'text-muted hover:text-text'
+              active
+                ? 'bg-surface font-medium text-text shadow-[0_1px_2px_var(--c-shadow)]'
+                : 'text-muted hover:text-text'
             }`}
           >
             {option.label}
@@ -134,7 +144,9 @@ export const Chip: React.FC<{ tone?: ChipTone; dot?: boolean; children: React.Re
   children,
   className = '',
 }) => (
-  <span className={`inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[11px] font-medium ${CHIP_TONES[tone]} ${className}`}>
+  <span
+    className={`inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[11px] font-medium ${CHIP_TONES[tone]} ${className}`}
+  >
     {dot && <span className="h-1.5 w-1.5 rounded-full bg-current" />}
     {children}
   </span>
@@ -143,9 +155,10 @@ export const Chip: React.FC<{ tone?: ChipTone; dot?: boolean; children: React.Re
 /** Floating panel: menus, the bulk bar, notices. */
 export const popClass = 'rounded-lg border border-line bg-surface shadow-pop';
 
-export const SectionLabel: React.FC<{ children: React.ReactNode; className?: string }> = ({ children, className = '' }) => (
-  <div className={`text-[11px] font-semibold uppercase tracking-wide text-faint ${className}`}>{children}</div>
-);
+export const SectionLabel: React.FC<{ children: React.ReactNode; className?: string }> = ({
+  children,
+  className = '',
+}) => <div className={`text-[11px] font-semibold uppercase tracking-wide text-faint ${className}`}>{children}</div>;
 
 interface DialogProps {
   title: string;
@@ -167,6 +180,7 @@ export const Dialog: React.FC<DialogProps> = ({ title, subtitle, onClose, footer
   }, [onClose]);
 
   return (
+    // biome-ignore lint/a11y/noStaticElementInteractions: a click outside closes the dialog; Escape does too.
     <div className="fixed inset-0 z-50 overflow-y-auto bg-black/40 p-4" onMouseDown={onClose}>
       <div className="flex min-h-full items-center justify-center">
         <section
@@ -187,7 +201,9 @@ export const Dialog: React.FC<DialogProps> = ({ title, subtitle, onClose, footer
           </header>
           <div className="px-5 pb-5 pt-2">{children}</div>
           {footer && (
-            <footer className="flex items-center justify-end gap-2 border-t border-line bg-sunken/60 px-5 py-3">{footer}</footer>
+            <footer className="flex items-center justify-end gap-2 border-t border-line bg-sunken/60 px-5 py-3">
+              {footer}
+            </footer>
           )}
         </section>
       </div>

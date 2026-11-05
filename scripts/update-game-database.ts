@@ -29,7 +29,14 @@ import {
   type GameDatabase,
 } from '../src/server/gameDatabaseSource.ts';
 import { APP_VERSION } from '../src/version.ts';
-import { DATASET_DIR, buildDatabaseEntries, datasetPostIds, listDatasetFiles, loadDataset, newestTimestamp } from '../src/server/reddit/snapshots.ts';
+import {
+  DATASET_DIR,
+  buildDatabaseEntries,
+  datasetPostIds,
+  listDatasetFiles,
+  loadDataset,
+  newestTimestamp,
+} from '../src/server/reddit/snapshots.ts';
 import { fetchNewSubredditPosts } from '../src/server/reddit/posts.ts';
 import { buildRedditSupplement } from '../src/server/reddit/supplement.ts';
 
@@ -113,7 +120,9 @@ async function run(): Promise<void> {
   const before = new Map((current?.games ?? []).map((game) => [game.id, game]));
   const added = next.games.filter((game) => !before.has(game.id));
   const removed = (current?.games ?? []).filter((game) => !next.games.some((n) => n.id === game.id));
-  const changed = next.games.filter((game) => before.has(game.id) && JSON.stringify(before.get(game.id)) !== JSON.stringify(game));
+  const changed = next.games.filter(
+    (game) => before.has(game.id) && JSON.stringify(before.get(game.id)) !== JSON.stringify(game)
+  );
   console.log(`Added ${added.length}, removed ${removed.length}, changed ${changed.length}.`);
   for (const game of added.slice(0, 20)) console.log(`  + ${game.name} [${game.executables.join(', ')}]`);
   if (added.length > 20) console.log(`  ... and ${added.length - 20} more`);

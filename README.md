@@ -15,9 +15,14 @@ It does not log into Discord, does not take a token, and does not change the Dis
 
 ## Download
 
-Get `OrbQuest.exe` from the [latest release](https://github.com/Ravan404/OrbQuest/releases/latest) and run it. No install is needed: the exe can sit in any folder, and the library is kept in `%LOCALAPPDATA%\OrbQuest`, so a newer exe downloaded somewhere else finds the same games. When a new release is out, a link to it appears next to the version at the top of the window. Each release lists the SHA-256 of the file (`OrbQuest.exe.sha256`).
+Each [release](https://github.com/Ravan404/OrbQuest/releases/latest) has two files:
 
-The exe is not code-signed, so Windows SmartScreen may say it is from an unknown publisher (More info → Run anyway). Some antivirus programs also flag the placeholder because it is a tiny program that runs under another game's name. The source of both is in this repository, and the release is built by GitHub Actions from it.
+- **`OrbQuest-Setup-<version>.exe`**: installs OrbQuest for your Windows user, without administrator rights, into `%LOCALAPPDATA%\Programs\OrbQuest`, with a Start menu entry. It starts in about a second. Uninstall it from Installed apps.
+- **`OrbQuest-<version>.exe`**: the portable version, one file that runs from any folder. It unpacks itself to `%TEMP%` on every start, so it takes a few seconds longer.
+
+Both keep the library in `%LOCALAPPDATA%\OrbQuest`, so switching between them, or uninstalling, keeps your games. When a new release is out, an Update button appears next to the version at the top of the window: OrbQuest downloads the new version from this repository's releases, checks it against `SHA256SUMS.txt`, closes, and opens again with the new version. `SHA256SUMS.txt` also lets you check a download yourself. See the [code signing policy](#code-signing-policy) and the [privacy policy](PRIVACY.md).
+
+The files are not code-signed, so Windows SmartScreen may say they are from an unknown publisher (More info → Run anyway). Some antivirus programs also flag the placeholder because it is a tiny program that runs under another game's name. The source of both is in this repository, and the release is built by GitHub Actions from it.
 
 ## Run from source
 
@@ -33,22 +38,25 @@ The server listens on `http://127.0.0.1:3000`.
 | Command | What it does |
 |---|---|
 | `npm run typecheck` | TypeScript check |
+| `npm run lint` | Biome lint and format check (`npm run format` fixes the format) |
 | `npm test` | Unit and API tests (`tests/`), offline, in a temporary folder |
+| `npm run test:e2e` | Browser test of the built app in Edge or Chrome (Windows; run `npm run build` first) |
 | `npm run build` | Frontend plus `dist/server.cjs` |
 | `npm start` | Run the production server |
 | `npm run verify:dist` | Boot the built server and check the offline database |
 | `npm run update-database` | Rebuild `src/server/gameDatabase.json` from Discord's list and r/DiscordQuests (`-- --dry-run` only shows the changes) |
 | `npm run clean` | Delete `dist/` and Vite's cache |
 
-Windows package:
+Windows packages:
 
 ```bat
 build_windows_exe.bat
+powershell -ExecutionPolicy Bypass -File scripts\smoke-test-package.ps1
 ```
 
-That writes `dist\OrbQuest.exe`. It needs a Windows machine. Games and settings go in `%LOCALAPPDATA%\OrbQuest\Games`; versions before 1.5.0 kept that folder next to the exe and it is moved there on the first start. If startup fails, look at `%LOCALAPPDATA%\OrbQuest\startup.log`. The backend's own messages go to `backend.log` in the same folder (the previous run is kept as `backend.log.1`). The window needs the Microsoft Edge WebView2 runtime, which Windows 10 and 11 normally have; on a PC without it, put a Fixed Version runtime in a `WebView2Runtime` folder next to the exe.
+The first writes `release\OrbQuest-Setup-<version>.exe` (with [Inno Setup 6](https://jrsoftware.org/isinfo.php)), `release\OrbQuest-<version>.exe` and `release\SHA256SUMS.txt`; the second installs, starts and uninstalls them. It needs a Windows machine with Python 3.13. Games and settings go in `%LOCALAPPDATA%\OrbQuest\Games`; versions before 1.5.0 kept that folder next to the exe and it is moved there on the first start. If startup fails, look at `%LOCALAPPDATA%\OrbQuest\startup.log`. The backend's own messages go to `backend.log` in the same folder (the previous run is kept as `backend.log.1`). The window needs the Microsoft Edge WebView2 runtime, which Windows 10 and 11 normally have; on a PC without it, put a Fixed Version runtime in a `WebView2Runtime` folder next to the exe.
 
-The placeholder (`placeholder_runtime.exe`) is committed as a binary. To rebuild it from `placeholder_runtime.c`, install MinGW-w64 and run `scripts\build-placeholder.bat`, then add the old file's SHA-256 to `LEGACY_SHA256_HASHES` in `src/server/placeholderUpgrade.ts` so existing copies are upgraded.
+The placeholder (`placeholder_runtime.exe`) is committed as a binary, and its build is reproducible: CI rebuilds it from `placeholder_runtime.c` with the pinned toolchain and fails if the result differs from the committed file by a single byte. See [CONTRIBUTING.md](CONTRIBUTING.md#the-placeholder-executable).
 
 ## Settings
 
@@ -128,19 +136,22 @@ server.ts                  Express app
 src/App.tsx                UI state and actions
 src/views/                 Library, Catalog, About
 src/components/            Cards, bars, timer menu, shared controls (ui.tsx)
-src/dialogs/               Add/edit game, start script
+src/dialogs/               Add/edit game, start script, update
 src/hooks/, src/utils/     Polling, timer maths, start scripts, executable choice
 src/strings.ts             Every text the window shows
 src/index.css              Light and dark theme colours
-src/server/                Library, game database, catalog, icons, Steam quests, release check
+src/server/                Game database, catalog, icons, Steam quests, session, updates
+src/server/library/        The library: scan, saved timers, placeholder processes
+src/server/routes/         The HTTP API
 src/server/gameDatabase.json  Discord's list of detectable games (compact)
 src/server/featuredGames.json Games shown before a search
 src/server/reddit/         Reads r/DiscordQuests for the database update (not part of the app)
 data/reddit/               r/DiscordQuests post snapshots
-tests/                     node:test suites (npm test)
-scripts/                   Test runner, database update, release checks
+tests/                     node:test suites (npm test); tests/e2e/ is the browser test
+scripts/                   Test runner, database update, release checks, package smoke test
 desktop_app.py             Windows window (pywebview), with single_instance.py
-OrbQuest.spec              PyInstaller recipe for the exe
+OrbQuest.spec              PyInstaller recipe for the installed files and the portable exe
+installer/OrbQuest.iss     Inno Setup script for the installer
 placeholder_runtime.c      Placeholder process (Win32, committed as placeholder_runtime.exe)
 placeholder_runtime.py     Placeholder fallback for development on Linux/macOS
 requirements-build.txt     Python packages for build_windows_exe.bat
@@ -152,11 +163,21 @@ docs/                      Screenshot for this README
 ## Security
 
 - Binds to `127.0.0.1` unless `DQR_BIND_HOST` says otherwise.
+- In the desktop app only its own window can use the API: the window opens with a token that is new on every start and keeps it as an HttpOnly cookie. Another program on the PC cannot start or remove games through it.
 - Rejects a `Host` header that is not loopback, unless `DQR_ALLOWED_HOSTS` allows it. That blocks a page from calling this API by pointing its own hostname at `127.0.0.1`.
 - Production builds send a Content-Security-Policy. The dev server does not, so the Vite client can connect.
 - `dist/server.cjs`, its sourcemap and the database JSON files are not served as static files.
 - File writes stay inside `Games/` and `icon-cache/`, for a Steam quest inside that game's folder and manifest in Steam's `steamapps`, and a start script only as `<Game> - OrbQuest.<bat|ps1|py>` in Downloads. An executable path from a request or from Discord's list must stay inside its game folder (no `..`, drive letters or absolute paths).
 - Images are only loaded from the app itself and `cdn.discordapp.com`. A website icon is downloaded by the server and served from `icon-cache/`.
+- An update is only downloaded from this repository's releases, must match the SHA-256 in the release's `SHA256SUMS.txt`, and is checked again by the desktop app before it runs.
+
+## Code signing policy
+
+The Windows files are not code-signed yet. Every release file is built from a tag of this repository by the [Release workflow](.github/workflows/release.yml), and each release is reviewed and published by hand.
+
+- Committers and reviewers: [Ravan404](https://github.com/Ravan404)
+- Approvers: [Ravan404](https://github.com/Ravan404)
+- Privacy: see the [privacy policy](PRIVACY.md).
 
 ## Contributing
 

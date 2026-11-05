@@ -1,6 +1,7 @@
-import React, { useMemo, useState } from 'react';
+import type React from 'react';
+import { useMemo, useState } from 'react';
 import { ChevronRight, Plus, Square, Trash2 } from 'lucide-react';
-import { Game } from '../types';
+import type { Game } from '../types';
 import type { TimerSettings } from '../api';
 import { t } from '../strings';
 import { Button, SearchInput, Segmented, popClass } from '../components/ui';
@@ -82,11 +83,32 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
   };
 
   const filterOptions: { value: Filter; label: React.ReactNode }[] = [
-    { value: 'all', label: <>{t('filterAll')} <span className="tabular text-faint">{games.length}</span></> },
-    { value: 'running', label: <>{t('filterRunning')} <span className="tabular text-faint">{runningCount}</span></> },
+    {
+      value: 'all',
+      label: (
+        <>
+          {t('filterAll')} <span className="tabular text-faint">{games.length}</span>
+        </>
+      ),
+    },
+    {
+      value: 'running',
+      label: (
+        <>
+          {t('filterRunning')} <span className="tabular text-faint">{runningCount}</span>
+        </>
+      ),
+    },
   ];
   if (customCount > 0) {
-    filterOptions.push({ value: 'custom', label: <>{t('filterCustom')} <span className="tabular text-faint">{customCount}</span></> });
+    filterOptions.push({
+      value: 'custom',
+      label: (
+        <>
+          {t('filterCustom')} <span className="tabular text-faint">{customCount}</span>
+        </>
+      ),
+    });
   }
 
   return (
@@ -108,7 +130,10 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
                 onClick={() =>
                   setMarked((previous) => {
                     const next = new Set(previous);
-                    visible.forEach((game) => (allVisibleMarked ? next.delete(game.id) : next.add(game.id)));
+                    for (const game of visible) {
+                      if (allVisibleMarked) next.delete(game.id);
+                      else next.add(game.id);
+                    }
                     return next;
                   })
                 }
@@ -122,7 +147,11 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
               <Button onClick={() => setSelecting(true)} disabled={games.length === 0}>
                 {t('select')}
               </Button>
-              <Button id="explore-catalog-btn" onClick={onOpenCatalog} icon={<ChevronRight className="order-last h-3.5 w-3.5" />}>
+              <Button
+                id="explore-catalog-btn"
+                onClick={onOpenCatalog}
+                icon={<ChevronRight className="order-last h-3.5 w-3.5" />}
+              >
                 {t('navCatalog')}
               </Button>
             </>
@@ -146,7 +175,9 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
           </div>
         ) : visible.length === 0 ? (
           <div className="mt-16 text-center">
-            <p className="text-[14px] text-muted">{query.trim() ? t('noMatch', { query: query.trim() }) : t('filterEmpty')}</p>
+            <p className="text-[14px] text-muted">
+              {query.trim() ? t('noMatch', { query: query.trim() }) : t('filterEmpty')}
+            </p>
             {query.trim() && (
               <Button id="no-match-open-catalog-btn" className="mt-4" onClick={onOpenCatalog}>
                 {t('browseCatalog')}
