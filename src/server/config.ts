@@ -28,23 +28,11 @@ export const OFFLINE = process.env.ORBQUEST_OFFLINE === '1';
 export const RATE_LIMIT_WINDOW = 60_000;
 export const RATE_LIMIT_MAX_REQUESTS = Number(process.env.ORBQUEST_RATE_LIMIT_MAX || 100);
 
-// ---------------------------------------------------------------------------
-// Host allow-list
-// ---------------------------------------------------------------------------
-
 /**
- * Hostnames the HTTP API accepts in the `Host` header.
- *
- * A web page can point a hostname it controls at 127.0.0.1 (DNS rebinding) and
- * then call the API with that hostname, which makes the request look
- * same-origin to the browser and bypasses the CORS preflight that otherwise
- * blocks cross-origin JSON requests. Only loopback hostnames are accepted by
- * default; widen the list only when the app really is served behind a proxy or
- * a preview host:
- *
- *   ORBQUEST_ALLOWED_HOSTS="preview.example.com,*.tunnels.example.com"
- *
- * `*` as a single entry disables the check entirely (not recommended).
+ * Hostnames the API accepts in the `Host` header. A page can point a hostname
+ * it controls at 127.0.0.1 (DNS rebinding) to look same-origin, so only loopback
+ * names are accepted by default. ORBQUEST_ALLOWED_HOSTS adds more
+ * (`*.example.com` works); a single `*` turns the check off.
  */
 export const DEFAULT_ALLOWED_HOSTS = ['localhost', '127.0.0.1', '::1', '[::1]', '0.0.0.0'];
 
@@ -77,7 +65,7 @@ export interface StoredGame {
   completed?: boolean;
   warmupRemainingSeconds?: number;
   session?: { started: number; base: number; warmup: number; resumed: boolean };
-  /** Provenance of the entry: added by hand, added from the catalog, or found by the folder scan. */
+  /** Where the entry came from: added by hand, from the catalog, or found by the scan. */
   origin?: GameOrigin;
   /** ISO timestamp written when the entry was first created. */
   addedAt?: string;

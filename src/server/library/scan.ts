@@ -70,7 +70,6 @@ async function scanGamesDir(): Promise<void> {
         continue;
       }
 
-      // Read .game-name.txt if available
       let storedName = '';
       const nameFile = path.join(folderPath, '.game-name.txt');
       if (fs.existsSync(nameFile)) {
@@ -79,14 +78,14 @@ async function scanGamesDir(): Promise<void> {
         } catch {}
       }
 
-      // Provenance marker (custom / catalog) written when the entry was added
+      // Where the entry came from, written when it was added
       const meta = readGameMeta(folder.name);
       const hintedName = meta.name || storedName || folder.name;
       const metaExe = meta.executable && isSafeExecutablePath(meta.executable) ? meta.executable : '';
       const knownExe = metaExe || inferKnownExecutableForGame(hintedName, folder.name, meta.appId);
       const fallbackExe = `${folder.name.toLowerCase().replace(/[^a-z0-9_-]/g, '') || 'game'}.exe`;
 
-      // Find executable or restore if the placeholder was removed by AV.
+      // Find the executable, or restore a placeholder that antivirus removed.
       // Catalog games keep theirs in a subfolder (`win64/x.exe`), as Discord expects.
       let exeName = '';
       const actualExe = files.find((f) => f.toLowerCase().endsWith('.exe'));
@@ -126,7 +125,7 @@ async function scanGamesDir(): Promise<void> {
           .toLowerCase()
           .replace(/\s+/g, '-')
           .replace(/[^a-z0-9._-]/g, '') || 'game';
-      // Persist disambiguated id and executable name so folder metadata survives AV quarantine.
+      // Save the id and executable so the folder survives antivirus quarantine.
       if ((id !== defaultId && meta.id !== id) || meta.executable !== exeName) {
         writeGameMeta(folder.name, { ...(id !== defaultId ? { id } : {}), executable: exeName });
       }
@@ -156,7 +155,7 @@ async function scanGamesDir(): Promise<void> {
       }
     }
 
-    // Simulated Steam layout used by catalog discoveries:
+    // Steam layout inside Games/ from early versions:
     // Games/steamapps/appmanifest_<appid>.acf and
     // Games/steamapps/common/<installdir>/<game>.exe
     const steamAppsDir = path.join(GAMES_DIR, 'steamapps');

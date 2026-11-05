@@ -3,8 +3,8 @@
  *   npm test
  *
  * Runs every tests/*.test.ts file with Node's built-in test runner and tsx.
- * The file list is built here because Node 20 does not expand globs itself
- * and cmd.exe (npm's shell on Windows) does not either.
+ * The file list is built here because cmd.exe (npm's shell on Windows) does
+ * not expand globs.
  */
 
 import { spawnSync } from 'node:child_process';

@@ -14,7 +14,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { redditPostId } from './corrections.ts';
-import { dedupeEntries, redditPostToEntries, type RedditCacheEntry, type RedditPostLike } from './dataset.ts';
+import { dedupeEntries, redditPostToEntries, type RedditEntry, type RedditPostLike } from './dataset.ts';
 
 export const DATASET_FILE_PATTERN = /^dataset_reddit-.*\.json$/;
 /** Folder of the r/DiscordQuests snapshots, relative to the repository root. */
@@ -131,6 +131,6 @@ export function datasetPostIds(dataset: LoadedDataset): Set<string> {
 }
 
 /** The database entries of a list of posts: canonical names, post fixes, one entry per executable. */
-export function buildDatabaseEntries(posts: DatasetPost[]): RedditCacheEntry[] {
+export function buildDatabaseEntries(posts: DatasetPost[]): RedditEntry[] {
   return dedupeEntries(posts.flatMap((post) => redditPostToEntries(post)));
 }

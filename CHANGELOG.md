@@ -4,7 +4,7 @@ Notable changes to OrbQuest. The format follows [Keep a Changelog](https://keepa
 
 ## [Unreleased]
 
-## [1.6.1] — 2026-11-05
+## [1.6.1] - 2026-11-05
 
 ### Added
 
@@ -16,12 +16,12 @@ Notable changes to OrbQuest. The format follows [Keep a Changelog](https://keepa
 - The settings variables start with `ORBQUEST_` instead of `DQR_`. The older `DISCORD_QUEST_ROOT`, `DISCORD_QUEST_ASSET_ROOT` and `DQR_REDDIT_CACHE_REFRESH` are gone. Placeholders in existing libraries are upgraded on their next start.
 - The repository is tidier: the desktop app and its packaging are in `desktop/`, the placeholder in `placeholder/`, and `build_windows_exe.bat` is now `scripts/build-windows.bat`.
 
-## [1.6.0] — 2026-11-03
+## [1.6.0] - 2026-11-03
 
 ### Added
 
-- **An installer**, `OrbQuest-Setup-<version>.exe`: installs OrbQuest for your Windows user without administrator rights, with a Start menu entry and an uninstaller. The installed app starts in about a second; the single exe took about seven, because it unpacks itself on every start.
-- **Updates from inside the app.** When a new release is out, the Update button next to the version downloads it from this repository's releases, checks it against the release's `SHA256SUMS.txt`, closes OrbQuest and opens the new version. The installed app runs the new installer silently; the portable exe is replaced by the new one.
+- An installer, `OrbQuest-Setup-<version>.exe`: installs OrbQuest for your Windows user without administrator rights, with a Start menu entry and an uninstaller. The installed app starts in about a second; the single exe took about seven, because it unpacks itself on every start.
+- Updates from inside the app. When a new release is out, the Update button next to the version downloads it from this repository's releases, checks it against the release's `SHA256SUMS.txt`, closes OrbQuest and opens the new version. The installed app runs the new installer silently; the portable exe is replaced by the new one.
 - The release files carry their version: `OrbQuest-Setup-1.6.0.exe` and the portable `OrbQuest-1.6.0.exe`, with `SHA256SUMS.txt` for both.
 - A privacy policy (`PRIVACY.md`) and a code signing policy in the README.
 - Only the OrbQuest window can use the app's API: it opens with a token that is new on every start. Another program on the PC can no longer start or remove games through it.
@@ -38,23 +38,23 @@ Notable changes to OrbQuest. The format follows [Keep a Changelog](https://keepa
 
 - A new release showed up late, sometimes only after five minutes: the window asked once 20 seconds after the start, often before the server had heard back from GitHub, and then only every five minutes. The server now asks GitHub as soon as it starts, the window asks right away and gets the answer of that first check, and a check that failed (no connection yet) is tried again after ten minutes instead of six hours.
 
-## [1.5.1] — 2026-11-03
+## [1.5.1] - 2026-11-03
 
 ### Changed
 
-- **Start scripts are saved straight to the Downloads folder** as `<Game> - OrbQuest.bat` (or `.ps1`, `.py`), so they are easy to find and not mistaken for the game's own files. Before, the window downloaded them as `run_<id>.bat` to wherever it chose.
-- **The theme button switches between light and dark** and shows the theme it switches to. The app follows Windows until the button is used, then keeps the choice; the saved theme is on the page from the first frame.
+- Start scripts are saved straight to the Downloads folder as `<Game> - OrbQuest.bat` (or `.ps1`, `.py`), so they are easy to find and not mistaken for the game's own files. Before, the window downloaded them as `run_<id>.bat` to wherever it chose.
+- The theme button switches between light and dark and shows the theme it switches to. The app follows Windows until the button is used, then keeps the choice; the saved theme is on the page from the first frame.
 
 ### Fixed
 
 - The placeholder window of a Steam quest (EA SPORTS FC 27) had no game icon.
 - A request for one game could reach another: games were also looked up by display name or folder, so of two games with the same name the first one answered. Only the id counts now.
 
-## [1.5.0] — 2026-11-02
+## [1.5.0] - 2026-11-02
 
 ### Added
 
-- **Steam quests work again.** EA SPORTS FC 27, Marathon, AION 2, Assassin's Creed Black Flag Resynced, MARVEL Tōkon and the Toxic Commando demo are only detected through Steam. Adding one from the catalog (marked Steam) writes the placeholder to `steamapps\common\<game>` of the Steam installation, found through the registry, with the `appmanifest_<id>.acf` the r/DiscordQuests post describes. A real install or manifest of the game is never overwritten, and removing the entry deletes only what the app wrote. 1.4.0 had dropped this.
+- Steam quests work again. EA SPORTS FC 27, Marathon, AION 2, Assassin's Creed Black Flag Resynced, MARVEL Tōkon and the Toxic Commando demo are only detected through Steam. Adding one from the catalog (marked Steam) writes the placeholder to `steamapps\common\<game>` of the Steam installation, found through the registry, with the `appmanifest_<id>.acf` the r/DiscordQuests post describes. A real install or manifest of the game is never overwritten, and removing the entry deletes only what the app wrote. 1.4.0 had dropped this.
 - When a new release is out, a link to it appears next to the version at the top of the window. The app asks GitHub every six hours; `DQR_UPDATE_CHECK=0` turns that off.
 - Firefox and Opera GX show their own icon instead of their initials. Discord has none for them, so the app saves their website's icon.
 - An Open folder button on the About page.
@@ -67,11 +67,11 @@ Notable changes to OrbQuest. The format follows [Keep a Changelog](https://keepa
 
 - `DQR_OFFLINE=1` did not stop icon downloads.
 
-## [1.4.0] — 2026-10-31
+## [1.4.0] - 2026-10-31
 
 ### Changed
 
-- **The catalog is Discord's own list of detectable games** (`discord.com/api/v9/applications/detectable`) instead of executables read from r/DiscordQuests posts. It has every game Discord can detect with a Windows executable (about 10,400), and the placeholder is written to the path Discord matches, including its folder: `Games\VALORANT\win64\valorant-win64-shipping.exe`. Before, a placeholder such as `Games\VALORANT\VALORANT-Win64-Shipping.exe` could miss Discord's folder rule.
+- The catalog is Discord's own list of detectable games (`discord.com/api/v9/applications/detectable`) instead of executables read from r/DiscordQuests posts. It has every game Discord can detect with a Windows executable (about 10,400), and the placeholder is written to the path Discord matches, including its folder: `Games\VALORANT\win64\valorant-win64-shipping.exe`. Before, a placeholder such as `Games\VALORANT\VALORANT-Win64-Shipping.exe` could miss Discord's folder rule.
 - r/DiscordQuests now only fills in the quest programs Discord publishes no executable for: apps such as Firefox, Opera GX and the Comet browser, and quest games Discord has not added yet (AION 2, Forza Horizon 6, Marathon and others). They show an r/DiscordQuests label and keep Discord's id and icon where Discord knows them.
 - The catalog page shows the games that have had Discord quests; searching finds any game in Discord's list, by name, other name or executable. When Discord lists several executables, the game's own is preselected and the others are in a list.
 - The Game database workflow rebuilds `src/server/gameDatabase.json` from Discord and r/DiscordQuests every six hours and publishes it on its own `database` branch, so updates no longer add commits to `main`. The app downloads it from there and never asks Reddit itself. It reads Discord's list itself only when the published file has been unreachable for a day.
@@ -85,12 +85,12 @@ Notable changes to OrbQuest. The format follows [Keep a Changelog](https://keepa
 - Adding Steam-manifest installs from the catalog. Installs made by earlier versions are still listed and can be removed safely.
 - Games Discord only recognises with command-line arguments (Team Fortress 2, Half-Life 2) are not in the catalog, because a placeholder is started without arguments.
 
-## [1.3.0] — 2026-10-28
+## [1.3.0] - 2026-10-28
 
 ### Changed
 
 - The r/DiscordQuests snapshots moved from the repository root to `data/reddit/`.
-- **Renamed to OrbQuest.** The exe is `OrbQuest.exe`, logs go to `%LOCALAPPDATA%\OrbQuest`, and the settings variables are `DQR_ROOT` and `DQR_ASSET_ROOT` (`DISCORD_QUEST_ROOT` and `DISCORD_QUEST_ASSET_ROOT` still work). Library folders, saved timers and Steam installs from DiscordQuestRun keep working; placeholders are upgraded on the next scan.
+- Renamed to OrbQuest. The exe is `OrbQuest.exe`, logs go to `%LOCALAPPDATA%\OrbQuest`, and the settings variables are `DQR_ROOT` and `DQR_ASSET_ROOT` (`DISCORD_QUEST_ROOT` and `DISCORD_QUEST_ASSET_ROOT` still work). Library folders, saved timers and Steam installs from DiscordQuestRun keep working; placeholders are upgraded on the next scan.
 - The window was rewritten. Games are cards with a large icon and a Launch button; the timer stays small at the bottom of each card. Every screen uses the same buttons, fields and dialogs.
 - Light and dark themes in black and white. The app follows the Windows setting until you pick one with the theme button; the choice is saved in `Games/.settings.json`. The desktop window opens in the matching colour.
 - The About page was rewritten in plainer words.
@@ -133,7 +133,7 @@ Notable changes to OrbQuest. The format follows [Keep a Changelog](https://keepa
 - The `lint` script (the same as `typecheck`) and unused functions in the server code.
 - The unused language switch in the old `i18n.tsx`, unused strings, and the unused `ExecutableDiscovery` type and preset labels.
 
-## [1.2.26] — 2026-10-26
+## [1.2.26] - 2026-10-26
 
 ### Fixed
 
@@ -169,7 +169,7 @@ Notable changes to OrbQuest. The format follows [Keep a Changelog](https://keepa
 
 - `body-parser` and `vite` updated (`npm audit` reports no vulnerabilities).
 
-## [1.2.25] — 2026-10-16
+## [1.2.25] - 2026-10-16
 
 ### Added
 
@@ -193,7 +193,7 @@ Notable changes to OrbQuest. The format follows [Keep a Changelog](https://keepa
 - Icons appeared late. Icons were downloaded from remote services on every start and before every search result. Icons on disk are now used immediately, and search no longer waits up to 1.2 s for them.
 - Catalog results did not carry an icon. They do now for database games.
 
-## [1.2.23] — 2026-10-15
+## [1.2.23] - 2026-10-15
 
 ### Fixed
 
@@ -207,21 +207,21 @@ Notable changes to OrbQuest. The format follows [Keep a Changelog](https://keepa
 - Catalog entries cannot be edited. The Edit button is disabled for them.
 - If the local server cannot be reached, the window shows the error and a Retry button.
 
-## [1.2.22] — 2026-10-14
+## [1.2.22] - 2026-10-14
 
 - Typing in the catalog no longer calls Reddit. Reddit runs after Enter or Search Online, and only when the local database has nothing for that game.
 - Quest database updated from r/DiscordQuests through 2026-10-14 (89 entries, 85 games).
 - Reddit requests are serialized, capped, and not retried after a rate limit.
 - A game added from a live Reddit result is saved to the offline database.
 
-## [1.2.21] — 2026-10-14
+## [1.2.21] - 2026-10-14
 
 - Catalog and search show one card per game. The local database is listed first.
 - Search Online adds live Reddit results under the database results instead of repeating them.
 - Quest names are cleaned and mapped to a canonical spelling. Hand-checked post fixes live in `redditCorrections.ts`.
 - The production bundle and the Windows package include the quest database. `npm run verify:dist` checks that the built server can answer from it.
 
-## [1.2.20] — 2026-10-06
+## [1.2.20] - 2026-10-06
 
 - The offline Reddit dataset is the first search source. Junk rows (no usable executable, sentence fragments, bad paths) are dropped when the cache is rebuilt.
 - `GET /server.cjs` and the sourcemap are refused, including percent-encoded paths.
@@ -229,69 +229,69 @@ Notable changes to OrbQuest. The format follows [Keep a Changelog](https://keepa
 - Production responses send a Content-Security-Policy.
 - Scraped links are limited to `http` and `https`. Scanned post text is length-capped.
 
-## [1.2.19] — 2026-10-05
+## [1.2.19] - 2026-10-05
 
 - Local Reddit cache, loaded at startup and refreshed in the background.
 - Search order: session cache, bundled cache, then live Reddit.
 
-## [1.2.18] — 2026-10-05
+## [1.2.18] - 2026-10-05
 
 - Reddit client reads rate-limit headers and backs off. Requests are spaced out.
 
-## [1.2.17] — 2026-10-05
+## [1.2.17] - 2026-10-05
 
 - Catalog matching ignores punctuation, accents, and edition marks. Prefix matches rank higher.
 
-## [1.2.16] — 2026-10-05
+## [1.2.16] - 2026-10-05
 
 - Catalog lists known games first. Reddit is searched after a game is selected.
 
-## [1.2.15] — 2026-10-05
+## [1.2.15] - 2026-10-05
 
 - Reddit query cache and in-flight deduplication. Stale catalog requests are cancelled while typing.
 
-## [1.2.14] — 2026-10-05
+## [1.2.14] - 2026-10-05
 
 - Executable search results come from Reddit posts only.
 
-## [1.2.13] — 2026-10-05
+## [1.2.13] - 2026-10-05
 
 - Catalog search talks to Reddit directly instead of searching every source and filtering afterward.
 
-## [1.2.12] — 2026-10-05
+## [1.2.12] - 2026-10-05
 
 - Catalog results limited to games with a community quest post. Empty library search can open the catalog.
 
-## [1.2.11] — 2026-10-05
+## [1.2.11] - 2026-10-05
 
 - Icon lookups share one in-flight SteamGridDB or Steam request. The icon cache drops unused entries.
 
-## [1.2.10] — 2026-10-05
+## [1.2.10] - 2026-10-05
 
 - SteamGridDB icons load even when the CDN does not send CORS headers.
 
-## [1.2.9] — 2026-10-05
+## [1.2.9] - 2026-10-05
 
 - Game icons prefer square SteamGridDB images, then Steam and PCGamingWiki.
 
-## [1.2.8] — 2026-10-04
+## [1.2.8] - 2026-10-04
 
 - Reddit posts with a simulated Steam manifest are kept as manifest quests.
 - Steam manifest games find the installed Steam `steamapps` folder, including libraries listed in `libraryfolders.vdf`.
 - Edit is a labeled button. Catalog and scanned entries can be edited. A later release locked catalog entries again because the server rejected those edits.
 
-## [1.2.0] — 2026-10-03
+## [1.2.0] - 2026-10-03
 
 - Simulated Steam manifest quests.
 - Version shown in the window title, the build script, and the header.
 
-## [1.1.1] — 2026-09-27
+## [1.1.1] - 2026-09-27
 
 - Library entries can be renamed. Origin is stored in `.game-meta.json`.
 - English-only UI.
 - Completed quest counters reset on restart.
 
-## [1.1.0] — 2026-09-27
+## [1.1.0] - 2026-09-27
 
 - Backend split into modules. Loopback bind, rate limits, path checks.
 - Quest progress saved to `Games/.state.json`.

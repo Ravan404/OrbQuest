@@ -95,8 +95,8 @@ export interface PoliteFetchOptions {
   headers?: Record<string, string>;
   timeoutMs?: number;
   /**
-   * Background work may wait (up to a minute) for the per-minute budget;
-   * interactive searches never do - they report "rate limited" right away.
+   * May wait up to a minute for the per-minute budget; otherwise a spent budget
+   * is reported as rate limited right away.
    */
   waitForBudget?: boolean;
 }

@@ -44,7 +44,7 @@ export function editGame(req: Request<IdParams>, res: Response) {
   const body = (req.body || {}) as Record<string, unknown>;
   const isSteamInstall = Boolean(game.specialRootPath);
 
-  // --- Validate -----------------------------------------------------------
+  // Validate first
   const prefs = parseTimerPreferences(body);
   if (typeof prefs === 'string') return res.status(400).json({ error: prefs });
 
@@ -110,7 +110,7 @@ export function editGame(req: Request<IdParams>, res: Response) {
     return res.status(500).json({ error: 'Local placeholder runtime is missing from this build.' });
   }
 
-  // --- Apply ----------------------------------------------------------------
+  // Apply
   if (exeChanged) {
     const currentExecutablePath = path.join(currentDir, game.executable);
     const nextExecutablePath = path.join(currentDir, nextExecutable);

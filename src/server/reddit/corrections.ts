@@ -1,14 +1,13 @@
 /**
- * Hand-checked fixes for r/DiscordQuests posts the extractor cannot read
- * correctly: typos, unusual separators, paths only described in prose, posts
- * about two games at once.
+ * Fixes for r/DiscordQuests posts the extractor cannot read correctly: typos,
+ * unusual separators, paths only described in prose, posts about two games.
  *
  * Each fix is keyed by the post id (`/comments/<id>/` in the post URL) and
  * was checked against the post and the subreddit's game index wiki
  * (https://www.reddit.com/r/DiscordQuests/wiki/game-index/).
  */
 
-import type { RedditCacheEntry } from './dataset.ts';
+import type { RedditEntry } from './dataset.ts';
 
 export interface RedditEntryFix {
   /** Why the extracted value was wrong. Documentation only. */
@@ -17,7 +16,7 @@ export interface RedditEntryFix {
   executableName?: string;
   folderPath?: string;
   notes?: string;
-  confidence?: RedditCacheEntry['confidence'];
+  confidence?: RedditEntry['confidence'];
   /**
    * Search aliases of the entry. When set they replace the spellings the post
    * used (e.g. a title that names two games or only the quest).
@@ -155,7 +154,7 @@ export const REDDIT_ENTRY_FIXES: Record<string, RedditEntryFix> = {
  * Additional games described by a post next to the one the extractor reads
  * (it keeps a single executable per post).
  */
-export const REDDIT_POST_SUPPLEMENTS: Record<string, Array<Omit<RedditCacheEntry, 'url' | 'source'>>> = {
+export const REDDIT_POST_SUPPLEMENTS: Record<string, Array<Omit<RedditEntry, 'url' | 'source'>>> = {
   // "blue pro and torchlight inf": "...\\Torchlight_Infinite.exe" + "bpsr\\BPSR_STEAM.exe"
   '1qer5b4': [
     {
@@ -225,8 +224,8 @@ export function redditPostId(url: string | undefined): string | undefined {
   return match ? match[1].toLowerCase() : undefined;
 }
 
-/** Applies the hand-checked fix of the entry's post, if there is one. */
-export function applyRedditEntryFix<T extends RedditCacheEntry>(entry: T): T {
+/** Applies the fix of the entry's post, if there is one. */
+export function applyRedditEntryFix<T extends RedditEntry>(entry: T): T {
   const id = redditPostId(entry.url);
   const fix = id ? REDDIT_ENTRY_FIXES[id] : undefined;
   if (!fix) return entry;

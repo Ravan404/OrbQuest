@@ -10,11 +10,8 @@ import { gamesMap } from './registry.ts';
 /** Per-game metadata files (`.game-meta.json`) and library ids. */
 
 /**
- * Provenance marker stored next to the game's placeholder executable.
- *
- * Keeping it inside the game folder (instead of a central index) means it
- * survives folder moves and never desynchronises from the entry it belongs
- * to. Entries without the file are library folders found by the scan.
+ * Where an entry came from, stored next to its placeholder so it survives
+ * folder moves. A folder without the file was found by the scan.
  */
 export const GAME_META_FILE_NAME = '.game-meta.json';
 
@@ -53,9 +50,8 @@ function isStableGameId(value: string): boolean {
 /**
  * Library id for a folder.
  *
- * "Foo Bar" and "Foo-Bar" both used to become `foo-bar`, and the second folder
- * was silently dropped on every scan. A preferred id from `.game-meta.json`
- * is kept so the disambiguated id survives a restart.
+ * "Foo Bar" and "Foo-Bar" would both become `foo-bar`. An id from
+ * `.game-meta.json` keeps the second one apart after a restart.
  */
 export function allocateLibraryId(folderName: string, preferred?: string): string {
   const base =
@@ -117,7 +113,7 @@ export function writeGameMeta(folder: string, meta: GameMeta): void {
   }
 }
 
-/** Origin shown when a folder carries no provenance marker of its own. */
+/** Origin shown when a folder has no `.game-meta.json`. */
 export function resolveGameOrigin(meta: GameMeta): GameOrigin {
   return meta.origin ?? 'scanned';
 }

@@ -206,10 +206,6 @@ export function createIconStore(options: IconStoreOptions): IconStore {
   };
 }
 
-// ---------------------------------------------------------------------------
-// Application instance
-// ---------------------------------------------------------------------------
-
 export const ICON_CACHE_DIR = path.join(PROJECT_ROOT, 'icon-cache');
 
 const store = createIconStore({ cacheDir: ICON_CACHE_DIR });

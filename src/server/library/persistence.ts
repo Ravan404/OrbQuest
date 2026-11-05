@@ -109,9 +109,9 @@ export function loadPersistedState(): void {
       const savedSeconds = Number.isFinite(entry.elapsedSeconds) ? Math.max(0, Math.floor(entry.elapsedSeconds)) : 0;
       const finished = entry.completed === true;
 
-      // A COMPLETED quest counter is never restored: restarting the launcher
-      // always shows a finished quest back at 00:00. Legacy entries without a
-      // known buffer preset counted pre-spawn time and cannot be credited.
+      // A completed counter is not restored: after a restart a finished quest shows
+      // 00:00. Old entries without a known buffer preset counted time before the
+      // spawn and cannot be credited.
       if (finished || savedSeconds <= 0 || !hasKnownPreset) {
         if (finished || savedSeconds > 0) droppedFinishedCounters = true;
         game.elapsedSeconds = 0;

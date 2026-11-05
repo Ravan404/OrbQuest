@@ -24,7 +24,6 @@ export const Toast: React.FC<{ notice: ToastNotification | null; onDismiss: () =
   return (
     <div
       key={notice.id}
-      id="phone-notification-banner"
       role="status"
       aria-live="polite"
       className={`animate-enter fixed bottom-14 right-4 z-[60] flex w-80 max-w-[calc(100vw-2rem)] items-start gap-3 py-3 pl-4 pr-2 ${popClass}`}

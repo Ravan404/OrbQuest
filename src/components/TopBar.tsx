@@ -86,7 +86,6 @@ export const TopBar: React.FC<TopBarProps> = ({
           return (
             <button
               key={tab.id}
-              id={`nav-${tab.id}`}
               type="button"
               onClick={() => onView(tab.id)}
               aria-current={active ? 'page' : undefined}
@@ -112,7 +111,6 @@ export const TopBar: React.FC<TopBarProps> = ({
           {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
         </IconButton>
         <IconButton
-          id="sound-toggle-btn"
           label={soundEnabled ? t('soundOn') : t('soundOff')}
           aria-pressed={soundEnabled}
           onClick={onToggleSound}
@@ -120,7 +118,6 @@ export const TopBar: React.FC<TopBarProps> = ({
           {soundEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
         </IconButton>
         <Button
-          id="header-refresh-btn"
           variant="ghost"
           title={t('rescanTitle')}
           icon={<RefreshCw className="h-3.5 w-3.5" />}
@@ -128,13 +125,7 @@ export const TopBar: React.FC<TopBarProps> = ({
         >
           {t('rescan')}
         </Button>
-        <Button
-          id="header-add-game-btn"
-          variant="primary"
-          className="ml-1"
-          icon={<Plus className="h-3.5 w-3.5" />}
-          onClick={onAddGame}
-        >
+        <Button variant="primary" className="ml-1" icon={<Plus className="h-3.5 w-3.5" />} onClick={onAddGame}>
           {t('addGame')}
         </Button>
       </div>

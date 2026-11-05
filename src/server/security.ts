@@ -2,11 +2,8 @@ import path from 'node:path';
 import { ALLOWED_HOSTS, RATE_LIMIT_WINDOW } from './config.ts';
 
 /**
- * Path containment check.
- *
- * The previous implementation used `child.startsWith(parent)` which is a
- * classic prefix bug: `/proje/Games-evil/...` would pass a check against
- * `/proje/Games`. `path.relative` makes the boundary explicit.
+ * True when `candidate` is inside `parent`. `path.relative` gets the boundary
+ * right: `/x/Games-evil` is not inside `/x/Games`.
  */
 export function isPathInside(parent: string, candidate: string): boolean {
   const relative = path.relative(path.resolve(parent), path.resolve(candidate));
@@ -14,11 +11,8 @@ export function isPathInside(parent: string, candidate: string): boolean {
 }
 
 /**
- * Strict file-name validation for values that become part of a filesystem
- * path (executable names, folder names).
- *
- * Rejects separators, Windows reserved device names (CON, NUL, ...),
- * control characters and characters illegal on NTFS.
+ * A file or folder name that is safe in a path: no separators, Windows device
+ * names (CON, NUL, ...), control characters or characters NTFS refuses.
  */
 export function isSafeFileName(value: string): boolean {
   if (typeof value !== 'string' || value.length === 0) return false;
@@ -88,16 +82,10 @@ export function libraryFolderName(folderPath: string | undefined, fallback: stri
 }
 
 /**
- * Host-header check (DNS-rebinding defence).
- *
- * Express' `req.hostname` is the `Host` header with the port stripped and the
- * IPv6 brackets removed, so the comparison happens on the bare name.
- *
- * A missing Host header is allowed: HTTP/1.0 clients and raw sockets do not
- * send one, and a local process can forge any Host value it likes anyway. What
- * this stops is a *browser* being tricked into sending a hostname the attacker
- * controls, which is the only way to make a cross-origin request look
- * same-origin without triggering a CORS preflight.
+ * Host-header check against DNS rebinding. `req.hostname` is the header without
+ * its port and IPv6 brackets. A missing header is allowed: raw clients do not
+ * send one, and a local process can forge any value anyway. This stops a browser
+ * from sending a hostname an attacker controls.
  */
 export function isAllowedRequestHost(hostname: string | undefined): boolean {
   if (!hostname) return true;
@@ -114,11 +102,8 @@ export function isAllowedRequestHost(hostname: string | undefined): boolean {
 }
 
 /**
- * Cross-Origin / Localhost CSRF defence for state-changing HTTP methods.
- *
- * Blocks cross-site browser requests (`Sec-Fetch-Site: cross-site` or an
- * `Origin` header whose hostname is not in `ALLOWED_HOSTS`) from invoking
- * `POST`/`PUT`/`PATCH`/`DELETE` endpoints on the local server.
+ * Refuses `POST`, `PUT`, `PATCH` and `DELETE` from other sites: `Sec-Fetch-Site:
+ * cross-site`, or an `Origin` whose hostname is not in `ALLOWED_HOSTS`.
  */
 export function isAllowedOriginForMethod(
   method: string | undefined,
@@ -149,9 +134,7 @@ export function isAllowedOriginForMethod(
 }
 
 /**
- * Minimal in-memory fixed-window rate limiter.
- * One limiter instance per logical endpoint group; entries are keyed by
- * client ip and cleaned up on every window reset.
+ * Fixed-window rate limiter in memory, keyed by client ip.
  */
 export function createRateLimiter(maxRequests: number) {
   const map = new Map<string, { count: number; resetTime: number }>();

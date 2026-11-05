@@ -33,9 +33,8 @@ export function removeGame(req: Request<IdParams>, res: Response) {
       : path.join(GAMES_DIR, game.folder);
     let manifestPathToRemove: string | undefined;
     try {
-      // Only the manifest of THIS app id is ever looked at. Without an app id
-      // no manifest is touched at all (the first manifest of a real Steam
-      // library must never be picked by accident).
+      // Only the manifest of this app id is looked at. Without an id none is touched,
+      // so the first manifest of a real Steam library is never picked by accident.
       const appId = game.steamAppId ?? Number(game.id.match(/^steam-(\d+)$/i)?.[1]);
       if (isSteamGame && Number.isSafeInteger(appId) && appId > 0) {
         const candidatePath = path.join(steamAppsPath, `appmanifest_${appId}.acf`);

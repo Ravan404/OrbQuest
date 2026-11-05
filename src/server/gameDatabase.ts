@@ -76,10 +76,6 @@ let _persist = false;
 let _refreshing = false;
 let _refreshTimer: NodeJS.Timeout | undefined;
 
-// ---------------------------------------------------------------------------
-// Load
-// ---------------------------------------------------------------------------
-
 function isNewer(candidate: string | undefined, than: string): boolean {
   return (
     Boolean(candidate) && !Number.isNaN(Date.parse(candidate!)) && (!than || Date.parse(candidate!) > Date.parse(than))
@@ -173,10 +169,6 @@ export function loadGameDatabase(): void {
   );
 }
 
-// ---------------------------------------------------------------------------
-// Lookup
-// ---------------------------------------------------------------------------
-
 export function getGameById(id: string | undefined): DatabaseGame | undefined {
   return id ? _byId.get(id) : undefined;
 }
@@ -268,10 +260,6 @@ export function getGameDatabaseInfo(): GameDatabaseInfo {
     checkedAt: _checkedAt,
   };
 }
-
-// ---------------------------------------------------------------------------
-// Update
-// ---------------------------------------------------------------------------
 
 function isOlderThan(timestamp: string, ms: number): boolean {
   return !timestamp || Number.isNaN(Date.parse(timestamp)) || Date.now() - Date.parse(timestamp) > ms;

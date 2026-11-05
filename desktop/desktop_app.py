@@ -30,7 +30,6 @@ DATA_ROOT = None
 UPDATE_TO_RUN = None
 WINDOW = None
 
-# Application metadata
 APP_NAME = "OrbQuest"
 APP_VERSION = "1.6.1"
 # The window title starts with this; single_instance.focus_existing_window
@@ -377,7 +376,7 @@ def report_startup_error(error: Exception) -> None:
         messagebox.showerror("OrbQuest", message)
         root.destroy()
     except Exception:
-        # Errors must still be logged on a headless/developer machine.
+        # No display: the log file has the error.
         pass
 
 
@@ -556,7 +555,6 @@ def main() -> None:
         else:
             webview.start(debug=False)
     except Exception as e:
-        # Ensure backend is stopped if webview fails to start
         stop_backend_server()
         raise RuntimeError(f"Failed to start desktop window: {e}") from e
 

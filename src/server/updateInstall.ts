@@ -60,7 +60,7 @@ export function canInstall(update: UpdateInfo | null): boolean {
   return Boolean(update.assets[updateFileName(kind, update.version)] && update.assets['SHA256SUMS.txt']);
 }
 
-/** `<sha256>  <file>` lines (`sha256sum` and certutil style) as a map. */
+/** `<sha256>  <file>` lines, as sha256sum writes them, as a map. */
 export function parseChecksums(text: string): Map<string, string> {
   const sums = new Map<string, string>();
   for (const line of text.split(/\r?\n/)) {

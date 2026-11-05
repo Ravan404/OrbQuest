@@ -4,13 +4,9 @@ import { playMilestoneSound } from '../utils/audio';
 import { t } from '../strings';
 
 /**
- * Reconcile the on-screen library with the server list.
- *
- * Games the server no longer has are dropped (a restart, or a delete from
- * another window, used to leave a ghost card that 404'd on launch). Games the
- * server has gained are appended. The server's copy of every game wins - timer
- * preferences included, since the server saves them - and the on-screen order
- * is kept.
+ * Merges the server's list into the one on screen: games the server no longer
+ * has are dropped, new ones are appended, the server's copy of each game wins
+ * and the on-screen order is kept.
  */
 export function mergePolledGames(previous: Game[], serverGames: Game[]): Game[] {
   const serverById = new Map(serverGames.map((game) => [game.id, game]));

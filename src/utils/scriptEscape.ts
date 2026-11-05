@@ -11,8 +11,7 @@ export const escapePowerShell = (value: string) => stripControlChars(value).repl
 /**
  * Unquoted batch text (the `title` command): metacharacters need a caret.
  * Inside double quotes a caret is printed literally, so quoted values use
- * escapeBatchQuoted instead - "Baldur's Gate (3)" used to come out as
- * "Baldur's Gate ^(3^)".
+ * escapeBatchQuoted.
  */
 export const escapeBatch = (value: string) =>
   stripControlChars(value)

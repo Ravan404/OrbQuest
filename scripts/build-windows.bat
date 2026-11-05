@@ -48,7 +48,7 @@ if not exist "%ROOT%placeholder\placeholder_runtime.exe" (
 echo.
 
 echo [6/7] Packaging release\OrbQuest\ and the portable exe (desktop\OrbQuest.spec)...
-rem --- Resolve node.exe: ORBQUEST_NODE_EXE (env) -> PATH -> default install ---
+rem Resolve node.exe: ORBQUEST_NODE_EXE, then PATH, then the default install
 set "NODE_EXE="
 if defined ORBQUEST_NODE_EXE set "NODE_EXE=%ORBQUEST_NODE_EXE%"
 if not defined NODE_EXE (

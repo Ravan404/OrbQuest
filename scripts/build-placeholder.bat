@@ -1,7 +1,6 @@
 @echo off
-rem ---------------------------------------------------------------------------
-rem Rebuilds placeholder\placeholder_runtime.exe from its .c and .rc files with MinGW-w64 (gcc + windres on PATH, for example
-rem from MSYS2: pacman -S mingw-w64-x86_64-gcc).
+rem Rebuilds placeholder\placeholder_runtime.exe from its .c and .rc files with
+rem MinGW-w64 (gcc and windres on PATH).
 rem
 rem The program has no C runtime: it starts at wWinMainCRTStartup and links
 rem only kernel32, user32 and gdi32. verify-dist checks that the PE stack
@@ -16,7 +15,6 @@ rem
 rem After a rebuild, add the SHA-256 of the OLD placeholder_runtime.exe to
 rem LEGACY_SHA256_HASHES in src/server/placeholderUpgrade.ts, so placeholders
 rem already copied into users' Games folders are upgraded to the new one.
-rem ---------------------------------------------------------------------------
 setlocal
 set "ROOT=%~dp0.."
 cd /d "%ROOT%"

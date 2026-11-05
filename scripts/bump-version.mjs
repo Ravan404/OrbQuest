@@ -100,14 +100,14 @@ if (changelog.includes(heading)) {
   console.log(`  CHANGELOG already has ${heading}`);
 } else {
   // The notes collected under [Unreleased] become the new version's notes.
-  changelog = changelog.replace('## [Unreleased]', `## [Unreleased]\n\n${heading} — ${today}`);
+  changelog = changelog.replace('## [Unreleased]', `## [Unreleased]\n\n${heading} - ${today}`);
   const repository = 'https://github.com/Ravan404/OrbQuest';
   changelog = changelog.replace(
     /^\[Unreleased\]: .*$/m,
     `[Unreleased]: ${repository}/compare/v${next}...HEAD\n[${next}]: ${repository}/compare/v${current}...v${next}`
   );
   fs.writeFileSync(changelogPath, changelog, 'utf8');
-  console.log(`  CHANGELOG: [Unreleased] is now ${heading} — ${today}`);
+  console.log(`  CHANGELOG: [Unreleased] is now ${heading} - ${today}`);
 }
 
 console.log(`\nVersion ${current} -> ${next}. Run "npm run build" and "npm run verify:dist" to check.`);

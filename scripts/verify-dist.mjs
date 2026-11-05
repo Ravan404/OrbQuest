@@ -5,16 +5,16 @@
  *
  *   npm run verify:dist
  *
- * It verifies that:
- *   1. the version number is the same in package.json, desktop/desktop_app.py
- *      and scripts/build-windows.bat;
- *   2. `dist/server.cjs` starts in production mode (with a throw-away data
- *      folder, no background database update);
- *   3. the bundled game database is the one in the repository and answers
- *      offline: search, the featured games and Discord's executable paths;
- *   4. a catalog game is written where Discord looks for it and its
- *      placeholder runs;
- *   5. the frontend is served and backend/database files are not.
+ * It checks that:
+ *   - the version number is the same in package.json, desktop/desktop_app.py
+ *     and scripts/build-windows.bat;
+ *   - `dist/server.cjs` starts in production mode (with a throw-away data
+ *     folder, no background database update);
+ *   - the bundled game database is the one in the repository and answers
+ *     offline: search, the featured games and Discord's executable paths;
+ *   - a catalog game is written where Discord looks for it and its placeholder
+ *     runs;
+ *   - the frontend is served and backend and database files are not.
  */
 
 import { spawn } from 'node:child_process';
@@ -76,7 +76,7 @@ async function getJson(base, endpoint, options = {}) {
 async function main() {
   console.log('Verifying the production bundle...');
 
-  // 1. Version numbers -------------------------------------------------------
+  // Version numbers
   const version = JSON.parse(read('package.json')).version;
   const desktopVersion = /^APP_VERSION = "([^"]+)"/m.exec(read('desktop/desktop_app.py'))?.[1];
   const batVersion = /Version: (\S+)/.exec(read('scripts/build-windows.bat'))?.[1];
@@ -88,7 +88,7 @@ async function main() {
     return;
   }
 
-  // 2. Start the bundled backend ---------------------------------------------
+  // Start the bundled backend
   const dataRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'orbquest-verify-'));
   const port = await freePort();
   const base = `http://127.0.0.1:${port}`;
@@ -138,7 +138,7 @@ async function main() {
       `bundled game database updated ${bundled.generatedAt} (${bundled.games.length} games from Discord's list)`
     );
 
-    // 3. Offline game database ---------------------------------------------------
+    // Offline game database
     const catalog = await getJson(base, '/api/catalog?q=valorant');
     const valorant = (catalog.json || [])[0];
     check(
@@ -163,7 +163,7 @@ async function main() {
       `the catalog page lists ${featuredList.length} games with Discord quests`
     );
 
-    // 4-5. Placeholder runtime & launcher lifecycle ------------------------------
+    // Placeholder and launch
     const placeholderBytes = fs.readFileSync(path.join(root, 'placeholder', 'placeholder_runtime.exe'));
     const peOffset = placeholderBytes.readUInt32LE(0x3c);
     const stackCommit = Number(placeholderBytes.readBigUInt64LE(peOffset + 24 + 80));
@@ -241,7 +241,7 @@ async function main() {
       'stop, reset-timer, and delete endpoints complete cleanly'
     );
 
-    // 6. Static files ------------------------------------------------------------
+    // Static files
     const page = await getJson(base, '/');
     check(page.status === 200 && page.type.includes('text/html'), 'frontend index.html is served');
     const favicon = await getJson(base, '/favicon.svg');

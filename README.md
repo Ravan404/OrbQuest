@@ -31,12 +31,12 @@
 
 OrbQuest starts a small placeholder program under a game's `.exe` name, counts the time, and stops it when the timer ends. It never logs in to Discord, never reads your token and does not change the Discord client. A finished timer here is not proof that Discord counted the quest.
 
-- **Every game Discord can detect:** the catalog is Discord's own list, about 10,400 games, so the placeholder gets exactly the name and folder Discord looks for. Quest programs the list has no executable for, such as Firefox or brand-new quest games, come from r/DiscordQuests.
-- **Timers that keep their place:** set a target from 1 to 1440 minutes or no limit. An interrupted run resumes, and the timer settings are kept.
-- **Steam quests:** quests Discord only detects through Steam, such as EA SPORTS FC 27, are set up in your Steam folder after you confirm it. A real install is never touched.
-- **The real game too:** save a start script that starts the real game and closes it after the same timer.
-- **Updates from inside the app:** a new version is downloaded, checked against its SHA-256 and installed with one click.
-- **Local and private:** no account, no analytics. See the [privacy policy](PRIVACY.md).
+- The catalog is Discord's own list of about 10,400 games, so the placeholder gets exactly the name and folder Discord looks for. Quest programs the list has no executable for, such as Firefox or new quest games, come from r/DiscordQuests.
+- Set a timer from 1 to 1440 minutes, or no limit. An interrupted run resumes, and the settings are kept.
+- Quests Discord only detects through Steam, such as EA SPORTS FC 27, are set up in your Steam folder after you confirm it. A real install is never touched.
+- A start script can run the real game instead and close it after the same timer.
+- New versions are downloaded, checked against their SHA-256 and installed from inside the app.
+- There is no account and no analytics. See the [privacy policy](PRIVACY.md).
 
 ![The catalog with the games that have had Discord quests](docs/catalog.png)
 
