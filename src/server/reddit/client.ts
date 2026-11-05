@@ -16,10 +16,10 @@ import { APP_VERSION } from '../../version.ts';
  * Reddit asks API clients for a unique, descriptive User-Agent
  * (`platform:app-id:version (contact)`); generic ones such as "Mozilla/5.0"
  * are throttled hard. A fork or a repackaged build can identify itself with
- * DQR_REDDIT_USER_AGENT.
+ * ORBQUEST_REDDIT_USER_AGENT.
  */
 export const REDDIT_USER_AGENT =
-  process.env.DQR_REDDIT_USER_AGENT?.trim() ||
+  process.env.ORBQUEST_REDDIT_USER_AGENT?.trim() ||
   `desktop:com.orbquest:v${APP_VERSION} (+https://github.com/Ravan404/OrbQuest)`;
 
 export type RemoteHost = 'reddit' | 'arctic-shift';

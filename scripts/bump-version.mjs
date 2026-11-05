@@ -4,15 +4,15 @@
  *
  * Writes one version number into every file that carries it:
  *   package.json, package-lock.json (two fields), src/version.ts,
- *   desktop_app.py (APP_VERSION), build_windows_exe.bat (the "Version:" banner).
- * placeholder_runtime.rc keeps its own version: the placeholder exe only
+ *   desktop/desktop_app.py (APP_VERSION), scripts/build-windows.bat (the "Version:" banner).
+ * placeholder/placeholder_runtime.rc keeps its own version: the placeholder exe only
  * changes when placeholder_runtime.c does (scripts/build-placeholder.bat).
  * The CHANGELOG [Unreleased] heading becomes the new version (an empty section
  * is added when there is none).
  *
  * Nothing is written unless every file has the expected old value, so a
  * half-edited checkout is reported instead of silently patched.
- * scripts/verify-dist.mjs checks the same files, so build_windows_exe.bat
+ * scripts/verify-dist.mjs checks the same files, so scripts/build-windows.bat
  * refuses to package a mismatch.
  */
 
@@ -64,13 +64,13 @@ const edits = [
     apply: (text) => text.replace(`APP_VERSION = '${current}'`, `APP_VERSION = '${next}'`),
   },
   {
-    file: 'desktop_app.py',
-    check: new RegExp(`^APP_VERSION = "${current.replaceAll('.', '\\.')}"`, 'm').test(read('desktop_app.py')),
+    file: 'desktop/desktop_app.py',
+    check: new RegExp(`^APP_VERSION = "${current.replaceAll('.', '\\.')}"`, 'm').test(read('desktop/desktop_app.py')),
     apply: (text) => text.replace(`APP_VERSION = "${current}"`, `APP_VERSION = "${next}"`),
   },
   {
-    file: 'build_windows_exe.bat',
-    check: read('build_windows_exe.bat').includes(`Version: ${current}`),
+    file: 'scripts/build-windows.bat',
+    check: read('scripts/build-windows.bat').includes(`Version: ${current}`),
     apply: (text) => text.replace(`Version: ${current}`, `Version: ${next}`),
   },
 ];

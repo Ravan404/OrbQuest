@@ -138,19 +138,19 @@ app.post('/api/open-games-folder', rateLimited, (_req, res) => {
 // They also prevent the launcher from mistaking another service on a raced
 // ephemeral port for its own backend. Without the token both routes are 404.
 function desktopAuthorized(req: express.Request): boolean {
-  const expected = process.env.DQR_SHUTDOWN_TOKEN;
+  const expected = process.env.ORBQUEST_SHUTDOWN_TOKEN;
   const remote = req.socket.remoteAddress;
   if (!expected || !['127.0.0.1', '::1', '::ffff:127.0.0.1'].includes(remote || '')) return false;
-  return sameSecret(req.get('X-DQR-Shutdown-Token') || '', expected);
+  return sameSecret(req.get('X-OrbQuest-Shutdown-Token') || '', expected);
 }
 app.get('/api/internal/ready', (req, res) => {
-  if (!process.env.DQR_SHUTDOWN_TOKEN) return res.sendStatus(404);
+  if (!process.env.ORBQUEST_SHUTDOWN_TOKEN) return res.sendStatus(404);
   if (!desktopAuthorized(req)) return res.sendStatus(403);
   res.json({ ok: true });
 });
 // TerminateProcess on Windows skips signal handlers and would orphan games.
 app.post('/api/internal/shutdown', (req, res) => {
-  if (!process.env.DQR_SHUTDOWN_TOKEN) return res.sendStatus(404);
+  if (!process.env.ORBQUEST_SHUTDOWN_TOKEN) return res.sendStatus(404);
   if (!desktopAuthorized(req)) return res.sendStatus(403);
   res.json({ success: true });
   setImmediate(shutdownHandler);

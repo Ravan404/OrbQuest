@@ -9,7 +9,7 @@ const { requireSession, startSession, withoutSecrets, SESSION_COOKIE } = await i
 after(removeSandbox);
 
 test('with a desktop token only the window that opened /session may use the API', async () => {
-  process.env.DQR_API_TOKEN = 'secret-token';
+  process.env.ORBQUEST_API_TOKEN = 'secret-token';
   const app = express();
   app.get('/session', startSession);
   app.use('/api', requireSession);
@@ -39,7 +39,7 @@ test('with a desktop token only the window that opened /session may use the API'
       'the desktop control calls have their own token'
     );
   } finally {
-    delete process.env.DQR_API_TOKEN;
+    delete process.env.ORBQUEST_API_TOKEN;
     server.close();
   }
 });
@@ -50,6 +50,6 @@ test('without a token the API is open, and started programs never get the tokens
     passed = true;
   });
   assert.ok(passed);
-  const env = withoutSecrets({ PATH: 'x', DQR_API_TOKEN: 'a', DQR_SHUTDOWN_TOKEN: 'b' });
+  const env = withoutSecrets({ PATH: 'x', ORBQUEST_API_TOKEN: 'a', ORBQUEST_SHUTDOWN_TOKEN: 'b' });
   assert.deepEqual(env, { PATH: 'x' });
 });

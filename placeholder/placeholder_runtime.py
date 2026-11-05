@@ -72,7 +72,7 @@ def main() -> None:
             return
 
     exe_path = Path(sys.executable if getattr(sys, 'frozen', False) else sys.argv[0])
-    name = os.environ.get('DQR_GAME_NAME', '').strip()
+    name = os.environ.get('ORBQUEST_GAME_NAME', '').strip()
     if not name:
         try:
             name_file = exe_path.parent / '.game-name.txt'
@@ -83,14 +83,14 @@ def main() -> None:
     name = name or exe_path.stem or "Game"
 
     # Timer configuration from environment (set by launcher)
-    target = int(read_number('DQR_TARGET_SECONDS', 900))
-    start = int(read_number('DQR_BUFFER_START', 5))
-    end = int(read_number('DQR_BUFFER_END', 10))
-    resume = int(read_number('DQR_RESUME_SECONDS', 0))
+    target = int(read_number('ORBQUEST_TARGET_SECONDS', 900))
+    start = int(read_number('ORBQUEST_BUFFER_START', 5))
+    end = int(read_number('ORBQUEST_BUFFER_END', 10))
+    resume = int(read_number('ORBQUEST_RESUME_SECONDS', 0))
 
     # Include PyInstaller/Tk initialization overhead, then use monotonic clock
     # for stable timing that survives wall-clock adjustments
-    launch = read_number('DQR_LAUNCHED_AT', time.time() * 1000) / 1000
+    launch = read_number('ORBQUEST_LAUNCHED_AT', time.time() * 1000) / 1000
     # Calculate when we actually started, accounting for init time
     time_since_launch = max(0, time.time() - launch)
     started = time.monotonic() - time_since_launch
@@ -105,8 +105,8 @@ def main() -> None:
         except KeyboardInterrupt:
             return
 
-    # Black and white like the app; DQR_THEME comes from the app's settings.
-    if os.environ.get('DQR_THEME') == 'dark':
+    # Black and white like the app; ORBQUEST_THEME comes from the app's settings.
+    if os.environ.get('ORBQUEST_THEME') == 'dark':
         bg, fg, faint = '#0d0d0d', '#f0f0f0', '#6e6e6e'
     else:
         bg, fg, faint = '#fafafa', '#111111', '#8c8c8c'

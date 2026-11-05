@@ -11,20 +11,19 @@ import os from 'node:os';
 import path from 'node:path';
 
 export const repoRoot = path.resolve(import.meta.dirname, '..');
-export const sandboxRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'dqr-test-'));
+export const sandboxRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'orbquest-test-'));
 export const assetRoot = path.join(sandboxRoot, 'assets');
 export const gamesDir = path.join(sandboxRoot, 'Games');
 
-fs.mkdirSync(assetRoot, { recursive: true });
-fs.copyFileSync(path.join(repoRoot, 'placeholder_runtime.exe'), path.join(assetRoot, 'placeholder_runtime.exe'));
+fs.mkdirSync(path.join(assetRoot, 'placeholder'), { recursive: true });
+export const placeholderPath = path.join(assetRoot, 'placeholder', 'placeholder_runtime.exe');
+fs.copyFileSync(path.join(repoRoot, 'placeholder', 'placeholder_runtime.exe'), placeholderPath);
 
-process.env.DQR_ROOT = sandboxRoot;
-process.env.DQR_ASSET_ROOT = assetRoot;
-process.env.DQR_OFFLINE = '1';
-process.env.DQR_DATABASE_REFRESH = '0';
-delete process.env.DQR_GAMES_DIR;
-
-export const placeholderPath = path.join(assetRoot, 'placeholder_runtime.exe');
+process.env.ORBQUEST_ROOT = sandboxRoot;
+process.env.ORBQUEST_ASSET_ROOT = assetRoot;
+process.env.ORBQUEST_OFFLINE = '1';
+process.env.ORBQUEST_DATABASE_REFRESH = '0';
+delete process.env.ORBQUEST_GAMES_DIR;
 
 export function removeSandbox(): void {
   try {

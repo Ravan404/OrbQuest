@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 /**
  * Checks the production bundle before it is packaged into the Windows exe
- * (build_windows_exe.bat runs it right after `npm run build`; CI runs it too).
+ * (scripts/build-windows.bat runs it right after `npm run build`; CI runs it too).
  *
  *   npm run verify:dist
  *
  * It verifies that:
- *   1. the version number is the same in package.json, desktop_app.py
- *      and build_windows_exe.bat;
+ *   1. the version number is the same in package.json, desktop/desktop_app.py
+ *      and scripts/build-windows.bat;
  *   2. `dist/server.cjs` starts in production mode (with a throw-away data
  *      folder, no background database update);
  *   3. the bundled game database is the one in the repository and answers
@@ -78,10 +78,10 @@ async function main() {
 
   // 1. Version numbers -------------------------------------------------------
   const version = JSON.parse(read('package.json')).version;
-  const desktopVersion = /^APP_VERSION = "([^"]+)"/m.exec(read('desktop_app.py'))?.[1];
-  const batVersion = /Version: (\S+)/.exec(read('build_windows_exe.bat'))?.[1];
-  check(desktopVersion === version, `desktop_app.py APP_VERSION is ${version} (found ${desktopVersion})`);
-  check(batVersion === version, `build_windows_exe.bat shows version ${version} (found ${batVersion})`);
+  const desktopVersion = /^APP_VERSION = "([^"]+)"/m.exec(read('desktop/desktop_app.py'))?.[1];
+  const batVersion = /Version: (\S+)/.exec(read('scripts/build-windows.bat'))?.[1];
+  check(desktopVersion === version, `desktop/desktop_app.py APP_VERSION is ${version} (found ${desktopVersion})`);
+  check(batVersion === version, `scripts/build-windows.bat shows version ${version} (found ${batVersion})`);
 
   if (!fs.existsSync(serverBundle)) {
     check(false, 'dist/server.cjs exists (run "npm run build" first)');
@@ -89,7 +89,7 @@ async function main() {
   }
 
   // 2. Start the bundled backend ---------------------------------------------
-  const dataRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'dqr-verify-'));
+  const dataRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'orbquest-verify-'));
   const port = await freePort();
   const base = `http://127.0.0.1:${port}`;
   let output = '';
@@ -99,11 +99,11 @@ async function main() {
       ...process.env,
       NODE_ENV: 'production',
       PORT: String(port),
-      DQR_BIND_HOST: '127.0.0.1',
-      DQR_DATABASE_REFRESH: '0',
-      DQR_ROOT: dataRoot,
-      DQR_ASSET_ROOT: root,
-      DQR_GAMES_DIR: path.join(dataRoot, 'Games'),
+      ORBQUEST_BIND_HOST: '127.0.0.1',
+      ORBQUEST_DATABASE_REFRESH: '0',
+      ORBQUEST_ROOT: dataRoot,
+      ORBQUEST_ASSET_ROOT: root,
+      ORBQUEST_GAMES_DIR: path.join(dataRoot, 'Games'),
     },
     stdio: ['ignore', 'pipe', 'pipe'],
   });
@@ -164,7 +164,7 @@ async function main() {
     );
 
     // 4-5. Placeholder runtime & launcher lifecycle ------------------------------
-    const placeholderBytes = fs.readFileSync(path.join(root, 'placeholder_runtime.exe'));
+    const placeholderBytes = fs.readFileSync(path.join(root, 'placeholder', 'placeholder_runtime.exe'));
     const peOffset = placeholderBytes.readUInt32LE(0x3c);
     const stackCommit = Number(placeholderBytes.readBigUInt64LE(peOffset + 24 + 80));
     check(
@@ -273,7 +273,7 @@ async function stopServer(server) {
  * Removes the throw-away data folder. Windows keeps a folder locked for a
  * moment after the process that used it as its working directory exits, so
  * the removal is retried - and a leftover temp folder never fails the check
- * (it would otherwise stop build_windows_exe.bat for no real reason).
+ * (it would otherwise stop scripts/build-windows.bat for no real reason).
  */
 function removeTempDir(dir) {
   try {

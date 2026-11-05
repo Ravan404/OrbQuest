@@ -33,7 +33,7 @@ CI runs them on Windows and Ubuntu, builds both Windows packages and installs, s
 
 `src/server/gameDatabase.json` comes from Discord's list of detectable games, plus r/DiscordQuests for programs Discord publishes no executable for. The Game database workflow rebuilds it every six hours and publishes it on the `database` branch, so the copy on `main` is only the starting point; do not edit it by hand. `npm run update-database` does the same locally.
 
-An r/DiscordQuests entry with the wrong name or executable: add a fix for its post in `src/server/reddit/corrections.ts`. In a fork, set `DQR_REDDIT_USER_AGENT` so the update identifies your project to Reddit. A game Discord lists with the wrong executable cannot be fixed here; it can still be added by hand with Add game.
+An r/DiscordQuests entry with the wrong name or executable: add a fix for its post in `src/server/reddit/corrections.ts`. In a fork, set `ORBQUEST_REDDIT_USER_AGENT` so the update identifies your project to Reddit. A game Discord lists with the wrong executable cannot be fixed here; it can still be added by hand with Add game.
 
 The games shown on the catalog page before a search are the Discord application ids in `src/server/featuredGames.json`. A game that gets a Discord quest belongs there.
 

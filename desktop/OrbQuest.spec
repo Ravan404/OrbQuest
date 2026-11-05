@@ -1,10 +1,10 @@
 # -*- mode: python ; coding: utf-8 -*-
-# PyInstaller recipe for the Windows packages. build_windows_exe.bat resolves
-# node.exe (DQR_NODE_EXE -> PATH -> default install), checks it, exports it as
-# DQR_NODE_EXE and then runs:
-#     python -m PyInstaller --noconfirm --clean --distpath release OrbQuest.spec
+# PyInstaller recipe for the Windows packages. scripts\build-windows.bat resolves
+# node.exe (ORBQUEST_NODE_EXE -> PATH -> default install), checks it, exports it as
+# ORBQUEST_NODE_EXE and then runs:
+#     python -m PyInstaller --noconfirm --clean --distpath release desktop\OrbQuest.spec
 # It makes two packages from one analysis:
-#   release\OrbQuest\                the folder the installer (installer\OrbQuest.iss) installs;
+#   release\OrbQuest\                the folder the installer (desktop\OrbQuest.iss) installs;
 #                                    it starts quickly because nothing is unpacked
 #   release\OrbQuest-<version>.exe   the portable single file, unpacked to %TEMP% on every start
 import json
@@ -21,8 +21,8 @@ from PyInstaller.utils.win32.versioninfo import (
     VSVersionInfo,
 )
 
-_NODE_EXE = os.environ.get('DQR_NODE_EXE') or shutil.which('node.exe') or r'C:\Program Files\nodejs\node.exe'
-with open('package.json', encoding='utf-8') as package:
+_NODE_EXE = os.environ.get('ORBQUEST_NODE_EXE') or shutil.which('node.exe') or r'C:\Program Files\nodejs\node.exe'
+with open(os.path.join(SPECPATH, '..', 'package.json'), encoding='utf-8') as package:
     _VERSION = json.load(package)['version']
 
 # File version shown under Properties > Details.
@@ -50,7 +50,7 @@ a = Analysis(
     ['desktop_app.py'],
     pathex=[],
     binaries=[(_NODE_EXE, 'node')],
-    datas=[('dist', 'dist'), ('placeholder_runtime.exe', '.')],
+    datas=[('../dist', 'dist'), ('../placeholder/placeholder_runtime.exe', 'placeholder')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
@@ -62,7 +62,7 @@ a = Analysis(
 pyz = PYZ(a.pure)
 
 _EXE_OPTIONS = dict(
-    icon='assets/OrbQuest.ico',
+    icon='../assets/OrbQuest.ico',
     version=_VERSION_INFO,
     debug=False,
     bootloader_ignore_signals=False,

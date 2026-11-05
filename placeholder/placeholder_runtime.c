@@ -26,7 +26,7 @@
 #define TIMER_MS      200
 
 /*
- * Black and white, like the app (src/index.css). Dark when DQR_THEME says
+ * Black and white, like the app (src/index.css). Dark when ORBQUEST_THEME says
  * so, or when it is unset/"system" and Windows apps are set to dark.
  */
 typedef struct {
@@ -233,8 +233,8 @@ static void resolve_game_and_exe_names(void) {
 
     wcopy(g_running_as, 300, g_exe_name);
 
-    /* 1. Check DQR_GAME_NAME environment variable */
-    DWORD env_len = GetEnvironmentVariableW(L"DQR_GAME_NAME", g_env_buf, 256);
+    /* 1. Check ORBQUEST_GAME_NAME environment variable */
+    DWORD env_len = GetEnvironmentVariableW(L"ORBQUEST_GAME_NAME", g_env_buf, 256);
     if (env_len > 0 && env_len < 256) {
         trim_wide(g_env_buf);
         if (g_env_buf[0] != L'\0') {
@@ -404,7 +404,7 @@ static BOOL windows_apps_use_dark(void) {
 
 static void pick_palette(void) {
     BOOL dark;
-    DWORD n = GetEnvironmentVariableW(L"DQR_THEME", g_env_buf, 256);
+    DWORD n = GetEnvironmentVariableW(L"ORBQUEST_THEME", g_env_buf, 256);
     if (n > 0 && n < 256 && wequal(g_env_buf, L"dark")) dark = TRUE;
     else if (n > 0 && n < 256 && wequal(g_env_buf, L"light")) dark = FALSE;
     else dark = windows_apps_use_dark();
@@ -592,12 +592,12 @@ static int run_app(HINSTANCE hInstance) {
     g_start_tick_ms = GetTickCount64();
     resolve_game_and_exe_names();
 
-    g_target_seconds = env_int(L"DQR_TARGET_SECONDS", 900, 0);
-    g_buffer_start   = env_int(L"DQR_BUFFER_START", 5, 0);
-    g_buffer_end     = env_int(L"DQR_BUFFER_END", 10, 0);
-    g_resume_seconds = env_int(L"DQR_RESUME_SECONDS", 0, 0);
+    g_target_seconds = env_int(L"ORBQUEST_TARGET_SECONDS", 900, 0);
+    g_buffer_start   = env_int(L"ORBQUEST_BUFFER_START", 5, 0);
+    g_buffer_end     = env_int(L"ORBQUEST_BUFFER_END", 10, 0);
+    g_resume_seconds = env_int(L"ORBQUEST_RESUME_SECONDS", 0, 0);
 
-    LONGLONG launched_raw = env_int(L"DQR_LAUNCHED_AT", 0, 0);
+    LONGLONG launched_raw = env_int(L"ORBQUEST_LAUNCHED_AT", 0, 0);
     g_initial_offset_sec = 0;
     if (launched_raw > 0) {
         LONGLONG now_ms = current_unix_epoch_ms();

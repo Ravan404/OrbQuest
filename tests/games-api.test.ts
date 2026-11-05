@@ -321,14 +321,14 @@ test('sound and theme settings are saved next to the library', async () => {
 
 test('a Steam quest from the catalog is written into the Steam library with its manifest', async () => {
   const fc27 = { name: 'EA SPORTS FC 27', executableName: 'fc27.exe', appId: '1531874756096295054', origin: 'catalog' };
-  process.env.DQR_STEAMAPPS = path.join(sandboxRoot, 'NoSteam', 'steamapps');
+  process.env.ORBQUEST_STEAMAPPS = path.join(sandboxRoot, 'NoSteam', 'steamapps');
   const noSteam = await call('POST', '/api/games', fc27);
   assert.equal(noSteam.status, 404);
   assert.match(noSteam.json.error, /needs Steam/);
 
   const steamApps = path.join(sandboxRoot, 'SteamQuest', 'steamapps');
   fs.mkdirSync(steamApps, { recursive: true });
-  process.env.DQR_STEAMAPPS = steamApps;
+  process.env.ORBQUEST_STEAMAPPS = steamApps;
   try {
     const added = await call('POST', '/api/games', fc27);
     assert.equal(added.status, 200, JSON.stringify(added.json));
@@ -376,13 +376,13 @@ test('a Steam quest from the catalog is written into the Steam library with its 
     assert.equal((await call('DELETE', '/api/games/steam-4354730')).status, 200);
     assert.ok(!fs.existsSync(demoDir), 'our own install with subfolders is removed');
   } finally {
-    delete process.env.DQR_STEAMAPPS;
+    delete process.env.ORBQUEST_STEAMAPPS;
   }
 });
 
 test('a start script is saved to the Downloads folder under the game name', async () => {
   const downloads = path.join(sandboxRoot, 'Downloads');
-  process.env.DQR_DOWNLOADS_DIR = downloads;
+  process.env.ORBQUEST_DOWNLOADS_DIR = downloads;
   try {
     const game = await addGame('Kilo Game', 'kilo.exe');
     const saved = await call('POST', `/api/games/${game.id}/script`, { kind: 'bat' });
@@ -394,7 +394,7 @@ test('a start script is saved to the Downloads folder under the game name', asyn
     assert.equal((await call('POST', `/api/games/${game.id}/script`, { kind: 'exe' })).status, 400);
     assert.equal((await call('POST', '/api/games/nope/script', { kind: 'py' })).status, 404);
   } finally {
-    delete process.env.DQR_DOWNLOADS_DIR;
+    delete process.env.ORBQUEST_DOWNLOADS_DIR;
   }
 });
 

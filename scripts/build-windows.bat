@@ -3,7 +3,7 @@ title Build OrbQuest
 echo Building OrbQuest, Version: 1.6.0
 echo.
 
-set "ROOT=%~dp0"
+for %%i in ("%~dp0..") do set "ROOT=%%~fi\"
 cd /d "%ROOT%"
 
 echo [1/7] Installing frontend and backend dependencies...
@@ -36,33 +36,21 @@ if errorlevel 1 (
 echo.
 
 echo [4/7] Installing Python packaging dependencies...
-python -m pip install --quiet -r requirements-build.txt
+python -m pip install --quiet -r desktop\requirements.txt
 if errorlevel 1 exit /b 1
 echo.
 
 echo [5/7] Checking the placeholder...
-if exist "%ROOT%placeholder_runtime.exe" (
-  echo         Using the committed native placeholder_runtime.exe ^(rebuild it with scripts\build-placeholder.bat^).
-) else (
-  echo         Building fallback placeholder_runtime.exe...
-  python -m PyInstaller --noconfirm --clean --onefile --noconsole --noupx ^
-    --exclude-module _socket --exclude-module socket --exclude-module _ssl --exclude-module ssl ^
-    --exclude-module ctypes --exclude-module _ctypes --exclude-module hashlib --exclude-module _hashlib ^
-    --exclude-module urllib --exclude-module http --exclude-module email --exclude-module xml ^
-    --exclude-module unittest --exclude-module pydoc --exclude-module sqlite3 ^
-    --exclude-module bz2 --exclude-module _bz2 --exclude-module lzma --exclude-module _lzma ^
-    --exclude-module zstd --exclude-module _zstd --exclude-module multiprocessing --exclude-module asyncio ^
-    --name placeholder_runtime placeholder_runtime.py
-  if errorlevel 1 exit /b 1
-  copy /y dist\placeholder_runtime.exe placeholder_runtime.exe >nul
-  if errorlevel 1 exit /b 1
+if not exist "%ROOT%placeholder\placeholder_runtime.exe" (
+  echo [ERROR] placeholder\placeholder_runtime.exe is missing. Build it with scripts\build-placeholder.bat.
+  exit /b 1
 )
 echo.
 
-echo [6/7] Packaging release\OrbQuest\ and the portable exe (OrbQuest.spec)...
-rem --- Resolve node.exe: DQR_NODE_EXE (env) -> PATH -> default install ---
+echo [6/7] Packaging release\OrbQuest\ and the portable exe (desktop\OrbQuest.spec)...
+rem --- Resolve node.exe: ORBQUEST_NODE_EXE (env) -> PATH -> default install ---
 set "NODE_EXE="
-if defined DQR_NODE_EXE set "NODE_EXE=%DQR_NODE_EXE%"
+if defined ORBQUEST_NODE_EXE set "NODE_EXE=%ORBQUEST_NODE_EXE%"
 if not defined NODE_EXE (
   for /f "delims=" %%i in ('where node.exe 2^>nul') do if not defined NODE_EXE set "NODE_EXE=%%i"
 )
@@ -70,7 +58,7 @@ if not defined NODE_EXE (
   if exist "C:\Program Files\nodejs\node.exe" set "NODE_EXE=C:\Program Files\nodejs\node.exe"
 )
 if not defined NODE_EXE (
-  echo [ERROR] node.exe not found. Add it to PATH or set DQR_NODE_EXE environment variable.
+  echo [ERROR] node.exe not found. Add it to PATH or set ORBQUEST_NODE_EXE environment variable.
   exit /b 1
 )
 echo         node.exe: %NODE_EXE%
@@ -80,18 +68,18 @@ if not exist "%NODE_EXE%" (
   echo [ERROR] Invalid node.exe path: "%NODE_EXE%"
   exit /b 1
 )
-set "DQR_NODE_EXE=%NODE_EXE%"
+set "ORBQUEST_NODE_EXE=%NODE_EXE%"
 for /f "delims=" %%v in ('node -p "require('./package.json').version"') do set "VERSION=%%v"
 if exist build rmdir /s /q build
 if exist release rmdir /s /q release
-python -m PyInstaller --noconfirm --clean --distpath release OrbQuest.spec
+python -m PyInstaller --noconfirm --clean --distpath release desktop\OrbQuest.spec
 if errorlevel 1 (
   echo [ERROR] Packaging failed.
   exit /b 1
 )
 echo.
 
-echo [7/7] Building the installer (installer\OrbQuest.iss)...
+echo [7/7] Building the installer (desktop\OrbQuest.iss)...
 set "ISCC="
 for /f "delims=" %%i in ('where ISCC.exe 2^>nul') do if not defined ISCC set "ISCC=%%i"
 if not defined ISCC if exist "%LOCALAPPDATA%\Programs\Inno Setup 6\ISCC.exe" set "ISCC=%LOCALAPPDATA%\Programs\Inno Setup 6\ISCC.exe"
@@ -101,7 +89,7 @@ if not defined ISCC (
   if defined CI exit /b 1
   goto checksums
 )
-"%ISCC%" /Q /DAppVersion=%VERSION% installer\OrbQuest.iss
+"%ISCC%" /Q /DAppVersion=%VERSION% desktop\OrbQuest.iss
 if errorlevel 1 (
   echo [ERROR] The installer could not be built.
   exit /b 1

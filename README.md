@@ -65,20 +65,20 @@ Settings are environment variables; the app does not read a `.env` file. In Powe
 | Variable | Default | Meaning |
 |---|---|---|
 | `PORT` | `3000` | HTTP port |
-| `DQR_BIND_HOST` | `127.0.0.1` | Bind address. Use `0.0.0.0` only if you mean to share it on the LAN |
-| `DQR_ALLOWED_HOSTS` | loopback names | Extra `Host` values, comma separated. `*.example.com` is allowed. A single `*` turns the check off |
-| `DQR_RATE_LIMIT_MAX` | `100` | Catalog requests per IP per minute |
-| `DQR_ROOT` | working directory | Where `Games/` and `icon-cache/` are written. The desktop build uses `%LOCALAPPDATA%\OrbQuest` |
-| `DQR_GAMES_DIR` | `<DQR_ROOT>/Games` | The library folder itself |
-| `DQR_ASSET_ROOT` | `DQR_ROOT` | Read-only files: `dist/` and `placeholder_runtime.exe` |
-| `DQR_DATABASE_REFRESH` | unset | Background database update. Unset means every six hours. `1` forces one at boot. `0` never |
-| `DQR_DATABASE_URL` | `src/server/gameDatabase.json` on this repository's `database` branch | Where the published game database is downloaded from. Point it at your fork's copy |
-| `DQR_STEAMAPPS` | Steam's own `steamapps` | The Steam library Steam quests are written to |
-| `DQR_DOWNLOADS_DIR` | Windows' Downloads folder | Where start scripts are saved |
-| `DQR_UPDATE_CHECK` | unset | `0`: never ask GitHub for a new release |
-| `DQR_OFFLINE` | unset | `1`: no network requests at all (database updates, icons, the release check; the full host list is in [SECURITY.md](SECURITY.md)). The bundled database and saved icons still work |
-| `DQR_DEBUG` | unset | Any value: log failed icon downloads |
-| `DQR_NODE_EXE` | `node.exe` on `PATH` | Build only: the Node.js runtime `build_windows_exe.bat` packs into the exe |
+| `ORBQUEST_BIND_HOST` | `127.0.0.1` | Bind address. Use `0.0.0.0` only if you mean to share it on the LAN |
+| `ORBQUEST_ALLOWED_HOSTS` | loopback names | Extra `Host` values, comma separated. `*.example.com` is allowed. A single `*` turns the check off |
+| `ORBQUEST_RATE_LIMIT_MAX` | `100` | Catalog requests per IP per minute |
+| `ORBQUEST_ROOT` | working directory | Where `Games/` and `icon-cache/` are written. The desktop build uses `%LOCALAPPDATA%\OrbQuest` |
+| `ORBQUEST_GAMES_DIR` | `<ORBQUEST_ROOT>/Games` | The library folder itself |
+| `ORBQUEST_ASSET_ROOT` | `ORBQUEST_ROOT` | Read-only files: `dist/` and `placeholder_runtime.exe` |
+| `ORBQUEST_DATABASE_REFRESH` | unset | Background database update. Unset means every six hours. `1` forces one at boot. `0` never |
+| `ORBQUEST_DATABASE_URL` | `src/server/gameDatabase.json` on this repository's `database` branch | Where the published game database is downloaded from. Point it at your fork's copy |
+| `ORBQUEST_STEAMAPPS` | Steam's own `steamapps` | The Steam library Steam quests are written to |
+| `ORBQUEST_DOWNLOADS_DIR` | Windows' Downloads folder | Where start scripts are saved |
+| `ORBQUEST_UPDATE_CHECK` | unset | `0`: never ask GitHub for a new release |
+| `ORBQUEST_OFFLINE` | unset | `1`: no network requests at all (database updates, icons, the release check; the full host list is in [SECURITY.md](SECURITY.md)). The bundled database and saved icons still work |
+| `ORBQUEST_DEBUG` | unset | Any value: log failed icon downloads |
+| `ORBQUEST_NODE_EXE` | `node.exe` on `PATH` | Build only: the Node.js runtime `build_windows_exe.bat` packs into the exe |
 
 ## What you can do in the app
 
@@ -162,9 +162,9 @@ docs/                      Screenshot for this README
 
 ## Security
 
-- Binds to `127.0.0.1` unless `DQR_BIND_HOST` says otherwise.
+- Binds to `127.0.0.1` unless `ORBQUEST_BIND_HOST` says otherwise.
 - In the desktop app only its own window can use the API: the window opens with a token that is new on every start and keeps it as an HttpOnly cookie. Another program on the PC cannot start or remove games through it.
-- Rejects a `Host` header that is not loopback, unless `DQR_ALLOWED_HOSTS` allows it. That blocks a page from calling this API by pointing its own hostname at `127.0.0.1`.
+- Rejects a `Host` header that is not loopback, unless `ORBQUEST_ALLOWED_HOSTS` allows it. That blocks a page from calling this API by pointing its own hostname at `127.0.0.1`.
 - Production builds send a Content-Security-Policy. The dev server does not, so the Vite client can connect.
 - `dist/server.cjs`, its sourcemap and the database JSON files are not served as static files.
 - File writes stay inside `Games/` and `icon-cache/`, for a Steam quest inside that game's folder and manifest in Steam's `steamapps`, and a start script only as `<Game> - OrbQuest.<bat|ps1|py>` in Downloads. An executable path from a request or from Discord's list must stay inside its game folder (no `..`, drive letters or absolute paths).

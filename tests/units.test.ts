@@ -179,7 +179,7 @@ test('icons come from Discord, or from the website of a program Discord has none
     'https://www.google.com/s2/favicons?domain=operagx.gg&sz=256'
   );
   assert.equal(remoteIconUrl({ id: '2' }), undefined);
-  // The tests run with DQR_OFFLINE=1: nothing is downloaded.
+  // The tests run with ORBQUEST_OFFLINE=1: nothing is downloaded.
   assert.equal(await cacheGameIcon({ id: 'r-operagx', site: 'operagx.gg' }), undefined);
 });
 
@@ -225,7 +225,7 @@ test('the icon cache keeps real images only: no SVG, no page that claims to be o
   const fs = await import('node:fs');
   const os = await import('node:os');
   const { createIconStore } = await import('../src/server/iconStore.ts');
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'dqr-icons-'));
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'orbquest-icons-'));
   const store = createIconStore({ cacheDir: dir });
   const png = Buffer.concat([Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]), Buffer.alloc(100)]);
   const answers: Record<string, [Buffer | string, string]> = {

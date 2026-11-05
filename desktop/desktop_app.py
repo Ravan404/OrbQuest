@@ -60,10 +60,10 @@ def hide_console_window() -> None:
 
 
 def application_root() -> Path:
-    """Return the writable folder beside the script or packaged executable."""
+    """The folder of the packaged executable, or the repository when run from source."""
     if getattr(sys, "frozen", False):
         return Path(sys.executable).resolve().parent
-    return Path(__file__).resolve().parent
+    return Path(__file__).resolve().parent.parent
 
 
 def asset_root() -> Path:
@@ -84,8 +84,8 @@ def asset_root() -> Path:
             return candidate.resolve()
     searched = ", ".join(str(candidate / "dist" / "server.cjs") for candidate in candidates)
     hint = (
-        f" The backend bundle is created by build_windows_exe.bat (or 'npm run build') "
-        f"and must be in the same folder as desktop_app.py: {application_root()}"
+        f" The backend bundle is created by 'npm run build' "
+        f"and must be in the dist folder of {application_root()}"
     )
     raise FileNotFoundError(f"Bundled application files not found. Searched: {searched}.{hint}")
 
@@ -153,8 +153,8 @@ def data_root() -> Path:
     kept both folders next to the exe; they are moved on the first start.
     If that fails, this run keeps using them where they are.
     """
-    if os.environ.get("DQR_ROOT"):
-        return Path(os.environ["DQR_ROOT"])
+    if os.environ.get("ORBQUEST_ROOT"):
+        return Path(os.environ["ORBQUEST_ROOT"])
     old_root = application_root()
     if not getattr(sys, "frozen", False):
         return old_root
@@ -390,7 +390,7 @@ def wait_for_server(timeout: float = 30.0) -> None:
     last_error = None
     while time.monotonic() < deadline:
         try:
-            request = urllib.request.Request(url, headers={"X-DQR-Shutdown-Token": SERVER_SHUTDOWN_TOKEN})
+            request = urllib.request.Request(url, headers={"X-OrbQuest-Shutdown-Token": SERVER_SHUTDOWN_TOKEN})
             with local_http_open(request, timeout=0.5) as response:
                 if json.load(response).get("ok") is not True:
                     raise RuntimeError("The local port is already occupied by another server.")
@@ -429,17 +429,17 @@ def start_backend_server() -> None:
         {
             "NODE_ENV": "production",
             "PORT": str(PORT),
-            "DQR_ROOT": str(DATA_ROOT),
-            "DQR_ASSET_ROOT": str(asset_root()),
-            "DQR_BIND_HOST": "127.0.0.1",
-            "DQR_SHUTDOWN_TOKEN": SERVER_SHUTDOWN_TOKEN,
-            "DQR_API_TOKEN": API_TOKEN,
+            "ORBQUEST_ROOT": str(DATA_ROOT),
+            "ORBQUEST_ASSET_ROOT": str(asset_root()),
+            "ORBQUEST_BIND_HOST": "127.0.0.1",
+            "ORBQUEST_SHUTDOWN_TOKEN": SERVER_SHUTDOWN_TOKEN,
+            "ORBQUEST_API_TOKEN": API_TOKEN,
         }
     )
     kind = install_kind()
     if kind:
-        environment["DQR_INSTALL_KIND"] = kind
-        environment["DQR_APP_EXE"] = str(Path(sys.executable).resolve())
+        environment["ORBQUEST_INSTALL_KIND"] = kind
+        environment["ORBQUEST_APP_EXE"] = str(Path(sys.executable).resolve())
     startup_info = None
     creation_flags = getattr(subprocess, "CREATE_NO_WINDOW", 0)
     if sys.platform == "win32":
@@ -479,7 +479,7 @@ def stop_backend_server() -> None:
                 f"http://127.0.0.1:{PORT}/api/internal/shutdown",
                 data=b"",
                 method="POST",
-                headers={"X-DQR-Shutdown-Token": SERVER_SHUTDOWN_TOKEN},
+                headers={"X-OrbQuest-Shutdown-Token": SERVER_SHUTDOWN_TOKEN},
             )
             with local_http_open(request, timeout=2):
                 pass
