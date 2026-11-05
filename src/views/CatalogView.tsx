@@ -163,7 +163,6 @@ export const CatalogView: React.FC<CatalogViewProps> = ({ databaseSize, onAdded,
     <div className="flex min-h-0 flex-1 flex-col">
       <div className="shrink-0 space-y-1.5 px-6 pb-3 pt-5">
         <SearchInput
-          id="catalog-search-input"
           className="w-full max-w-md"
           value={query}
           onChange={(event) => setQuery(event.target.value)}

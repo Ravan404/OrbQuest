@@ -19,4 +19,4 @@ The app only downloads public files. These requests carry no personal data, but 
 
 Those services have their own privacy policies: [GitHub](https://docs.github.com/site-policy/privacy-policies/github-general-privacy-statement), [jsDelivr](https://www.jsdelivr.com/terms/privacy-policy-jsdelivr-net), [Discord](https://discord.com/privacy) and [Google](https://policies.google.com/privacy).
 
-Setting the environment variable `DQR_OFFLINE=1` turns all of these requests off; the bundled database and saved icons keep working.
+Setting the environment variable `ORBQUEST_OFFLINE=1` turns all of these requests off; the bundled database and saved icons keep working.

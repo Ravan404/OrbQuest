@@ -83,13 +83,7 @@ export const GameDialog: React.FC<GameDialogProps> = ({ game, onClose, onSubmit 
           <Button variant="ghost" onClick={onClose}>
             {t('cancel')}
           </Button>
-          <Button
-            id="custom-game-submit-btn"
-            type="submit"
-            form="game-dialog-form"
-            variant="primary"
-            disabled={!canSubmit}
-          >
+          <Button type="submit" form="game-dialog-form" variant="primary" disabled={!canSubmit}>
             {busy ? (editing ? t('saving') : t('adding')) : editing ? t('save') : t('addToLibrary')}
           </Button>
         </>
@@ -102,7 +96,6 @@ export const GameDialog: React.FC<GameDialogProps> = ({ game, onClose, onSubmit 
 
         <Field label={t('fieldName')}>
           <TextInput
-            id="custom-game-name-input"
             required
             autoFocus
             value={name}
@@ -114,7 +107,6 @@ export const GameDialog: React.FC<GameDialogProps> = ({ game, onClose, onSubmit 
         <div className="grid grid-cols-2 gap-3">
           <Field label={t('fieldExe')}>
             <TextInput
-              id="custom-game-exe-input"
               required
               className="font-mono"
               value={exe}

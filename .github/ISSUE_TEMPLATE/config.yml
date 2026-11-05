@@ -1,5 +1,8 @@
-blank_issues_enabled: true
+blank_issues_enabled: false
 contact_links:
   - name: Security problem
     url: https://github.com/Ravan404/OrbQuest/security/advisories/new
     about: Report security problems privately, not as an issue.
+  - name: Questions
+    url: https://github.com/Ravan404/OrbQuest#questions
+    about: Answers about antivirus warnings, quests that did not count and more.

@@ -49,8 +49,8 @@ async function settle(): Promise<void> {
 beforeEach(() => {
   resetUpdateDownload();
   fs.rmSync(path.join(sandboxRoot, 'update'), { recursive: true, force: true });
-  delete process.env.DQR_INSTALL_KIND;
-  delete process.env.DQR_APP_EXE;
+  delete process.env.ORBQUEST_INSTALL_KIND;
+  delete process.env.ORBQUEST_APP_EXE;
 });
 
 test('checksum files in sha256sum and certutil style are read', () => {
@@ -72,7 +72,7 @@ test('the installed app downloads the installer, checks it and leaves it for the
   await checkForUpdate(fetchImpl);
   assert.equal(canInstall(availableUpdate()), false, 'not from source or a browser');
 
-  process.env.DQR_INSTALL_KIND = 'installed';
+  process.env.ORBQUEST_INSTALL_KIND = 'installed';
   assert.equal(canInstall(availableUpdate()), true);
   startUpdateDownload(fetchImpl);
   await settle();
@@ -93,8 +93,8 @@ test('the portable app downloads the new exe next to itself', async () => {
   await checkForUpdate(fetchImpl);
   const folder = path.join(sandboxRoot, 'Downloads');
   fs.mkdirSync(folder, { recursive: true });
-  process.env.DQR_INSTALL_KIND = 'portable';
-  process.env.DQR_APP_EXE = path.join(folder, 'OrbQuest-1.6.0.exe');
+  process.env.ORBQUEST_INSTALL_KIND = 'portable';
+  process.env.ORBQUEST_APP_EXE = path.join(folder, 'OrbQuest-1.6.0.exe');
   startUpdateDownload(fetchImpl);
   await settle();
   assert.equal(downloadState().state, 'ready', JSON.stringify(downloadState()));
@@ -107,7 +107,7 @@ test('a download that does not match its SHA-256 is deleted and never offered', 
     'SHA256SUMS.txt': `${sha(setupBytes)}  OrbQuest-Setup-99.0.0.exe\n`,
   });
   await checkForUpdate(fetchImpl);
-  process.env.DQR_INSTALL_KIND = 'installed';
+  process.env.ORBQUEST_INSTALL_KIND = 'installed';
   startUpdateDownload(fetchImpl);
   await settle();
   assert.equal(downloadState().state, 'failed');
@@ -132,7 +132,7 @@ test('files from anywhere but the release downloads are ignored', async () => {
       ],
     })) as unknown as typeof fetch;
   await checkForUpdate(fetchImpl);
-  process.env.DQR_INSTALL_KIND = 'installed';
+  process.env.ORBQUEST_INSTALL_KIND = 'installed';
   assert.equal(canInstall(availableUpdate()), false);
   assert.equal(startUpdateDownload(fetchImpl).state, 'failed');
 });

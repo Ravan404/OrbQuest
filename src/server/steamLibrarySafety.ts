@@ -8,7 +8,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { hasPlaceholderRuntimeSignature } from './placeholderUpgrade.ts';
 
-/** Written next to a placeholder so a later delete can recognise our install. */
+/** Written next to a placeholder so a later delete can recognise our install. The name is from before the rename; existing installs carry it. */
 export const MANAGED_INSTALL_MARKER = '.dqr-managed.json';
 
 const METADATA_FILES = new Set(['.game-name.txt', '.game-meta.json', '.game-icon.ico', MANAGED_INSTALL_MARKER]);

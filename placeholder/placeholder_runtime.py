@@ -36,7 +36,7 @@ def timer_state(seconds: int, target: int, start: int, end: int, resume: int = 0
     Returns:
         Tuple of (displayed_seconds, status_message)
     """
-    # Handle resume: base is max(start, previous_elapsed) + new elapsed beyond start
+    # Resuming: base is max(start, previous_elapsed) plus the time since start
     if resume:
         elapsed = max(start, resume) + max(0, seconds - start)
     else:
@@ -61,18 +61,17 @@ def main() -> None:
     try:
         import tkinter as tk
     except ImportError as e:
-        # Fallback: if tkinter is not available, just sleep as a placeholder process
-        # This allows the backend to still track process lifetime
+        # Without tkinter, sleep so the server can still track the process
         print(f"Tkinter not available, running headless placeholder: {e}", file=sys.stderr)
         try:
-            # Headless mode: run until terminated by launcher
+            # Runs until the server stops it
             while True:
                 time.sleep(1)
         except KeyboardInterrupt:
             return
 
     exe_path = Path(sys.executable if getattr(sys, 'frozen', False) else sys.argv[0])
-    name = os.environ.get('DQR_GAME_NAME', '').strip()
+    name = os.environ.get('ORBQUEST_GAME_NAME', '').strip()
     if not name:
         try:
             name_file = exe_path.parent / '.game-name.txt'
@@ -82,16 +81,13 @@ def main() -> None:
             pass
     name = name or exe_path.stem or "Game"
 
-    # Timer configuration from environment (set by launcher)
-    target = int(read_number('DQR_TARGET_SECONDS', 900))
-    start = int(read_number('DQR_BUFFER_START', 5))
-    end = int(read_number('DQR_BUFFER_END', 10))
-    resume = int(read_number('DQR_RESUME_SECONDS', 0))
+    target = int(read_number('ORBQUEST_TARGET_SECONDS', 900))
+    start = int(read_number('ORBQUEST_BUFFER_START', 5))
+    end = int(read_number('ORBQUEST_BUFFER_END', 10))
+    resume = int(read_number('ORBQUEST_RESUME_SECONDS', 0))
 
-    # Include PyInstaller/Tk initialization overhead, then use monotonic clock
-    # for stable timing that survives wall-clock adjustments
-    launch = read_number('DQR_LAUNCHED_AT', time.time() * 1000) / 1000
-    # Calculate when we actually started, accounting for init time
+    # Count from the launch time, then use the monotonic clock
+    launch = read_number('ORBQUEST_LAUNCHED_AT', time.time() * 1000) / 1000
     time_since_launch = max(0, time.time() - launch)
     started = time.monotonic() - time_since_launch
 
@@ -105,8 +101,8 @@ def main() -> None:
         except KeyboardInterrupt:
             return
 
-    # Black and white like the app; DQR_THEME comes from the app's settings.
-    if os.environ.get('DQR_THEME') == 'dark':
+    # Black and white like the app; ORBQUEST_THEME comes from the app's settings.
+    if os.environ.get('ORBQUEST_THEME') == 'dark':
         bg, fg, faint = '#0d0d0d', '#f0f0f0', '#6e6e6e'
     else:
         bg, fg, faint = '#fafafa', '#111111', '#8c8c8c'
@@ -126,7 +122,7 @@ def main() -> None:
         status = tk.Label(frame, fg=faint, bg=bg, anchor='w', font=('Segoe UI', 11))
         status.pack(fill='x')
     except Exception:
-        # If label creation fails, still run mainloop with minimal UI
+        # The window can still run without its labels
         timer = tk.Label(root, text="00:00", fg=fg, bg=bg, font=('Segoe UI', 28))
         timer.pack(pady=20)
         status = tk.Label(root, text="", fg=faint, bg=bg, font=('Segoe UI', 11))
@@ -139,9 +135,9 @@ def main() -> None:
             timer.config(text=f'{shown // 60:02d}:{shown % 60:02d}')
             status.config(text=message)
         except Exception:
-            # Don't crash on timer update errors
+            # The next tick tries again
             pass
-        # The launcher owns process termination, including the final margin
+        # The server stops the process, including the final margin
         try:
             root.after(200, update_timer)
         except Exception:

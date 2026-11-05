@@ -115,7 +115,6 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
     <div className="flex min-h-0 flex-1 flex-col">
       <div className="flex shrink-0 flex-wrap items-center gap-2 px-6 pb-3 pt-5">
         <SearchInput
-          id="library-search-input"
           className="w-64"
           value={query}
           onChange={(event) => setQuery(event.target.value)}
@@ -147,11 +146,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
               <Button onClick={() => setSelecting(true)} disabled={games.length === 0}>
                 {t('select')}
               </Button>
-              <Button
-                id="explore-catalog-btn"
-                onClick={onOpenCatalog}
-                icon={<ChevronRight className="order-last h-3.5 w-3.5" />}
-              >
+              <Button onClick={onOpenCatalog} icon={<ChevronRight className="order-last h-3.5 w-3.5" />}>
                 {t('navCatalog')}
               </Button>
             </>
@@ -165,10 +160,10 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
             <h2 className="text-[16px] font-semibold text-text">{t('libraryEmpty')}</h2>
             <p className="mt-1 text-[13px] text-muted">{t('libraryEmptyHint')}</p>
             <div className="mt-5 flex justify-center gap-2">
-              <Button id="empty-open-catalog-btn" variant="primary" onClick={onOpenCatalog}>
+              <Button variant="primary" onClick={onOpenCatalog}>
                 {t('browseCatalog')}
               </Button>
-              <Button id="empty-add-game-btn" onClick={onAddGame} icon={<Plus className="h-3.5 w-3.5" />}>
+              <Button onClick={onAddGame} icon={<Plus className="h-3.5 w-3.5" />}>
                 {t('addGame')}
               </Button>
             </div>
@@ -179,7 +174,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
               {query.trim() ? t('noMatch', { query: query.trim() }) : t('filterEmpty')}
             </p>
             {query.trim() && (
-              <Button id="no-match-open-catalog-btn" className="mt-4" onClick={onOpenCatalog}>
+              <Button className="mt-4" onClick={onOpenCatalog}>
                 {t('browseCatalog')}
               </Button>
             )}

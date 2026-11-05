@@ -1,5 +1,9 @@
 # Security
 
+## Supported versions
+
+Only the latest release gets fixes. OrbQuest 1.6.0 and newer update themselves from inside the app.
+
 ## Reporting a problem
 
 Please do not open a public issue for a security problem. Use **Report a vulnerability** on the repository's Security tab (GitHub private vulnerability reporting). Say what you found, how to reproduce it and which version you used. You will get an answer within a week.
@@ -25,9 +29,9 @@ It never logs in to Discord, never reads your token and never changes the Discor
 |---|---|
 | Game database updates (every six hours) | `raw.githubusercontent.com/Ravan404/OrbQuest`, `cdn.jsdelivr.net/gh/Ravan404/OrbQuest` (the published database). Only if both fail for a day: `discord.com` (Discord's public list of detectable games) |
 | Game icons | `cdn.discordapp.com`; for the few programs Discord has no icon for, `www.google.com/s2/favicons` (their website's icon) |
-| New release check (at the start and every six hours) | `api.github.com` (the latest OrbQuest release; `DQR_UPDATE_CHECK=0` turns it off) |
+| New release check (at the start and every six hours) | `api.github.com` (the latest OrbQuest release; `ORBQUEST_UPDATE_CHECK=0` turns it off) |
 | Installing an update, only when you click Install | `github.com/Ravan404/OrbQuest/releases/download/` (GitHub serves the file from `objects.githubusercontent.com`) |
 
-`DQR_OFFLINE=1` turns all of them off; the bundled database and saved icons keep working.
+`ORBQUEST_OFFLINE=1` turns all of them off; the bundled database and saved icons keep working.
 
 The app never contacts Reddit. The Game database workflow on GitHub reads r/DiscordQuests (`www.reddit.com`, or the `arctic-shift.photon-reddit.com` archive) to fill in executables Discord does not publish.

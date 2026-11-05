@@ -1,10 +1,7 @@
 /**
- * App-wide preferences saved next to the library (`Games/.settings.json`).
- *
- * They used to live in the browser's localStorage. The desktop build picks a
- * new loopback port on every start, and localStorage belongs to one origin
- * (scheme + host + port), so every start began with empty settings. The server
- * folder is the same on every start.
+ * App settings, saved next to the library (`Games/.settings.json`). Not in the
+ * browser's localStorage: the desktop app uses a new port on every start, and
+ * localStorage belongs to one origin.
  */
 
 import fs from 'node:fs';

@@ -4,18 +4,15 @@
  *
  * Rebuilds src/server/gameDatabase.json:
  *
- *   1. Discord's list of detectable games gives the games and their
- *      executables.
- *   2. r/DiscordQuests gives the quest programs Discord's list has no
- *      executable for (browsers and other apps, new quest games Discord has
- *      not added yet). Only posts newer than the snapshots in data/reddit/ are
- *      read, usually with one request; new posts are saved as a snapshot.
- *      When Reddit and its Arctic Shift archive do not answer, the snapshots
- *      already there are used.
+ *   - Discord's list of detectable games gives the games and their executables.
+ *   - r/DiscordQuests gives the quest programs that list has no executable for.
+ *     Only posts newer than the snapshots in data/reddit/ are read, and new
+ *     posts are saved as a snapshot. When Reddit and its Arctic Shift archive
+ *     do not answer, the snapshots already there are used.
  *
  * The file is only rewritten when the games changed. The Game database
  * workflow (.github/workflows/database.yml) runs this every six hours and
- * commits the result.
+ * publishes the result.
  */
 
 import fs from 'node:fs';

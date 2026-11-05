@@ -14,9 +14,9 @@ const DEFAULT_URLS = [
   'https://cdn.jsdelivr.net/gh/Ravan404/OrbQuest@database/src/server/gameDatabase.json',
 ];
 
-/** Where the database is downloaded from, in order. DQR_DATABASE_URL replaces the list (forks). */
-export const PUBLISHED_DATABASE_URLS = process.env.DQR_DATABASE_URL?.trim()
-  ? [process.env.DQR_DATABASE_URL.trim()]
+/** Where the database is downloaded from, in order. ORBQUEST_DATABASE_URL replaces the list (forks). */
+export const PUBLISHED_DATABASE_URLS = process.env.ORBQUEST_DATABASE_URL?.trim()
+  ? [process.env.ORBQUEST_DATABASE_URL.trim()]
   : DEFAULT_URLS;
 
 /** The real file is about 1.6 MB; anything this large is not it. */

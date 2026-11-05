@@ -1,5 +1,5 @@
 <#
-  Checks the Windows packages build_windows_exe.bat made in release\:
+  Checks the Windows packages scripts\build-windows.bat made in release\:
   installs OrbQuest-Setup-<version>.exe silently into a temporary folder,
   starts the installed app with a throw-away library, waits until its server
   answers (and refuses an API call without the window's session), does the
@@ -14,7 +14,7 @@ $release = Join-Path $root 'release'
 $setup = Join-Path $release "OrbQuest-Setup-$version.exe"
 $portable = Join-Path $release "OrbQuest-$version.exe"
 foreach ($file in @($setup, $portable, (Join-Path $release 'SHA256SUMS.txt'))) {
-  if (-not (Test-Path $file)) { throw "Missing $file. Run build_windows_exe.bat first." }
+  if (-not (Test-Path $file)) { throw "Missing $file. Run scripts\build-windows.bat first." }
 }
 
 $work = Join-Path ([IO.Path]::GetTempPath()) ("orbquest-smoke-" + [guid]::NewGuid().ToString('N'))
@@ -32,7 +32,7 @@ function Test-Start([string] $exe, [string] $label) {
   New-Item -ItemType Directory -Force $data | Out-Null
   $previous = $env:LOCALAPPDATA
   $env:LOCALAPPDATA = $data
-  $env:DQR_UPDATE_CHECK = '0'
+  $env:ORBQUEST_UPDATE_CHECK = '0'
   try {
     $process = Start-Process $exe -PassThru
     $log = Join-Path $data 'OrbQuest\backend.log'
@@ -70,6 +70,7 @@ try {
   $install = Start-Process $setup -ArgumentList '/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART', "/DIR=$app", '/TASKS=' -PassThru -Wait
   if ($install.ExitCode -ne 0) { throw "The installer failed with exit code $($install.ExitCode)." }
   if (-not (Test-Path (Join-Path $app 'OrbQuest.exe'))) { throw 'The installer did not install OrbQuest.exe.' }
+  if (-not (Test-Path (Join-Path $app '_internal\placeholder\placeholder_runtime.exe'))) { throw 'The installed files have no placeholder.' }
   Write-Host "OrbQuest-Setup-$version.exe installs."
 
   Test-Start (Join-Path $app 'OrbQuest.exe') 'Installed OrbQuest'

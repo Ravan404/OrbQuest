@@ -105,7 +105,7 @@ jobs:
 
       - name: Build the installer and the portable exe
         shell: cmd
-        run: .\build_windows_exe.bat
+        run: scripts\build-windows.bat
 
       - name: Install, start and uninstall the packages
         shell: pwsh

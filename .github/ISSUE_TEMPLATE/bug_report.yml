@@ -14,7 +14,7 @@ body:
     attributes:
       label: Version
       description: Shown next to the name at the top of the window, and on the About page.
-      placeholder: 1.4.0
+      placeholder: 1.6.1
     validations:
       required: true
   - type: dropdown

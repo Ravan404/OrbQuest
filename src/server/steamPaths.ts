@@ -75,10 +75,10 @@ export function findSteamAppsPaths(options: SteamPathEnvironment = {}): string[]
 
 /**
  * The library Steam-manifest quests go to: the main installation's
- * `steamapps`, where Steam always looks. DQR_STEAMAPPS overrides it.
+ * `steamapps`, where Steam always looks. ORBQUEST_STEAMAPPS overrides it.
  */
 export function findSteamAppsPath(options: SteamPathEnvironment = {}): string | undefined {
-  const override = (options.env ?? process.env).DQR_STEAMAPPS?.trim();
+  const override = (options.env ?? process.env).ORBQUEST_STEAMAPPS?.trim();
   if (override) return fs.existsSync(override) ? path.resolve(override) : undefined;
   return findSteamAppsPaths(options)[0];
 }

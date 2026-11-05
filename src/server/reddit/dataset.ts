@@ -9,17 +9,13 @@ import {
   extractMatchesFromText,
   isMeaningfulFolder,
   sanitizeSourceUrl,
-  type UnifiedMatch,
+  type ExtractedMatch,
 } from './extract.ts';
 import { cleanDisplayName, normalizeGameKey } from '../gameKey.ts';
 import { applyRedditEntryFix, REDDIT_ENTRY_FIXES, REDDIT_POST_SUPPLEMENTS, redditPostId } from './corrections.ts';
 
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
-
-export interface RedditCacheEntry {
-  /** Canonical game name (see gameNames.ts) - one name per game. */
+export interface RedditEntry {
+  /** The game name, one per game. */
   gameName: string;
   executableName: string;
   folderPath: string;
@@ -33,15 +29,6 @@ export interface RedditCacheEntry {
   manifestContent?: string;
   /** Other names the post used for this game ("Marvel Rivals Deadpool"). Search-only. */
   aliases?: string[];
-  /** Title of the Reddit post the entry was read from. */
-  postTitle?: string;
-  /**
-   * Local part of the database only: how the entry got there - found by the
-   * background update, or saved when the user added a live Reddit result to
-   * the library - and when.
-   */
-  addedFrom?: 'refresh' | 'library';
-  addedAt?: string;
 }
 
 /** Minimal shape of a scraped Reddit post (Apify dataset or the live API). */
@@ -60,10 +47,6 @@ export interface RedditPostLike {
    */
   textFormat?: 'text' | 'markdown';
 }
-
-// ---------------------------------------------------------------------------
-// Markdown source -> text
-// ---------------------------------------------------------------------------
 
 /** ASCII punctuation: the only characters a markdown backslash escapes. */
 const MARKDOWN_ESCAPABLE = /[!-/:-@[-`{-~]/;
@@ -115,10 +98,6 @@ export function redditMarkdownToText(markdown: string): string {
     .replace(/&amp;/g, '&');
 }
 
-// ---------------------------------------------------------------------------
-// Game-name cleaning
-// ---------------------------------------------------------------------------
-
 /** A post field as text. Posts are untrusted: a "string" field can be a number, an object or null. */
 function text(value: unknown): string {
   if (typeof value === 'string') return value;
@@ -149,10 +128,9 @@ const TRAILING_NOISE: RegExp[] = [
 ];
 
 /**
- * Words that only ever start a question, never a game title. A title that
- * begins with one of them AND continues with a prose word is a question
- * ("help for forza horizon 6 quest"), while "Where Winds Meet" is a perfectly
- * good game name that merely starts with a question word.
+ * Words that only start a question. A title that begins with one and goes on
+ * with a prose word is a question ("help for forza horizon 6 quest");
+ * "Where Winds Meet" is not.
  */
 const TITLE_QUESTION_START =
   /^(?:how|why|what|when|where|which|who|is|are|was|were|can|could|should|would|does|do|did|any|anyone|somebody|someone|psa|megathread|method|fix|guide|tutorial|update|release|reminder|question|help)\b/i;
@@ -225,10 +203,6 @@ export function cleanGameName(rawTitle: string): string {
   return name;
 }
 
-// ---------------------------------------------------------------------------
-// Folder helpers
-// ---------------------------------------------------------------------------
-
 /** Generic engine folders that never identify a game. */
 const GENERIC_FOLDER_NAMES = new Set([
   '.',
@@ -278,10 +252,6 @@ function firstMeaningfulSegment(folderPath: string): string | undefined {
   return undefined;
 }
 
-// ---------------------------------------------------------------------------
-// Entry building
-// ---------------------------------------------------------------------------
-
 /** Most aliases kept per entry; they only widen the search. */
 const MAX_ENTRY_ALIASES = 6;
 
@@ -292,17 +262,14 @@ function manifestDisplayName(manifestContent: string | undefined): string {
 }
 
 /**
- * Gives an entry its canonical game name and keeps the other spellings the
- * post used as search aliases.
- *
- * A hand-checked fix (corrections.ts) that names the game explicitly
- * always wins; otherwise the cleaned post name is used.
+ * Gives an entry its final name and keeps the other spellings the post used as
+ * search aliases. A fix in corrections.ts that names the game wins.
  */
 function finalizeEntryName(
-  entry: RedditCacheEntry,
+  entry: RedditEntry,
   extraNames: string[] = [],
   options: { postFix?: boolean } = {}
-): RedditCacheEntry {
+): RedditEntry {
   const id = redditPostId(entry.url);
   // The post's fix describes the entry the extractor reads; the extra games of
   // the same post (REDDIT_POST_SUPPLEMENTS) carry their own names.
@@ -323,26 +290,18 @@ function finalizeEntryName(
     aliases.push(name);
   }
 
-  const result: RedditCacheEntry = { ...entry, gameName: canonical || entry.gameName };
+  const result: RedditEntry = { ...entry, gameName: canonical || entry.gameName };
   if (aliases.length > 0) result.aliases = aliases.slice(0, MAX_ENTRY_ALIASES);
   else delete result.aliases;
   return result;
 }
 
 /**
- * Builds a cache entry out of an already extracted match.
- *
- * The raw game name is resolved in this order: `preferredName` (a known game
- * name from the verified quest database), the name inside a Steam manifest,
- * the cleaned post title, the install folder mentioned in the path and finally
- * `fallbackName` (the query of a live search). The raw name is then mapped to
- * its canonical spelling (gameNames.ts), and the hand-checked fix of the post
- * (corrections.ts) is applied.
+ * An entry from an extracted match. The name is, in this order: the name inside
+ * a Steam manifest, the cleaned post title, or the install folder in the path.
+ * The fix of the post (corrections.ts) is then applied.
  */
-export function buildCacheEntry(
-  match: UnifiedMatch,
-  options: { title?: string; url?: string; preferredName?: string; fallbackName?: string } = {}
-): RedditCacheEntry | null {
+export function buildEntry(match: ExtractedMatch, options: { title?: string; url?: string } = {}): RedditEntry | null {
   const rawFolder =
     match.folderPath && !match.folderPath.toLowerCase().startsWith('not found')
       ? match.folderPath
@@ -365,17 +324,15 @@ export function buildCacheEntry(
   const trustedManifestName = isManifest ? manifestName || manifestInstallDir : '';
 
   const rawName =
-    (options.preferredName || '').trim() ||
     trustedManifestName ||
     cleanGameName(manifestInstallDir) ||
     (titleName && !isUnreliableTitle(titleName) ? titleName : '') ||
     fallbackDir ||
-    (options.fallbackName || '').trim() ||
     '';
 
   if (!rawName) return null;
 
-  let entry: RedditCacheEntry = {
+  let entry: RedditEntry = {
     gameName: rawName,
     executableName: match.executableName.trim(),
     folderPath: folderPath || 'Not found',
@@ -389,18 +346,12 @@ export function buildCacheEntry(
   if (match.steamAppId) entry.steamAppId = match.steamAppId;
   if (match.manifestFileName) entry.manifestFileName = match.manifestFileName;
   if (match.manifestContent) entry.manifestContent = match.manifestContent;
-  const postTitle = text(options.title).replace(/\s+/g, ' ').trim();
-  if (postTitle) entry.postTitle = postTitle.slice(0, 200);
 
   entry = applyRedditEntryFix(entry);
   return finalizeEntryName(entry, [titleName, manifestName, isManifest ? manifestInstallDir : '']);
 }
 
-/**
- * `fallbackName` names the game when neither the title nor the path does
- * (live searches pass the user's query).
- */
-function postToEntry(post: RedditPostLike, fallbackName?: string): RedditCacheEntry | null {
+function postToEntry(post: RedditPostLike): RedditEntry | null {
   if (!post || typeof post !== 'object') return null;
 
   const title = text(post.title).trim();
@@ -412,32 +363,29 @@ function postToEntry(post: RedditPostLike, fallbackName?: string): RedditCacheEn
   // mentions example paths; those are not quest results for a game.
   if (!cleanGameName(title) && TOOL_TITLE.test(title)) return null;
 
-  const match = extractMatchesFromText(`${title}\n${body}`, title, url, 'reddit');
+  const match = extractMatchesFromText(`${title}\n${body}`, url);
   if (!match) return null;
 
-  return buildCacheEntry(match, { title, url, fallbackName });
+  return buildEntry(match, { title, url });
 }
 
 /**
- * Every cache entry of one post: the entry the extractor reads plus the
- * hand-checked extra games of posts that document more than one
- * (corrections.ts).
+ * Every entry of one post: the one the extractor reads, plus the extra games of
+ * posts about several (corrections.ts).
  */
-export function redditPostToEntries(post: RedditPostLike, options: { fallbackName?: string } = {}): RedditCacheEntry[] {
-  const entry = postToEntry(post, options.fallbackName);
+export function redditPostToEntries(post: RedditPostLike): RedditEntry[] {
+  const entry = postToEntry(post);
   if (!post || typeof post !== 'object') return entry ? [entry] : [];
 
   const url = sanitizeSourceUrl(text(post.url || post.permalink).trim());
   const id = redditPostId(url);
   const supplements = id ? (REDDIT_POST_SUPPLEMENTS[id] ?? []) : [];
-  const postTitle = text(post.title).replace(/\s+/g, ' ').trim().slice(0, 200);
   const extra = supplements.map((supplement) =>
     finalizeEntryName(
       {
         ...supplement,
         url,
         source: 'reddit',
-        ...(postTitle ? { postTitle } : {}),
       },
       [],
       { postFix: false }
@@ -446,11 +394,7 @@ export function redditPostToEntries(post: RedditPostLike, options: { fallbackNam
   return [...(entry ? [entry] : []), ...extra];
 }
 
-// ---------------------------------------------------------------------------
-// Collection helpers
-// ---------------------------------------------------------------------------
-
-function executableKey(entry: RedditCacheEntry): string {
+function executableKey(entry: RedditEntry): string {
   return entry.executableName.trim().toLowerCase();
 }
 
@@ -459,9 +403,9 @@ function executableKey(entry: RedditCacheEntry): string {
  *
  * The first occurrence wins, so callers pass the most trusted source first.
  */
-export function dedupeEntries(entries: RedditCacheEntry[]): RedditCacheEntry[] {
+export function dedupeEntries(entries: RedditEntry[]): RedditEntry[] {
   const seen = new Set<string>();
-  const deduped: RedditCacheEntry[] = [];
+  const deduped: RedditEntry[] = [];
 
   for (const entry of entries) {
     if (!entry.executableName || !entry.gameName) continue;

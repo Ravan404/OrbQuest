@@ -43,7 +43,6 @@ export const StatusBar: React.FC<StatusBarProps> = ({
             </span>
           )}
           <Button
-            id="bottom-quick-toggle-btn"
             size="sm"
             variant={game.isRunning ? 'danger-soft' : 'secondary'}
             icon={
@@ -54,12 +53,7 @@ export const StatusBar: React.FC<StatusBarProps> = ({
             {game.isRunning ? t('stop') : t('launch')}
           </Button>
           {(game.isRunning || game.elapsedSeconds > 0) && (
-            <IconButton
-              id="bottom-quick-reset-btn"
-              label={t('resetTitle')}
-              className="h-7 w-7"
-              onClick={() => onReset(game)}
-            >
+            <IconButton label={t('resetTitle')} className="h-7 w-7" onClick={() => onReset(game)}>
               <RotateCcw className="h-3.5 w-3.5" />
             </IconButton>
           )}
@@ -72,7 +66,6 @@ export const StatusBar: React.FC<StatusBarProps> = ({
         {t('runningCount', { n: runningCount })}
       </span>
       <Button
-        id="global-stop-all-btn"
         size="sm"
         variant="danger-soft"
         disabled={runningCount === 0}

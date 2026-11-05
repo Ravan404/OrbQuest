@@ -78,7 +78,6 @@ export const GameCard: React.FC<GameCardProps> = ({
   return (
     // biome-ignore lint/a11y/useKeyWithClickEvents: a click selects the card for the status bar; every action has its own button.
     <article
-      id={`game-card-${game.id}`}
       onClick={selectMode ? onMark : onSelect}
       className={`relative flex flex-col overflow-hidden rounded-xl border bg-surface transition-colors ${
         marked
@@ -121,7 +120,6 @@ export const GameCard: React.FC<GameCardProps> = ({
           <>
             <span className="flex-1 px-1 text-[13px] text-danger">{t('confirmRemove')}</span>
             <Button
-              id={`confirm-delete-${game.id}`}
               variant="danger"
               onClick={() => {
                 setConfirmRemove(false);
@@ -137,7 +135,6 @@ export const GameCard: React.FC<GameCardProps> = ({
         ) : (
           <>
             <Button
-              id={`play-stop-btn-${game.id}`}
               variant={running ? 'danger-soft' : 'primary'}
               className="mr-1 flex-1"
               icon={running ? <Square className="h-3 w-3 fill-current" /> : <Play className="h-3 w-3 fill-current" />}
@@ -166,12 +163,7 @@ export const GameCard: React.FC<GameCardProps> = ({
             >
               <Pencil className="h-3.5 w-3.5" />
             </IconButton>
-            <IconButton
-              id={`delete-game-btn-${game.id}`}
-              label={t('remove')}
-              tone="danger"
-              onClick={() => setConfirmRemove(true)}
-            >
+            <IconButton label={t('remove')} tone="danger" onClick={() => setConfirmRemove(true)}>
               <Trash2 className="h-3.5 w-3.5" />
             </IconButton>
           </>
@@ -189,7 +181,6 @@ export const GameCard: React.FC<GameCardProps> = ({
             {phase.targetSeconds > 0 && ` / ${formatRuntime(phase.targetSeconds)}`}
           </span>
           <button
-            id={`reset-timer-btn-${game.id}`}
             type="button"
             onClick={onReset}
             title={t('resetTitle')}

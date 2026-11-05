@@ -85,13 +85,7 @@ export const UpdateDialog: React.FC<{ update: UpdateInfo; onClose: () => void }>
           <Button onClick={onClose} disabled={busy}>
             {t('updateLater')}
           </Button>
-          <Button
-            id="install-update-btn"
-            variant="primary"
-            icon={<ArrowUpCircle className="h-3.5 w-3.5" />}
-            disabled={busy}
-            onClick={start}
-          >
+          <Button variant="primary" icon={<ArrowUpCircle className="h-3.5 w-3.5" />} disabled={busy} onClick={start}>
             {t('updateInstall')}
           </Button>
         </>

@@ -26,7 +26,7 @@
 #define TIMER_MS      200
 
 /*
- * Black and white, like the app (src/index.css). Dark when DQR_THEME says
+ * Black and white, like the app (src/index.css). Dark when ORBQUEST_THEME says
  * so, or when it is unset/"system" and Windows apps are set to dark.
  */
 typedef struct {
@@ -45,7 +45,7 @@ static const Palette *g_pal = &PALETTE_LIGHT;
 
 enum { PHASE_WAITING, PHASE_RUNNING, PHASE_FINISHING, PHASE_DONE };
 
-/* Keep all working buffers in static storage so stack frames stay tiny (< 128 B) */
+/* Working buffers are static to keep stack frames small. */
 static wchar_t g_game_name[256];
 static wchar_t g_exe_name[256];
 static wchar_t g_running_as[300];
@@ -71,7 +71,7 @@ static HFONT  g_font_small  = NULL;
 static HICON  g_icon_big    = NULL;
 static HICON  g_icon_small  = NULL;
 
-/* Retain a relocated pointer so the PE image always includes a standard .reloc section for ASLR */
+/* A relocated pointer, so the image has a .reloc section for ASLR. */
 __attribute__((used))
 static const wchar_t *g_window_class_ptr = L"OrbQuestPlaceholderWindow";
 
@@ -233,8 +233,8 @@ static void resolve_game_and_exe_names(void) {
 
     wcopy(g_running_as, 300, g_exe_name);
 
-    /* 1. Check DQR_GAME_NAME environment variable */
-    DWORD env_len = GetEnvironmentVariableW(L"DQR_GAME_NAME", g_env_buf, 256);
+    /* The name the app passes */
+    DWORD env_len = GetEnvironmentVariableW(L"ORBQUEST_GAME_NAME", g_env_buf, 256);
     if (env_len > 0 && env_len < 256) {
         trim_wide(g_env_buf);
         if (g_env_buf[0] != L'\0') {
@@ -243,7 +243,7 @@ static void resolve_game_and_exe_names(void) {
         }
     }
 
-    /* 2. Check .game-name.txt in the executable directory */
+    /* Then .game-name.txt next to the executable */
     if (g_dir_path[0] != L'\0') {
         wcopy(g_name_file, MAX_PATH, g_dir_path);
         wappend(g_name_file, MAX_PATH, L".game-name.txt");
@@ -252,7 +252,7 @@ static void resolve_game_and_exe_names(void) {
         }
     }
 
-    /* 3. Fallback to executable stem with underscores/hyphens replaced by spaces */
+    /* Last, the executable's name with underscores and hyphens as spaces */
     wcopy(g_game_name, 256, g_exe_name);
     int last_dot = -1;
     for (int i = 0; g_game_name[i] != L'\0'; i++) {
@@ -404,7 +404,7 @@ static BOOL windows_apps_use_dark(void) {
 
 static void pick_palette(void) {
     BOOL dark;
-    DWORD n = GetEnvironmentVariableW(L"DQR_THEME", g_env_buf, 256);
+    DWORD n = GetEnvironmentVariableW(L"ORBQUEST_THEME", g_env_buf, 256);
     if (n > 0 && n < 256 && wequal(g_env_buf, L"dark")) dark = TRUE;
     else if (n > 0 && n < 256 && wequal(g_env_buf, L"light")) dark = FALSE;
     else dark = windows_apps_use_dark();
@@ -592,12 +592,12 @@ static int run_app(HINSTANCE hInstance) {
     g_start_tick_ms = GetTickCount64();
     resolve_game_and_exe_names();
 
-    g_target_seconds = env_int(L"DQR_TARGET_SECONDS", 900, 0);
-    g_buffer_start   = env_int(L"DQR_BUFFER_START", 5, 0);
-    g_buffer_end     = env_int(L"DQR_BUFFER_END", 10, 0);
-    g_resume_seconds = env_int(L"DQR_RESUME_SECONDS", 0, 0);
+    g_target_seconds = env_int(L"ORBQUEST_TARGET_SECONDS", 900, 0);
+    g_buffer_start   = env_int(L"ORBQUEST_BUFFER_START", 5, 0);
+    g_buffer_end     = env_int(L"ORBQUEST_BUFFER_END", 10, 0);
+    g_resume_seconds = env_int(L"ORBQUEST_RESUME_SECONDS", 0, 0);
 
-    LONGLONG launched_raw = env_int(L"DQR_LAUNCHED_AT", 0, 0);
+    LONGLONG launched_raw = env_int(L"ORBQUEST_LAUNCHED_AT", 0, 0);
     g_initial_offset_sec = 0;
     if (launched_raw > 0) {
         LONGLONG now_ms = current_unix_epoch_ms();
@@ -664,11 +664,9 @@ static int run_app(HINSTANCE hInstance) {
     apply_game_icon(hwnd);
 
     /*
-     * On Windows, the VERY FIRST call to ShowWindow in a GUI process uses
-     * STARTUPINFO.wShowWindow if STARTF_USESHOWWINDOW was set by the parent
-     * (e.g., SW_HIDE when spawned with windowsHide). Calling ShowWindow twice
-     * consumes the STARTUPINFO override on the first call and guarantees the
-     * window is visibly shown on the second call.
+     * The first ShowWindow call in a GUI process obeys STARTUPINFO.wShowWindow
+     * when the parent set it (SW_HIDE with windowsHide). The second call shows
+     * the window.
      */
     ShowWindow(hwnd, SW_SHOWNORMAL);
     ShowWindow(hwnd, SW_SHOW);

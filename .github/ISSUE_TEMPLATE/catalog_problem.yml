@@ -1,6 +1,6 @@
 name: Catalog problem
 description: A quest game is missing from the featured games, or the wrong executable is chosen for it
-labels: [catalog]
+labels: [enhancement]
 body:
   - type: input
     id: game

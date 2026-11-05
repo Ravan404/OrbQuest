@@ -45,8 +45,8 @@ const DIRECT_REFRESH_INTERVAL_MS = 24 * 60 * 60 * 1000;
 /** Discord's full list is about 13 MB. */
 const DIRECT_MAX_BYTES = 64 * 1024 * 1024;
 
-/** `DQR_DATABASE_REFRESH=1` forces a check at start, `=0` disables it (DQR_REDDIT_CACHE_REFRESH, the 1.3.0 name, still works). */
-const REFRESH_MODE = (process.env.DQR_DATABASE_REFRESH ?? process.env.DQR_REDDIT_CACHE_REFRESH ?? '').trim();
+/** `ORBQUEST_DATABASE_REFRESH=1` forces a check at start, `=0` disables it. */
+const REFRESH_MODE = (process.env.ORBQUEST_DATABASE_REFRESH ?? '').trim();
 
 interface LocalFile {
   /** Last successful check (published copy or Discord). */
@@ -75,10 +75,6 @@ let _byFile = new Map<string, DatabaseGame[]>();
 let _persist = false;
 let _refreshing = false;
 let _refreshTimer: NodeJS.Timeout | undefined;
-
-// ---------------------------------------------------------------------------
-// Load
-// ---------------------------------------------------------------------------
 
 function isNewer(candidate: string | undefined, than: string): boolean {
   return (
@@ -173,10 +169,6 @@ export function loadGameDatabase(): void {
   );
 }
 
-// ---------------------------------------------------------------------------
-// Lookup
-// ---------------------------------------------------------------------------
-
 export function getGameById(id: string | undefined): DatabaseGame | undefined {
   return id ? _byId.get(id) : undefined;
 }
@@ -268,10 +260,6 @@ export function getGameDatabaseInfo(): GameDatabaseInfo {
     checkedAt: _checkedAt,
   };
 }
-
-// ---------------------------------------------------------------------------
-// Update
-// ---------------------------------------------------------------------------
 
 function isOlderThan(timestamp: string, ms: number): boolean {
   return !timestamp || Number.isNaN(Date.parse(timestamp)) || Date.now() - Date.parse(timestamp) > ms;

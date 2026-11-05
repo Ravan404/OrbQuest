@@ -1,6 +1,6 @@
-; Inno Setup script for OrbQuest-Setup-<version>.exe. build_windows_exe.bat
+; Inno Setup script for OrbQuest-Setup-<version>.exe. scripts\build-windows.bat
 ; runs it after PyInstaller has made release\OrbQuest\:
-;     ISCC.exe /DAppVersion=1.6.0 installer\OrbQuest.iss
+;     ISCC.exe /DAppVersion=1.6.0 desktop\OrbQuest.iss
 ;
 ; Installs for the current user only (no administrator rights) into
 ; %LOCALAPPDATA%\Programs\OrbQuest, with a Start menu entry and an entry under
@@ -9,7 +9,7 @@
 ; again when it is done.
 
 #ifndef AppVersion
-  #error Pass the version: ISCC.exe /DAppVersion=1.6.0 installer\OrbQuest.iss
+  #error Pass the version: ISCC.exe /DAppVersion=1.6.0 desktop\OrbQuest.iss
 #endif
 
 [Setup]

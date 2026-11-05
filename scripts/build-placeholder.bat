@@ -1,8 +1,6 @@
 @echo off
-rem ---------------------------------------------------------------------------
-rem Rebuilds placeholder_runtime.exe from placeholder_runtime.c and
-rem placeholder_runtime.rc with MinGW-w64 (gcc + windres on PATH, for example
-rem from MSYS2: pacman -S mingw-w64-x86_64-gcc).
+rem Rebuilds placeholder\placeholder_runtime.exe from its .c and .rc files with
+rem MinGW-w64 (gcc and windres on PATH).
 rem
 rem The program has no C runtime: it starts at wWinMainCRTStartup and links
 rem only kernel32, user32 and gdi32. verify-dist checks that the PE stack
@@ -17,7 +15,6 @@ rem
 rem After a rebuild, add the SHA-256 of the OLD placeholder_runtime.exe to
 rem LEGACY_SHA256_HASHES in src/server/placeholderUpgrade.ts, so placeholders
 rem already copied into users' Games folders are upgraded to the new one.
-rem ---------------------------------------------------------------------------
 setlocal
 set "ROOT=%~dp0.."
 cd /d "%ROOT%"
@@ -32,7 +29,7 @@ where windres >nul 2>nul || (
 )
 
 if not exist build mkdir build
-windres placeholder_runtime.rc -O coff -o build\placeholder_runtime.res.o
+windres placeholder\placeholder_runtime.rc -O coff -o build\placeholder_runtime.res.o
 if errorlevel 1 exit /b 1
 
 gcc -O2 -municode -mwindows -nostdlib -ffreestanding -fno-builtin ^
@@ -41,11 +38,11 @@ gcc -O2 -municode -mwindows -nostdlib -ffreestanding -fno-builtin ^
   -Xlinker --stack -Xlinker 0x100000,0x20000 -Wl,--dynamicbase -Wl,--nxcompat -Wl,--high-entropy-va ^
   -Wl,--no-insert-timestamp ^
   -s -o build\placeholder_runtime.exe ^
-  placeholder_runtime.c build\placeholder_runtime.res.o ^
+  placeholder\placeholder_runtime.c build\placeholder_runtime.res.o ^
   -lkernel32 -luser32 -lgdi32 -lgcc
 if errorlevel 1 exit /b 1
 
-for /f %%h in ('powershell -NoProfile -Command "(Get-FileHash placeholder_runtime.exe -Algorithm SHA256).Hash.ToLower()"') do set "OLD_HASH=%%h"
+for /f %%h in ('powershell -NoProfile -Command "(Get-FileHash placeholder\placeholder_runtime.exe -Algorithm SHA256).Hash.ToLower()"') do set "OLD_HASH=%%h"
 for /f %%h in ('powershell -NoProfile -Command "(Get-FileHash build\placeholder_runtime.exe -Algorithm SHA256).Hash.ToLower()"') do set "NEW_HASH=%%h"
 if /i "%~1"=="--check" (
   if /i "%OLD_HASH%"=="%NEW_HASH%" (
@@ -57,7 +54,7 @@ if /i "%~1"=="--check" (
   echo         built:     %NEW_HASH%
   exit /b 1
 )
-copy /y build\placeholder_runtime.exe placeholder_runtime.exe >nul
+copy /y build\placeholder_runtime.exe placeholder\placeholder_runtime.exe >nul
 if errorlevel 1 exit /b 1
 
 echo.

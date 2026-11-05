@@ -1,7 +1,6 @@
 /**
- * Tiny, dependency-free helpers that decide when a typed name matches a game
- * name: "helldivers 2" finds "HELLDIVERS™ 2", and a short query only matches
- * at the start of a word.
+ * Decides when a typed name matches a game name: "helldivers 2" finds
+ * "HELLDIVERS™ 2", and a short query only matches at the start of a word.
  */
 
 /** Trademark-style marks that Steam store names carry but nobody types. */
@@ -17,9 +16,8 @@ function text(value: unknown): string {
  * Comparison key of a game name: trademark marks removed, accents folded,
  * lower-cased and reduced to `[a-z0-9]`.
  *
- * The marks are stripped BEFORE the Unicode normalization on purpose: NFKD
- * turns "™" into the letters "TM", which used to make "Battlefield™ 6" invisible
- * to a "battlefield 6" query.
+ * The marks are stripped before normalizing: NFKD turns "™" into the letters
+ * "TM", and "Battlefield™ 6" would not match "battlefield 6".
  */
 export function normalizeGameKey(value: unknown): string {
   return text(value)

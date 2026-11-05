@@ -4,7 +4,7 @@
  * returned) right at the start and then every six hours; a failed check is
  * tried again after ten minutes. Installing it is updateInstall.ts.
  *
- *   DQR_UPDATE_CHECK=0   never ask (DQR_OFFLINE=1 also turns it off)
+ *   ORBQUEST_UPDATE_CHECK=0   never ask (ORBQUEST_OFFLINE=1 also turns it off)
  */
 
 import { OFFLINE } from './config.ts';
@@ -113,7 +113,7 @@ export function availableUpdate(): UpdateInfo | null {
 }
 
 export function scheduleUpdateChecks(): void {
-  if (OFFLINE || process.env.DQR_UPDATE_CHECK === '0') return;
+  if (OFFLINE || process.env.ORBQUEST_UPDATE_CHECK === '0') return;
   const run = async () => {
     const answered = await checkForUpdate();
     setTimeout(run, answered ? CHECK_INTERVAL_MS : RETRY_INTERVAL_MS).unref();

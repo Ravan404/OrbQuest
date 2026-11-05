@@ -136,17 +136,17 @@ export function launchGame(req: Request<IdParams>, res: Response) {
   const childEnvironment = withoutSecrets();
   const launchEnv = {
     ...childEnvironment,
-    DQR_GAME_NAME: game.name,
-    DQR_TARGET_SECONDS: String(prefs.targetMinutes * 60),
-    DQR_BUFFER_START: String(config.start),
-    DQR_BUFFER_END: String(config.end),
-    DQR_RESUME_SECONDS: String(game.elapsedSeconds),
-    DQR_LAUNCHED_AT: String(Date.now()),
+    ORBQUEST_GAME_NAME: game.name,
+    ORBQUEST_TARGET_SECONDS: String(prefs.targetMinutes * 60),
+    ORBQUEST_BUFFER_START: String(config.start),
+    ORBQUEST_BUFFER_END: String(config.end),
+    ORBQUEST_RESUME_SECONDS: String(game.elapsedSeconds),
+    ORBQUEST_LAUNCHED_AT: String(Date.now()),
     // The placeholder window uses the app's light or dark theme.
-    DQR_THEME: getSettings().theme,
+    ORBQUEST_THEME: getSettings().theme,
   };
   try {
-    const pyRuntimePath = path.resolve(ASSET_ROOT, 'placeholder_runtime.py');
+    const pyRuntimePath = path.resolve(ASSET_ROOT, 'placeholder', 'placeholder_runtime.py');
     const usePosixPlaceholderFallback =
       process.platform !== 'win32' &&
       executablePath.toLowerCase().endsWith('.exe') &&

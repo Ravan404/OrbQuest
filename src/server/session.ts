@@ -1,10 +1,10 @@
 /**
  * The desktop window's session. The desktop app (desktop_app.py) makes a new
- * random token on every start and gives it to the server as DQR_API_TOKEN.
+ * random token on every start and gives it to the server as ORBQUEST_API_TOKEN.
  * The window first opens `/session?token=...`, which turns the token into a
  * cookie only that window holds; from then on every `/api` request needs
  * it. Another program on the PC does not know the token, so it cannot start
- * or remove games through the API. Without DQR_API_TOKEN (development, tests)
+ * or remove games through the API. Without ORBQUEST_API_TOKEN (development, tests)
  * there is no check.
  */
 
@@ -30,11 +30,11 @@ export function readCookie(header: string | undefined, name: string): string | u
   return undefined;
 }
 
-const token = () => process.env.DQR_API_TOKEN?.trim() ?? '';
+const token = () => process.env.ORBQUEST_API_TOKEN?.trim() ?? '';
 
 /** The environment for a program the server starts: without the desktop app's tokens. */
 export function withoutSecrets(env: NodeJS.ProcessEnv = process.env): NodeJS.ProcessEnv {
-  const { DQR_SHUTDOWN_TOKEN: _shutdown, DQR_API_TOKEN: _api, ...rest } = env;
+  const { ORBQUEST_SHUTDOWN_TOKEN: _shutdown, ORBQUEST_API_TOKEN: _api, ...rest } = env;
   return rest;
 }
 

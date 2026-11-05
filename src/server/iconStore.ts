@@ -12,9 +12,9 @@ import path from 'node:path';
 import { OFFLINE, PROJECT_ROOT } from './config.ts';
 import type { DatabaseGame } from './gameDatabaseSource.ts';
 
-/** Network lookup failures are expected offline; printed only with DQR_DEBUG=1. */
+/** Network lookup failures are expected offline; printed only with ORBQUEST_DEBUG=1. */
 const debugLog = (...args: unknown[]): void => {
-  if (process.env.DQR_DEBUG) console.debug(...args);
+  if (process.env.ORBQUEST_DEBUG) console.debug(...args);
 };
 
 export const CACHED_ICON_URL_PREFIX = '/game-icons-cache/';
@@ -205,10 +205,6 @@ export function createIconStore(options: IconStoreOptions): IconStore {
     },
   };
 }
-
-// ---------------------------------------------------------------------------
-// Application instance
-// ---------------------------------------------------------------------------
 
 export const ICON_CACHE_DIR = path.join(PROJECT_ROOT, 'icon-cache');
 

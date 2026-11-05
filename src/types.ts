@@ -7,9 +7,7 @@ export const FINAL_SAFETY_MARGIN_SECONDS = 10;
 export const MAX_QUEST_TARGET_MINUTES = 1440;
 
 /**
- * Where a library entry came from. Persisted per game folder in
- * `.game-meta.json` so a manually added ("custom") entry stays visually
- * distinct from one added through the online catalog.
+ * Where a library entry came from, saved per game folder in `.game-meta.json`.
  */
 export type GameOrigin = 'custom' | 'catalog' | 'scanned';
 
@@ -30,11 +28,11 @@ export interface Game {
   warmupRemainingSeconds?: number;
   completed?: boolean;
   elapsedSeconds: number;
-  targetMinutes?: number; // Target timer in minutes (e.g. 15, or 0 for unlimited)
-  bufferPreset?: BufferPreset; // Post-spawn detection preset
-  autoStop?: boolean; // Whether to automatically stop runner when target is reached
-  origin?: GameOrigin; // custom | catalog | scanned
-  addedAt?: string; // ISO timestamp of when the entry was created
+  targetMinutes?: number;
+  bufferPreset?: BufferPreset;
+  autoStop?: boolean;
+  origin?: GameOrigin;
+  addedAt?: string;
   specialRootPath?: string;
   steamAppId?: number;
 }

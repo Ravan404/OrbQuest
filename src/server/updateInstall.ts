@@ -1,6 +1,6 @@
 /**
  * Installs a newer release from inside the app. The desktop app tells the
- * server how it runs (DQR_INSTALL_KIND, desktop_app.py):
+ * server how it runs (ORBQUEST_INSTALL_KIND, desktop_app.py):
  *
  *   installed   OrbQuest-Setup-<version>.exe is downloaded to <data>/update/
  *   portable    OrbQuest-<version>.exe is downloaded next to the running exe
@@ -43,7 +43,7 @@ let download: DownloadState = { state: 'idle' };
 
 /** How this copy of OrbQuest runs; undefined outside the desktop app. */
 export function installKind(): InstallKind | undefined {
-  const kind = process.env.DQR_INSTALL_KIND;
+  const kind = process.env.ORBQUEST_INSTALL_KIND;
   return kind === 'installed' || kind === 'portable' ? kind : undefined;
 }
 
@@ -56,11 +56,11 @@ export function updateFileName(kind: InstallKind, version: string): string {
 export function canInstall(update: UpdateInfo | null): boolean {
   const kind = installKind();
   if (!update || !kind || !update.assets) return false;
-  if (kind === 'portable' && !process.env.DQR_APP_EXE) return false;
+  if (kind === 'portable' && !process.env.ORBQUEST_APP_EXE) return false;
   return Boolean(update.assets[updateFileName(kind, update.version)] && update.assets['SHA256SUMS.txt']);
 }
 
-/** `<sha256>  <file>` lines (`sha256sum` and certutil style) as a map. */
+/** `<sha256>  <file>` lines, as sha256sum writes them, as a map. */
 export function parseChecksums(text: string): Map<string, string> {
   const sums = new Map<string, string>();
   for (const line of text.split(/\r?\n/)) {
@@ -77,7 +77,7 @@ export function downloadState(): DownloadState {
 /** Where the file goes: the update folder, or next to the portable exe. */
 function targetFor(kind: InstallKind, fileName: string): string {
   if (kind === 'installed') return path.join(UPDATE_DIR(), fileName);
-  return path.join(path.dirname(process.env.DQR_APP_EXE ?? ''), fileName);
+  return path.join(path.dirname(process.env.ORBQUEST_APP_EXE ?? ''), fileName);
 }
 
 async function fetchChecked(url: string, fetchImpl: typeof fetch): Promise<Response> {

@@ -6,3 +6,7 @@
 *.jpg binary
 *.ico binary
 *.exe binary
+
+# Generated data does not count as the project's code on GitHub.
+data/** linguist-generated
+src/server/gameDatabase.json linguist-generated

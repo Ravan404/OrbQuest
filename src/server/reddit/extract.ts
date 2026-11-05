@@ -5,35 +5,18 @@
  * itself never reads Reddit.
  */
 
-export interface UnifiedMatch {
-  title: string;
-  /** Clean resolved title of this result; used as the library name when added. */
+export interface ExtractedMatch {
   gameName?: string;
   url: string;
   folderPath: string;
   executableName: string;
-  hasFolder: boolean;
-  inLibrary: boolean;
-  source: 'verified' | 'pcgw' | 'steam' | 'steam-manifest' | 'reddit' | 'web';
   questMethod?: 'process' | 'steam-manifest';
   steamAppId?: number;
   manifestFileName?: string;
   manifestContent?: string;
   confidence: 'verified' | 'high' | 'medium' | 'experimental';
   notes?: string;
-  logoUrl?: string;
-  isPrimary?: boolean;
-  /** Where this result came from: the local quest database or a live Reddit search. */
-  foundVia?: 'database' | 'online';
-  /** A database result that a live Reddit search returned as well. */
-  onlineConfirmed?: boolean;
 }
-
-/**
- * `database` answers from the local quest database and only asks Reddit when
- * the database has nothing for the game. `online` ("Search Reddit") always runs
- * a live Reddit search and adds what it finds below the database results.
- */
 
 // Disallowed or generic executable names to filter out false positives
 const BANNED_EXECUTABLES = new Set([
@@ -85,10 +68,6 @@ const BANNED_EXECUTABLES = new Set([
   'lpt8.exe',
   'lpt9.exe',
 ]);
-
-// ---------------------------------------------------------------------------
-// Path / executable extraction helpers
-// ---------------------------------------------------------------------------
 
 /** Characters allowed inside a Windows path segment (spaces included). */
 const PATH_SEGMENT_CHARS = String.raw`A-Za-z0-9_ .()+\-'&`;
@@ -460,14 +439,9 @@ const QUOTED_VALUE = (key: string): RegExp =>
   new RegExp(`["']${key}["']\\s*["']([^"']*(?:'(?=[A-Za-z])[^"']*)*)["']`, 'i');
 
 /**
- * Extracts candidate .exe and folder from freeform text with advanced heuristic parsing.
+ * The executable and folder in a post's text, or null.
  */
-export function extractMatchesFromText(
-  text: string,
-  title: string,
-  url: string,
-  source: 'reddit' | 'web' | 'pcgw' = 'web'
-): UnifiedMatch | null {
+export function extractMatchesFromText(text: string, url: string): ExtractedMatch | null {
   if (!text) return null;
   if (text.length > MAX_SCAN_LENGTH) text = text.slice(0, MAX_SCAN_LENGTH);
 
@@ -478,10 +452,7 @@ export function extractMatchesFromText(
   const manifestMatch = normalizedText.match(/appmanifest_(\d+)\.acf/i);
   const installDirMatch = normalizedText.match(QUOTED_VALUE('installdir'));
   const hasManifestTemplate =
-    source === 'reddit' &&
-    manifestMatch &&
-    installDirMatch &&
-    /appstate|steamapps\s*[\\/]\s*common|stateflags/i.test(normalizedText);
+    manifestMatch && installDirMatch && /appstate|steamapps\s*[\\/]\s*common|stateflags/i.test(normalizedText);
   if (hasManifestTemplate) {
     const exeMatchFromManifest = normalizedText.match(/\b([A-Za-z0-9_.-]+\.exe)\b/i);
     const executableName = exeMatchFromManifest?.[1];
@@ -501,14 +472,10 @@ export function extractMatchesFromText(
     "installdir"        "${installDir}"
 }`;
       return {
-        title: title.trim(),
         gameName: installDir,
         url: sanitizeSourceUrl(url),
         folderPath: `steamapps\\common\\${installDir}`,
         executableName,
-        hasFolder: true,
-        inLibrary: false,
-        source: 'steam-manifest',
         questMethod: 'steam-manifest',
         steamAppId: appId,
         manifestFileName: `appmanifest_${appId}.acf`,
@@ -519,19 +486,15 @@ export function extractMatchesFromText(
     }
   }
 
-  // 1. Look for a full path ending in .exe, e.g. C:\\Games\\Foo\\Bar.exe or
-  //    Folder/Subfolder/Game.exe. See FULL_PATH_REGEX above for the rules that
-  //    keep prose out of the match.
+  // A full path ending in .exe (see FULL_PATH_REGEX).
   const pathMatch = findBestPath(text);
 
-  // 2. Look for a standalone .exe file NAME (no spaces, no separators).
-  //    NOTE: the class must not contain whitespace - otherwise the regex
-  //    captures the words preceding the file name ("run setup.exe") and the
-  //    banned-executable check below no longer matches.
+  // A standalone file name. The class has no whitespace, or it would capture the
+  // words before the name ("run setup.exe") and miss the banned list below.
   const exeRegex = /\b([A-Za-z0-9_.-]+\.exe)\b/i;
   const exeMatch = text.match(exeRegex);
 
-  // 3. Look for directory or folder hint
+  // A directory or folder hint
   const folderRegex = /(?:folder|directory|path|install\s*dir|location)\s*[:=-]\s*([^\r\n<>"]+)/im;
   const folderMatch = text.match(folderRegex);
 
@@ -548,7 +511,6 @@ export function extractMatchesFromText(
     if (exeMatch) executableName = exeMatch[1].trim();
   }
 
-  // Clean trailing punctuation
   executableName = executableName.replace(/^[(["']+|[)\]"',.:;]+$/g, '').trim();
 
   // Validate executable: it must look like a real file name (not a sentence
@@ -560,15 +522,10 @@ export function extractMatchesFromText(
   const hasFolder = Boolean(folderPath.trim()) && !folderPath.toLowerCase().startsWith('not found');
 
   return {
-    title: title.trim(),
     url: sanitizeSourceUrl(url),
     folderPath: hasFolder ? folderPath : 'Not found',
     executableName,
-    hasFolder,
-    inLibrary: false,
-    source,
-    confidence: source === 'pcgw' ? 'high' : hasFolder ? 'medium' : 'experimental',
-    isPrimary: true,
+    confidence: hasFolder ? 'medium' : 'experimental',
   };
 }
 

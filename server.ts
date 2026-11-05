@@ -30,19 +30,11 @@ function shutdownHandler() {
   setTimeout(() => process.exit(0), 1000);
 }
 
-// ---------------------------------------------------------------
-// Middleware
-// ---------------------------------------------------------------
-
 /**
- * Content-Security-Policy for the packaged app.
- *
- * `style-src` keeps `'unsafe-inline'` because React writes the timer progress
- * width through inline style attributes, and `img-src` allows Discord's CDN
- * because game icons come from there until they are saved. Everything
- * else is locked to same-origin. Applied in production builds only: the dev
- * server injects the Vite client, which needs a WebSocket connection that
- * `connect-src 'self'` would block.
+ * Content-Security-Policy for production builds. `style-src` allows inline
+ * styles for the timer's progress width, and `img-src` allows Discord's CDN
+ * until icons are saved. The dev server does not get it: the Vite client needs
+ * a WebSocket.
  */
 const CONTENT_SECURITY_POLICY = [
   "default-src 'self'",
@@ -69,8 +61,7 @@ app.use((_req, res, next) => {
   next();
 });
 
-// DNS-rebinding & Localhost CSRF defence: only loopback (or explicitly allowed)
-// hostnames and same-site origins may talk to the API.
+// Only loopback hostnames (or allowed ones) and same-site origins may talk to the API.
 app.use((req, res, next) => {
   if (!isAllowedRequestHost(req.hostname)) {
     console.warn(`Blocked request with untrusted Host header "${req.get('host')}".`);
@@ -83,7 +74,7 @@ app.use((req, res, next) => {
   next();
 });
 
-// Simple rate limiting for the network-backed endpoints
+// For the endpoints that can reach the network.
 const checkRateLimit = createRateLimiter(RATE_LIMIT_MAX_REQUESTS);
 const rateLimited = (req: express.Request, res: express.Response, next: express.NextFunction) => {
   const clientIp = req.ip || req.socket.remoteAddress || 'unknown';
@@ -92,10 +83,6 @@ const rateLimited = (req: express.Request, res: express.Response, next: express.
   }
   next();
 };
-
-// ---------------------------------------------------------------
-// API Routes
-// ---------------------------------------------------------------
 
 // Only the desktop window may use the API (session.ts).
 app.get('/session', startSession);
@@ -134,23 +121,23 @@ app.post('/api/open-games-folder', rateLimited, (_req, res) => {
     res.status(500).json({ error: 'Could not open the folder.' });
   }
 });
-// Desktop-only control endpoints. The nonce is NOT returned to the browser.
-// They also prevent the launcher from mistaking another service on a raced
-// ephemeral port for its own backend. Without the token both routes are 404.
+// Desktop-only control endpoints. Their token never reaches the browser, and it
+// keeps another service on a raced port from passing for the backend. Without
+// the token both routes are 404.
 function desktopAuthorized(req: express.Request): boolean {
-  const expected = process.env.DQR_SHUTDOWN_TOKEN;
+  const expected = process.env.ORBQUEST_SHUTDOWN_TOKEN;
   const remote = req.socket.remoteAddress;
   if (!expected || !['127.0.0.1', '::1', '::ffff:127.0.0.1'].includes(remote || '')) return false;
-  return sameSecret(req.get('X-DQR-Shutdown-Token') || '', expected);
+  return sameSecret(req.get('X-OrbQuest-Shutdown-Token') || '', expected);
 }
 app.get('/api/internal/ready', (req, res) => {
-  if (!process.env.DQR_SHUTDOWN_TOKEN) return res.sendStatus(404);
+  if (!process.env.ORBQUEST_SHUTDOWN_TOKEN) return res.sendStatus(404);
   if (!desktopAuthorized(req)) return res.sendStatus(403);
   res.json({ ok: true });
 });
 // TerminateProcess on Windows skips signal handlers and would orphan games.
 app.post('/api/internal/shutdown', (req, res) => {
-  if (!process.env.DQR_SHUTDOWN_TOKEN) return res.sendStatus(404);
+  if (!process.env.ORBQUEST_SHUTDOWN_TOKEN) return res.sendStatus(404);
   if (!desktopAuthorized(req)) return res.sendStatus(403);
   res.json({ success: true });
   setImmediate(shutdownHandler);
@@ -158,10 +145,6 @@ app.post('/api/internal/shutdown', (req, res) => {
 app.use('/api/games', gamesRouter);
 app.use('/api/catalog', rateLimited, catalogRouter);
 app.use('/api/settings', settingsRouter);
-
-// ---------------------------------------------------------------
-// Boot + Vite middleware / static serving
-// ---------------------------------------------------------------
 
 async function startServer() {
   await initGameStore();
@@ -185,17 +168,13 @@ async function startServer() {
     const distPath = path.join(ASSET_ROOT, 'dist');
     const indexPath = path.join(distPath, 'index.html');
     /**
-     * `npm run build` writes the frontend bundle AND the esbuild server bundle
-     * into the same `dist/` folder. Serving the latter would hand the entire
-     * backend implementation to anyone who can reach the app, and
-     * `server.cjs.map` even embeds the original TypeScript sources
-     * (`sourcesContent`). The game database is baked into server.cjs; its
-     * JSON files (and those an older build left in dist/) are refused as well.
+     * `npm run build` writes the frontend and `server.cjs` into the same `dist/`
+     * folder, so the backend bundle, its sourcemap and the database files are
+     * refused here.
      */
     const isBackendArtifact = (requestPath: string): boolean => {
-      // `req.path` is still percent-encoded while `send` decodes it before
-      // touching the disk, so BOTH forms must be checked: "/server%2Ecjs"
-      // otherwise slips past the guard and serves the whole backend bundle.
+      // `req.path` is still percent-encoded and `send` decodes it, so both forms are
+      // checked: "/server%2Ecjs" would otherwise be served.
       let decoded = requestPath;
       try {
         decoded = decodeURIComponent(requestPath);
@@ -238,7 +217,6 @@ async function startServer() {
     });
   }
 
-  // Error handling middleware to catch any stream or route errors
   app.use((err: unknown, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
     const status = (err as { status?: number; statusCode?: number } | null) ?? {};
     if (status.status === 404 || status.statusCode === 404) {

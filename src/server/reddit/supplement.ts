@@ -19,7 +19,7 @@ import {
   type DatabaseGame,
   type SteamQuest,
 } from '../gameDatabaseSource.ts';
-import type { RedditCacheEntry } from './dataset.ts';
+import type { RedditEntry } from './dataset.ts';
 import { extractInstallDir } from './extract.ts';
 
 /**
@@ -36,7 +36,7 @@ const PROGRAM_SITES: Record<string, string> = {
  * `steamapps\common\EA SPORTS FC 27` + `fc27.exe`, or with subfolders
  * `...\Toxic Commando Demo\client_pc\root\bin\pc` + `toxic commando.exe`.
  */
-function steamQuestOf(entry: RedditCacheEntry): { steam: SteamQuest; executable: string } | undefined {
+function steamQuestOf(entry: RedditEntry): { steam: SteamQuest; executable: string } | undefined {
   if (entry.questMethod !== 'steam-manifest' || !entry.steamAppId) return undefined;
   const fromManifest = /"installdir"\s+"([^"]+)"/i.exec(entry.manifestContent || '')?.[1];
   const installDir = safeInstallDir(fromManifest ?? extractInstallDir(entry.folderPath));
@@ -64,7 +64,7 @@ function redditId(key: string): string {
 }
 
 export function buildRedditSupplement(
-  entries: readonly RedditCacheEntry[],
+  entries: readonly RedditEntry[],
   discordList: readonly unknown[],
   discordGames: readonly DatabaseGame[]
 ): DatabaseGame[] {
