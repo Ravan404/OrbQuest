@@ -1,5 +1,9 @@
 # Security
 
+## Supported versions
+
+Only the latest release gets fixes. OrbQuest 1.6.0 and newer update themselves from inside the app.
+
 ## Reporting a problem
 
 Please do not open a public issue for a security problem. Use **Report a vulnerability** on the repository's Security tab (GitHub private vulnerability reporting). Say what you found, how to reproduce it and which version you used. You will get an answer within a week.

@@ -70,6 +70,7 @@ try {
   $install = Start-Process $setup -ArgumentList '/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART', "/DIR=$app", '/TASKS=' -PassThru -Wait
   if ($install.ExitCode -ne 0) { throw "The installer failed with exit code $($install.ExitCode)." }
   if (-not (Test-Path (Join-Path $app 'OrbQuest.exe'))) { throw 'The installer did not install OrbQuest.exe.' }
+  if (-not (Test-Path (Join-Path $app '_internal\placeholder\placeholder_runtime.exe'))) { throw 'The installed files have no placeholder.' }
   Write-Host "OrbQuest-Setup-$version.exe installs."
 
   Test-Start (Join-Path $app 'OrbQuest.exe') 'Installed OrbQuest'

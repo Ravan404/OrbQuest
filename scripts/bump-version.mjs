@@ -1,14 +1,14 @@
 #!/usr/bin/env node
 /**
- *   npm run bump-version -- 1.4.0
+ *   npm run bump-version -- 1.7.0
  *
  * Writes one version number into every file that carries it:
  *   package.json, package-lock.json (two fields), src/version.ts,
  *   desktop/desktop_app.py (APP_VERSION), scripts/build-windows.bat (the "Version:" banner).
  * placeholder/placeholder_runtime.rc keeps its own version: the placeholder exe only
  * changes when placeholder_runtime.c does (scripts/build-placeholder.bat).
- * The CHANGELOG [Unreleased] heading becomes the new version (an empty section
- * is added when there is none).
+ * The notes under the CHANGELOG [Unreleased] heading become the new version's,
+ * and the links at the end of the file follow.
  *
  * Nothing is written unless every file has the expected old value, so a
  * half-edited checkout is reported instead of silently patched.
@@ -93,20 +93,21 @@ for (const edit of edits) {
 }
 
 const changelogPath = path.join(root, 'CHANGELOG.md');
-const changelog = fs.readFileSync(changelogPath, 'utf8');
+let changelog = fs.readFileSync(changelogPath, 'utf8');
 const heading = `## [${next}]`;
 const today = new Date().toISOString().slice(0, 10);
-if (changelog.includes('## [Unreleased]') && !changelog.includes(heading)) {
+if (changelog.includes(heading)) {
+  console.log(`  CHANGELOG already has ${heading}`);
+} else {
   // The notes collected under [Unreleased] become the new version's notes.
-  fs.writeFileSync(changelogPath, changelog.replace('## [Unreleased]', `${heading} — ${today}`), 'utf8');
+  changelog = changelog.replace('## [Unreleased]', `## [Unreleased]\n\n${heading} — ${today}`);
+  const repository = 'https://github.com/Ravan404/OrbQuest';
+  changelog = changelog.replace(
+    /^\[Unreleased\]: .*$/m,
+    `[Unreleased]: ${repository}/compare/v${next}...HEAD\n[${next}]: ${repository}/compare/v${current}...v${next}`
+  );
+  fs.writeFileSync(changelogPath, changelog, 'utf8');
   console.log(`  CHANGELOG: [Unreleased] is now ${heading} — ${today}`);
-} else if (!changelog.includes(heading)) {
-  const section = `${heading} — ${today}\n\n- (describe the changes)\n\n`;
-  const marker = changelog.indexOf('## [');
-  const updated =
-    marker === -1 ? `${changelog}\n${section}` : `${changelog.slice(0, marker)}${section}${changelog.slice(marker)}`;
-  fs.writeFileSync(changelogPath, updated, 'utf8');
-  console.log(`  added a CHANGELOG section for ${next} - replace the placeholder text before release`);
 }
 
 console.log(`\nVersion ${current} -> ${next}. Run "npm run build" and "npm run verify:dist" to check.`);

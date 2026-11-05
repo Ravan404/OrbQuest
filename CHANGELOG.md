@@ -1,6 +1,20 @@
 # Changelog
 
+Notable changes to OrbQuest. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow [Semantic Versioning](https://semver.org/). Versions before 1.3.0 were called DiscordQuestRun.
+
 ## [Unreleased]
+
+## [1.6.1] — 2026-11-05
+
+### Added
+
+- A code of conduct, a feature request template, and release notes that list what changed in the version.
+
+### Changed
+
+- The README is now about using the app, with a current screenshot and answers to common questions. The details moved to `docs/`: how it works, configuration and development.
+- The settings variables start with `ORBQUEST_` instead of `DQR_`. The older `DISCORD_QUEST_ROOT`, `DISCORD_QUEST_ASSET_ROOT` and `DQR_REDDIT_CACHE_REFRESH` are gone. Placeholders in existing libraries are upgraded on their next start.
+- The repository is tidier: the desktop app and its packaging are in `desktop/`, the placeholder in `placeholder/`, and `build_windows_exe.bat` is now `scripts/build-windows.bat`.
 
 ## [1.6.0] — 2026-11-03
 
@@ -286,3 +300,10 @@
 ## [1.0.0]
 
 - First release: library, placeholder process, quest timer, catalog, Reddit search, Windows shell.
+
+[Unreleased]: https://github.com/Ravan404/OrbQuest/compare/v1.6.1...HEAD
+[1.6.1]: https://github.com/Ravan404/OrbQuest/compare/v1.6.0...v1.6.1
+[1.6.0]: https://github.com/Ravan404/OrbQuest/compare/v1.5.1...v1.6.0
+[1.5.1]: https://github.com/Ravan404/OrbQuest/compare/v1.5.0...v1.5.1
+[1.5.0]: https://github.com/Ravan404/OrbQuest/compare/v1.4.0...v1.5.0
+[1.4.0]: https://github.com/Ravan404/OrbQuest/releases/tag/v1.4.0
