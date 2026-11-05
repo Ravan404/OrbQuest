@@ -86,6 +86,23 @@ export interface UpdateInfo {
   url: string;
 }
 
+/** The download of an update the app installs itself (src/server/updateInstall.ts). */
+export interface UpdateDownload {
+  state: 'idle' | 'downloading' | 'ready' | 'failed';
+  version?: string;
+  received?: number;
+  total?: number;
+  error?: string;
+}
+
+/** GET /api/update. */
+export interface UpdateStatus {
+  update: UpdateInfo | null;
+  /** This copy can download and install it itself. */
+  installable: boolean;
+  download: UpdateDownload;
+}
+
 /** Server profile returned by GET /api/profile. */
 export interface AppProfile {
   version: string;

@@ -1,6 +1,7 @@
-import React, { useLayoutEffect, useRef, useState } from 'react';
+import type React from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
 import { RotateCcw } from 'lucide-react';
-import { BufferPreset, BUFFER_PRESET_DURATIONS, Game, MAX_QUEST_TARGET_MINUTES } from '../types';
+import { type BufferPreset, BUFFER_PRESET_DURATIONS, type Game, MAX_QUEST_TARGET_MINUTES } from '../types';
 import type { TimerSettings } from '../api';
 import { clampTargetMinutes } from '../utils/timerUtils';
 import { t } from '../strings';
@@ -56,6 +57,7 @@ export const TimerMenu: React.FC<TimerMenuProps> = ({ game, anchor, onChange, on
 
   return (
     <>
+      {/* biome-ignore lint/a11y/noStaticElementInteractions: a click outside closes the menu; Escape does too. */}
       <div className="fixed inset-0 z-30" onMouseDown={onClose} />
       <div
         ref={menuRef}

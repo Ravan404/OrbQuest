@@ -66,9 +66,23 @@ test('parseTimerPreferences validates every field that is present', () => {
 });
 
 test('mergePolledGames keeps the screen order and takes the server copy', () => {
-  const game = (id: string, targetMinutes: number) => ({ id, name: id, folder: id, executable: `${id}.exe`, isRunning: false, elapsedSeconds: 0, targetMinutes });
-  const merged = mergePolledGames([game('b', 1), game('a', 1), game('gone', 1)], [game('a', 5), game('b', 6), game('new', 7)]);
-  assert.deepEqual(merged.map((g) => g.id), ['b', 'a', 'new']);
+  const game = (id: string, targetMinutes: number) => ({
+    id,
+    name: id,
+    folder: id,
+    executable: `${id}.exe`,
+    isRunning: false,
+    elapsedSeconds: 0,
+    targetMinutes,
+  });
+  const merged = mergePolledGames(
+    [game('b', 1), game('a', 1), game('gone', 1)],
+    [game('a', 5), game('b', 6), game('new', 7)]
+  );
+  assert.deepEqual(
+    merged.map((g) => g.id),
+    ['b', 'a', 'new']
+  );
   assert.equal(merged[0].targetMinutes, 6);
 });
 
@@ -91,7 +105,11 @@ test('start scripts close the game after the card timer and escape the game name
   assert.ok(scripts.py.includes('time.sleep(618)'));
   assert.ok(scripts.py.includes('"Full path to ab.exe: "'));
   assert.equal(scriptFileName({ name: 'EA SPORTS FC 27' }, 'ps1'), 'EA SPORTS FC 27 - OrbQuest.ps1');
-  assert.equal(scriptFileName({ name: 'Who: "Me"?' }, 'bat'), 'Who Me - OrbQuest.bat', 'characters Windows refuses are dropped');
+  assert.equal(
+    scriptFileName({ name: 'Who: "Me"?' }, 'bat'),
+    'Who Me - OrbQuest.bat',
+    'characters Windows refuses are dropped'
+  );
 
   // No limit, or "Stop at the end" off: the scripts only start the game.
   for (const untimed of [{ targetMinutes: 0 }, { targetMinutes: 10, autoStop: false }]) {
@@ -127,28 +145,48 @@ test('the default executable of a catalog game is the game binary, not a helper'
     'win64/marvel.exe',
   ];
   assert.equal(preferredExecutable({ name: 'Marvel Rivals', executables: marvel }), 'win64/marvel-win64-shipping.exe');
-  assert.equal(preferredExecutable({ name: 'Where Winds Meet', executables: ['wwm.exe', 'where winds meet.exe'] }), 'where winds meet.exe');
+  assert.equal(
+    preferredExecutable({ name: 'Where Winds Meet', executables: ['wwm.exe', 'where winds meet.exe'] }),
+    'where winds meet.exe'
+  );
   assert.equal(preferredExecutable({ name: 'One', executables: ['one.exe'] }), 'one.exe');
 });
 
 test('isSafeExecutablePath accepts a file or a relative path inside the game folder only', async () => {
   const { isSafeExecutablePath } = await import('../src/server/security.ts');
   for (const ok of ['game.exe', 'win64/game.exe', 'Binaries\\Win64\\Game.exe']) assert.ok(isSafeExecutablePath(ok), ok);
-  for (const bad of ['../game.exe', 'a/../game.exe', 'C:/game.exe', '/game.exe', 'game.bin', 'con/game.exe', 'a./game.exe', ''])
+  for (const bad of [
+    '../game.exe',
+    'a/../game.exe',
+    'C:/game.exe',
+    '/game.exe',
+    'game.bin',
+    'con/game.exe',
+    'a./game.exe',
+    '',
+  ])
     assert.ok(!isSafeExecutablePath(bad), bad);
 });
 
 test('icons come from Discord, or from the website of a program Discord has none for', async () => {
   const { cacheGameIcon, remoteIconUrl } = await import('../src/server/iconStore.ts');
-  assert.equal(remoteIconUrl({ id: '1', icon: 'a'.repeat(32) }), `https://cdn.discordapp.com/app-icons/1/${'a'.repeat(32)}.png?size=256`);
-  assert.equal(remoteIconUrl({ id: 'r-operagx', site: 'operagx.gg' }), 'https://www.google.com/s2/favicons?domain=operagx.gg&sz=256');
+  assert.equal(
+    remoteIconUrl({ id: '1', icon: 'a'.repeat(32) }),
+    `https://cdn.discordapp.com/app-icons/1/${'a'.repeat(32)}.png?size=256`
+  );
+  assert.equal(
+    remoteIconUrl({ id: 'r-operagx', site: 'operagx.gg' }),
+    'https://www.google.com/s2/favicons?domain=operagx.gg&sz=256'
+  );
   assert.equal(remoteIconUrl({ id: '2' }), undefined);
   // The tests run with DQR_OFFLINE=1: nothing is downloaded.
   assert.equal(await cacheGameIcon({ id: 'r-operagx', site: 'operagx.gg' }), undefined);
 });
 
 test('a newer GitHub release is offered, anything else is not', async () => {
-  const { availableUpdate, checkForUpdate, isNewerVersion, parseLatestRelease } = await import('../src/server/updateCheck.ts');
+  const { availableUpdate, checkForUpdate, isNewerVersion, parseLatestRelease, updateAnswer } = await import(
+    '../src/server/updateCheck.ts'
+  );
   const { APP_VERSION } = await import('../src/version.ts');
   assert.ok(isNewerVersion('1.10.0', '1.9.3'));
   assert.ok(isNewerVersion('v2.0.0', '1.4.0'));
@@ -161,7 +199,10 @@ test('a newer GitHub release is offered, anything else is not', async () => {
   assert.equal(parseLatestRelease({ tag_name: 'v99.0.0', html_url: page, prerelease: true }), null);
   assert.equal(parseLatestRelease({ tag_name: 'v99.0.0', html_url: 'https://evil.example/OrbQuest.exe' }), null);
 
-  const answer = (body: unknown, status = 200) => async () => new Response(JSON.stringify(body), { status });
+  const answer =
+    (body: unknown, status = 200) =>
+    async () =>
+      new Response(JSON.stringify(body), { status });
   assert.equal(availableUpdate(), null);
   await checkForUpdate(answer({ tag_name: `v${APP_VERSION}`, html_url: page }));
   assert.equal(availableUpdate(), null, 'the running version is not an update');
@@ -169,4 +210,41 @@ test('a newer GitHub release is offered, anything else is not', async () => {
   assert.deepEqual(availableUpdate(), { version: '99.0.0', url: page });
   await checkForUpdate(answer({ message: 'rate limited' }, 403));
   assert.deepEqual(availableUpdate(), { version: '99.0.0', url: page }, 'a failed check keeps what was found');
+  assert.equal(await checkForUpdate(answer({}, 500)), false, 'a failed check reports it, so it is retried soon');
+
+  // The window's first question waits for a check that is still running.
+  let reply: (response: Response) => void = () => {};
+  const slow = checkForUpdate(() => new Promise<Response>((resolve) => (reply = resolve)));
+  const answerPromise = updateAnswer(5_000);
+  reply(new Response(JSON.stringify({ tag_name: 'v99.1.0', html_url: page }), { status: 200 }));
+  assert.equal(await slow, true);
+  assert.deepEqual(await answerPromise, { version: '99.1.0', url: page });
+});
+
+test('the icon cache keeps real images only: no SVG, no page that claims to be one', async () => {
+  const fs = await import('node:fs');
+  const os = await import('node:os');
+  const { createIconStore } = await import('../src/server/iconStore.ts');
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'dqr-icons-'));
+  const store = createIconStore({ cacheDir: dir });
+  const png = Buffer.concat([Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]), Buffer.alloc(100)]);
+  const answers: Record<string, [Buffer | string, string]> = {
+    'https://x.test/real.png': [png, 'image/png'],
+    'https://x.test/drawing.svg': [`<svg xmlns="http://www.w3.org/2000/svg">${' '.repeat(100)}</svg>`, 'image/svg+xml'],
+    'https://x.test/page.png': [`<html><script>alert(1)</script>${' '.repeat(100)}</html>`, 'image/png'],
+  };
+  const realFetch = globalThis.fetch;
+  globalThis.fetch = (async (url: string) => {
+    const [body, type] = answers[url];
+    return new Response(typeof body === 'string' ? body : new Uint8Array(body), { headers: { 'content-type': type } });
+  }) as typeof fetch;
+  try {
+    assert.equal(await store.saveRemoteIcon('real', 'https://x.test/real.png'), '/game-icons-cache/real.png');
+    assert.equal(await store.saveRemoteIcon('drawing', 'https://x.test/drawing.svg'), undefined);
+    assert.equal(await store.saveRemoteIcon('page', 'https://x.test/page.png'), undefined);
+    assert.deepEqual(fs.readdirSync(dir), ['real.png']);
+  } finally {
+    globalThis.fetch = realFetch;
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
 });

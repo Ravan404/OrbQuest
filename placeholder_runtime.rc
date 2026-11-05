@@ -1,8 +1,12 @@
 #include <windows.h>
 
+// The placeholder's own version. It changes only when placeholder_runtime.c
+// does: OrbQuest recognises its placeholders by their SHA-256
+// (src/server/placeholderUpgrade.ts), so a rebuild must be deliberate.
+
 VS_VERSION_INFO VERSIONINFO
-FILEVERSION     1,5,1,0
-PRODUCTVERSION  1,5,1,0
+FILEVERSION     1,6,0,0
+PRODUCTVERSION  1,6,0,0
 FILEFLAGSMASK   VS_FFI_FILEFLAGSMASK
 FILEFLAGS       0x0L
 FILEOS          VOS_NT_WINDOWS32
@@ -15,12 +19,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName",      "OrbQuest\0"
             VALUE "FileDescription",  "OrbQuest Local Timer Window\0"
-            VALUE "FileVersion",      "1.5.1.0\0"
+            VALUE "FileVersion",      "1.6.0.0\0"
             VALUE "InternalName",     "placeholder_runtime\0"
             VALUE "LegalCopyright",   "Copyright (c) 2026 OrbQuest. MIT License.\0"
             VALUE "OriginalFilename", "placeholder_runtime.exe\0"
             VALUE "ProductName",      "OrbQuest\0"
-            VALUE "ProductVersion",   "1.5.1.0\0"
+            VALUE "ProductVersion",   "1.6.0.0\0"
         END
     END
     BLOCK "VarFileInfo"

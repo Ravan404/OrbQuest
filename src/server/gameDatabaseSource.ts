@@ -105,14 +105,19 @@ export function toDatabaseGame(raw: unknown): DatabaseGame | null {
   const aliases: string[] = [];
   for (const alias of Array.isArray(app.aliases) ? app.aliases : []) {
     const clean = cleanName(alias);
-    if (clean && clean.toLowerCase() !== name.toLowerCase() && !aliases.some((a) => a.toLowerCase() === clean.toLowerCase())) {
+    if (
+      clean &&
+      clean.toLowerCase() !== name.toLowerCase() &&
+      !aliases.some((a) => a.toLowerCase() === clean.toLowerCase())
+    ) {
       aliases.push(clean);
     }
   }
   const icon = typeof app.icon_hash === 'string' && /^[a-f0-9]{32}$/.test(app.icon_hash) ? app.icon_hash : undefined;
 
   const fromReddit = app.source === 'reddit';
-  const url = fromReddit && typeof app.url === 'string' && /^https:\/\/www\.reddit\.com\//.test(app.url) ? app.url : undefined;
+  const url =
+    fromReddit && typeof app.url === 'string' && /^https:\/\/www\.reddit\.com\//.test(app.url) ? app.url : undefined;
   const steam = fromReddit ? toSteamQuest(app.steam) : undefined;
   const site = fromReddit && !icon ? toSite(app.site) : undefined;
   return {
@@ -155,7 +160,9 @@ function toSite(value: unknown): string | undefined {
 
 /** Sorted by name, the order of the file. */
 export function sortGames(games: DatabaseGame[]): DatabaseGame[] {
-  return [...games].sort((a, b) => a.name.localeCompare(b.name, 'en', { sensitivity: 'base' }) || a.id.localeCompare(b.id));
+  return [...games].sort(
+    (a, b) => a.name.localeCompare(b.name, 'en', { sensitivity: 'base' }) || a.id.localeCompare(b.id)
+  );
 }
 
 /** The compact database for Discord's whole list, sorted by name. */

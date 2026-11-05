@@ -38,4 +38,3 @@ export function parseSimulatedSteamManifest(content: string): SimulatedSteamMani
 export function readSimulatedSteamManifest(filePath: string): SimulatedSteamManifest {
   return parseSimulatedSteamManifest(fs.readFileSync(filePath, 'utf8'));
 }
-

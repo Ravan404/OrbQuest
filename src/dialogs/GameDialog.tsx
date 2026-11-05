@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { Game, MAX_QUEST_TARGET_MINUTES } from '../types';
+import type React from 'react';
+import { useState } from 'react';
+import { type Game, MAX_QUEST_TARGET_MINUTES } from '../types';
 import type { GameDraft } from '../api';
 import { clampTargetMinutes } from '../utils/timerUtils';
 import { t } from '../strings';
@@ -25,6 +26,7 @@ function initialDuration(minutes: number): { duration: Duration; custom: string 
 }
 
 const Field: React.FC<{ label: string; hint?: string; children: React.ReactNode }> = ({ label, hint, children }) => (
+  // biome-ignore lint/a11y/noLabelWithoutControl: the field's input is passed in as children.
   <label className="block space-y-1.5">
     <span className="block text-[12px] font-medium text-muted">{label}</span>
     {children}
@@ -65,8 +67,8 @@ export const GameDialog: React.FC<GameDialogProps> = ({ game, onClose, onSubmit 
         autoStop,
       });
       onClose();
-    } catch (err: any) {
-      setError(err?.message || t('updateFailed'));
+    } catch (err) {
+      setError((err as Error)?.message || t('updateFailed'));
       setBusy(false);
     }
   };
@@ -81,14 +83,22 @@ export const GameDialog: React.FC<GameDialogProps> = ({ game, onClose, onSubmit 
           <Button variant="ghost" onClick={onClose}>
             {t('cancel')}
           </Button>
-          <Button id="custom-game-submit-btn" type="submit" form="game-dialog-form" variant="primary" disabled={!canSubmit}>
+          <Button
+            id="custom-game-submit-btn"
+            type="submit"
+            form="game-dialog-form"
+            variant="primary"
+            disabled={!canSubmit}
+          >
             {busy ? (editing ? t('saving') : t('adding')) : editing ? t('save') : t('addToLibrary')}
           </Button>
         </>
       }
     >
       <form id="game-dialog-form" onSubmit={submit} className="space-y-4">
-        {error && <p className="rounded-md border border-danger/40 bg-danger/8 px-3 py-2 text-[13px] text-danger">{error}</p>}
+        {error && (
+          <p className="rounded-md border border-danger/40 bg-danger/8 px-3 py-2 text-[13px] text-danger">{error}</p>
+        )}
 
         <Field label={t('fieldName')}>
           <TextInput
@@ -153,7 +163,12 @@ export const GameDialog: React.FC<GameDialogProps> = ({ game, onClose, onSubmit 
             </div>
           )}
           <label className="flex items-center gap-2 pt-1 text-[13px] text-muted hover:text-text">
-            <input type="checkbox" checked={autoStop} onChange={(event) => setAutoStop(event.target.checked)} className="h-3.5 w-3.5" />
+            <input
+              type="checkbox"
+              checked={autoStop}
+              onChange={(event) => setAutoStop(event.target.checked)}
+              className="h-3.5 w-3.5"
+            />
             {t('stopAtEnd')}
           </label>
         </div>

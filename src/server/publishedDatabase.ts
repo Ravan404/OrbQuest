@@ -60,7 +60,12 @@ export async function fetchPublishedDatabase(
       if (text.length > MAX_BYTES) continue;
       const database: unknown = JSON.parse(text);
       if (!database || typeof database !== 'object' || !Array.isArray((database as PublishedDatabase).games)) continue;
-      return { status: 'updated', database: database as PublishedDatabase, etag: response.headers.get('etag') || '', url };
+      return {
+        status: 'updated',
+        database: database as PublishedDatabase,
+        etag: response.headers.get('etag') || '',
+        url,
+      };
     } catch {
       // Unreachable, timed out or not JSON: try the next address.
     }

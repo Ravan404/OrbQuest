@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import type React from 'react';
+import { useEffect, useState } from 'react';
 import { Check, Loader2, Plus } from 'lucide-react';
-import { CatalogGame } from '../types';
+import type { CatalogGame } from '../types';
 import { api } from '../api';
 import { t } from '../strings';
 import { preferredExecutable } from '../utils/executables';
@@ -26,67 +27,77 @@ const CatalogTile: React.FC<{
 }> = ({ game, onAdd }) => {
   const [executable, setExecutable] = useState(() => preferredExecutable(game));
   const [busy, setBusy] = useState(false);
+  // A Steam quest writes into Steam's folder, so the first click says so.
+  const [confirmSteam, setConfirmSteam] = useState(false);
   const exeId = `exe-${game.id}`;
 
   return (
-    <div className="flex min-w-0 items-center gap-3 rounded-lg border border-line bg-surface px-3 py-2.5">
-      <GameIcon name={game.name} src={game.icon} size="md" />
-      <div className="min-w-0 flex-1">
-        {/* The labels wrap under a long name instead of squeezing it away. */}
-        <p className="flex min-w-0 flex-wrap items-center gap-x-1.5 gap-y-0.5">
-          <span className="max-w-full truncate text-[13px] font-medium text-text" title={game.name}>
-            {game.name}
-          </span>
-          {game.source === 'reddit' && (
-            <span className="shrink-0" title={t('fromRedditTitle')}>
-              <Chip>{t('fromReddit')}</Chip>
+    <div className="min-w-0 rounded-lg border border-line bg-surface px-3 py-2.5">
+      <div className="flex min-w-0 items-center gap-3">
+        <GameIcon name={game.name} src={game.icon} size="md" />
+        <div className="min-w-0 flex-1">
+          {/* The labels wrap under a long name instead of squeezing it away. */}
+          <p className="flex min-w-0 flex-wrap items-center gap-x-1.5 gap-y-0.5">
+            <span className="max-w-full truncate text-[13px] font-medium text-text" title={game.name}>
+              {game.name}
             </span>
-          )}
-          {game.steam && (
-            <span className="shrink-0" title={t('needsSteamTitle')}>
-              <Chip>{t('needsSteam')}</Chip>
-            </span>
-          )}
-        </p>
-        {game.executables.length > 1 ? (
-          <select
-            id={exeId}
-            aria-label={t('executable')}
-            value={executable}
-            onChange={(event) => setExecutable(event.target.value)}
-            className="mt-0.5 w-full max-w-full truncate rounded border border-line bg-surface font-mono text-[11px] text-faint focus:border-primary focus:outline-none"
-          >
-            {game.executables.map((exe) => (
-              <option key={exe} value={exe}>
-                {exe}
-              </option>
-            ))}
-          </select>
-        ) : (
-          <p className="truncate font-mono text-[11px] text-faint" title={executable}>
-            {executable}
+            {game.source === 'reddit' && (
+              <span className="shrink-0" title={t('fromRedditTitle')}>
+                <Chip>{t('fromReddit')}</Chip>
+              </span>
+            )}
+            {game.steam && (
+              <span className="shrink-0" title={t('needsSteamTitle')}>
+                <Chip>{t('needsSteam')}</Chip>
+              </span>
+            )}
           </p>
+          {game.executables.length > 1 ? (
+            <select
+              id={exeId}
+              aria-label={t('executable')}
+              value={executable}
+              onChange={(event) => setExecutable(event.target.value)}
+              className="mt-0.5 w-full max-w-full truncate rounded border border-line bg-surface font-mono text-[11px] text-faint focus:border-primary focus:outline-none"
+            >
+              {game.executables.map((exe) => (
+                <option key={exe} value={exe}>
+                  {exe}
+                </option>
+              ))}
+            </select>
+          ) : (
+            <p className="truncate font-mono text-[11px] text-faint" title={executable}>
+              {executable}
+            </p>
+          )}
+        </div>
+        {game.inLibrary ? (
+          <Chip tone="run">
+            <Check className="h-3 w-3" />
+            {t('inLibrary')}
+          </Chip>
+        ) : (
+          <Button
+            size="sm"
+            icon={busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Plus className="h-3.5 w-3.5" />}
+            disabled={busy}
+            onClick={async () => {
+              if (game.steam && !confirmSteam) {
+                setConfirmSteam(true);
+                return;
+              }
+              setBusy(true);
+              await onAdd(game, executable);
+              setBusy(false);
+              setConfirmSteam(false);
+            }}
+          >
+            {busy ? t('adding') : confirmSteam ? t('confirm') : t('add')}
+          </Button>
         )}
       </div>
-      {game.inLibrary ? (
-        <Chip tone="run">
-          <Check className="h-3 w-3" />
-          {t('inLibrary')}
-        </Chip>
-      ) : (
-        <Button
-          size="sm"
-          icon={busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Plus className="h-3.5 w-3.5" />}
-          disabled={busy}
-          onClick={async () => {
-            setBusy(true);
-            await onAdd(game, executable);
-            setBusy(false);
-          }}
-        >
-          {busy ? t('adding') : t('add')}
-        </Button>
-      )}
+      {confirmSteam && <p className="mt-2 text-[12px] text-muted">{t('steamConfirm')}</p>}
     </div>
   );
 };
@@ -98,6 +109,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({ databaseSize, onAdded,
   const [loading, setLoading] = useState(false);
   const [refresh, setRefresh] = useState(0);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: refresh reloads the list after a game was added.
   useEffect(() => {
     const controller = new AbortController();
     api
@@ -107,6 +119,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({ databaseSize, onAdded,
     return () => controller.abort();
   }, [refresh]);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: refresh runs the search again after a game was added.
   useEffect(() => {
     const trimmed = query.trim();
     if (trimmed.length < MIN_QUERY_LENGTH) {
@@ -174,7 +187,13 @@ export const CatalogView: React.FC<CatalogViewProps> = ({ databaseSize, onAdded,
         ) : (
           <>
             <div className="mb-3 flex items-baseline gap-3">
-              <SectionLabel>{!typed ? t('catalogFeatured') : shown.length === 1 ? t('catalogResultOne') : t('catalogResults', { n: shown.length })}</SectionLabel>
+              <SectionLabel>
+                {!typed
+                  ? t('catalogFeatured')
+                  : shown.length === 1
+                    ? t('catalogResultOne')
+                    : t('catalogResults', { n: shown.length })}
+              </SectionLabel>
             </div>
             <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-2">
               {shown.map((game) => (

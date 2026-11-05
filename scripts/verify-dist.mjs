@@ -6,8 +6,8 @@
  *   npm run verify:dist
  *
  * It verifies that:
- *   1. the version number is the same in package.json, desktop_app.py,
- *      build_windows_exe.bat and placeholder_runtime.rc;
+ *   1. the version number is the same in package.json, desktop_app.py
+ *      and build_windows_exe.bat;
  *   2. `dist/server.cjs` starts in production mode (with a throw-away data
  *      folder, no background database update);
  *   3. the bundled game database is the one in the repository and answers
@@ -82,8 +82,6 @@ async function main() {
   const batVersion = /Version: (\S+)/.exec(read('build_windows_exe.bat'))?.[1];
   check(desktopVersion === version, `desktop_app.py APP_VERSION is ${version} (found ${desktopVersion})`);
   check(batVersion === version, `build_windows_exe.bat shows version ${version} (found ${batVersion})`);
-  const rcVersion = /VALUE "ProductVersion",\s*"(\d+\.\d+\.\d+)\.0\\0"/.exec(read('placeholder_runtime.rc'))?.[1];
-  check(rcVersion === version, `placeholder_runtime.rc ProductVersion is ${version} (found ${rcVersion})`);
 
   if (!fs.existsSync(serverBundle)) {
     check(false, 'dist/server.cjs exists (run "npm run build" first)');
@@ -150,7 +148,9 @@ async function main() {
       'searching "valorant" finds VALORANT with its Discord executable path and icon'
     );
 
-    const firefox = ((await getJson(base, '/api/catalog?q=firefox')).json || []).find((game) => game.name === 'Firefox');
+    const firefox = ((await getJson(base, '/api/catalog?q=firefox')).json || []).find(
+      (game) => game.name === 'Firefox'
+    );
     check(
       firefox?.source === 'reddit' && firefox.executables?.includes('firefox.exe'),
       'an app Discord gives no executable for (Firefox) comes from r/DiscordQuests'
@@ -182,7 +182,13 @@ async function main() {
       },
     });
     const addedId = added.json?.game?.id;
-    const addedExePath = path.join(dataRoot, 'Games', added.json?.game?.folder || 'VALORANT', 'win64', 'valorant-win64-shipping.exe');
+    const addedExePath = path.join(
+      dataRoot,
+      'Games',
+      added.json?.game?.folder || 'VALORANT',
+      'win64',
+      'valorant-win64-shipping.exe'
+    );
     check(
       added.status === 200 && fs.existsSync(addedExePath),
       'adding VALORANT from the catalog creates Games/VALORANT/win64/valorant-win64-shipping.exe'
@@ -223,10 +229,7 @@ async function main() {
       'timer preferences are saved to Games/.state.json'
     );
     const settings = await getJson(base, '/api/settings', { method: 'PUT', body: { soundEnabled: false } });
-    check(
-      settings.status === 200 && settings.json?.soundEnabled === false,
-      'the sound setting is saved by the server'
-    );
+    check(settings.status === 200 && settings.json?.soundEnabled === false, 'the sound setting is saved by the server');
     const removed = await getJson(base, `/api/games/${encodeURIComponent(addedId)}`, { method: 'DELETE' });
     check(
       stopped.status === 200 &&

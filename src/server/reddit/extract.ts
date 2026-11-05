@@ -35,7 +35,6 @@ export interface UnifiedMatch {
  * a live Reddit search and adds what it finds below the database results.
  */
 
-
 // Disallowed or generic executable names to filter out false positives
 const BANNED_EXECUTABLES = new Set([
   'setup.exe',
@@ -63,11 +62,28 @@ const BANNED_EXECUTABLES = new Set([
   'riotclientservices.exe',
   // Windows reserved device names: never a game, and games.ts rejects them
   // again via isSafeFileName().
-  'con.exe', 'prn.exe', 'aux.exe', 'nul.exe',
-  'com1.exe', 'com2.exe', 'com3.exe', 'com4.exe',
-  'com5.exe', 'com6.exe', 'com7.exe', 'com8.exe', 'com9.exe',
-  'lpt1.exe', 'lpt2.exe', 'lpt3.exe', 'lpt4.exe',
-  'lpt5.exe', 'lpt6.exe', 'lpt7.exe', 'lpt8.exe', 'lpt9.exe',
+  'con.exe',
+  'prn.exe',
+  'aux.exe',
+  'nul.exe',
+  'com1.exe',
+  'com2.exe',
+  'com3.exe',
+  'com4.exe',
+  'com5.exe',
+  'com6.exe',
+  'com7.exe',
+  'com8.exe',
+  'com9.exe',
+  'lpt1.exe',
+  'lpt2.exe',
+  'lpt3.exe',
+  'lpt4.exe',
+  'lpt5.exe',
+  'lpt6.exe',
+  'lpt7.exe',
+  'lpt8.exe',
+  'lpt9.exe',
 ]);
 
 // ---------------------------------------------------------------------------
@@ -94,13 +110,13 @@ const MAX_PATH_SEGMENTS = 12;
  *   * `(?<![A-Za-z0-9])` keeps the match from starting mid-word.
  */
 const FULL_PATH_REGEX = new RegExp(
-  String.raw`(?<![A-Za-z0-9])(?:` +
+  '(?<![A-Za-z0-9])(?:' +
     // Absolute path: a real drive letter (colon immediately + separator).
     String.raw`[A-Za-z]:[\\/](?:[${PATH_SEGMENT_CHARS}]{1,${MAX_PATH_SEGMENT_LENGTH}}[\\/]){0,${MAX_PATH_SEGMENTS}}[${PATH_SEGMENT_CHARS}]{1,${MAX_PATH_SEGMENT_LENGTH}}\.exe` +
-    String.raw`|` +
+    '|' +
     // Relative path: at least one separator, then the executable.
     String.raw`(?:[${PATH_SEGMENT_CHARS}]{1,${MAX_PATH_SEGMENT_LENGTH}}[\\/]){1,${MAX_PATH_SEGMENTS}}[${PATH_SEGMENT_CHARS}]{1,${MAX_PATH_SEGMENT_LENGTH}}\.exe` +
-  String.raw`)\b`,
+    String.raw`)\b`,
   'gi'
 );
 
@@ -113,18 +129,160 @@ const FULL_PATH_REGEX = new RegExp(
  * least two of these words, which prose always does and game names never do.
  */
 const PROSE_WORDS = new Set([
-  'about','actually','after','again','also','although','always','am','another','any','anyone','anything',
-  'are','because','before','being','both','but','can','cant','come','could','couldnt','did','didnt','do',
-  'does','doesnt','doing','done','dont','either','else','emulate','emulated','even','ever','every',
-  'everything','find','following','found','get','give','go','going','gone','had','has','have','having',
-  'here','heres','however','if','into','is','it','its','just','keep','know','let','like','likely','look',
-  'looking','made','make','may','might','more','most','much','must','my','need','needed','never','not','now',
-  'only','otherwise','our','rather','really','since','so','some','someone','something','still','such','sure',
-  'take','tell','than','thats','their','theirs','them','then','there','therefore','these','they','think',
-  'this','those','though','thus','too','trying','until','upon','use','used','using','very','want','was',
-  'were','what','whats','when','where','whether','which','while','who','whom','whose','why','will','with',
-  'within','without','wont','work','works','working','would','yet','you','your','yours',
-  'submitted','directory','folder','location','install','installed','exe','executable',
+  'about',
+  'actually',
+  'after',
+  'again',
+  'also',
+  'although',
+  'always',
+  'am',
+  'another',
+  'any',
+  'anyone',
+  'anything',
+  'are',
+  'because',
+  'before',
+  'being',
+  'both',
+  'but',
+  'can',
+  'cant',
+  'come',
+  'could',
+  'couldnt',
+  'did',
+  'didnt',
+  'do',
+  'does',
+  'doesnt',
+  'doing',
+  'done',
+  'dont',
+  'either',
+  'else',
+  'emulate',
+  'emulated',
+  'even',
+  'ever',
+  'every',
+  'everything',
+  'find',
+  'following',
+  'found',
+  'get',
+  'give',
+  'go',
+  'going',
+  'gone',
+  'had',
+  'has',
+  'have',
+  'having',
+  'here',
+  'heres',
+  'however',
+  'if',
+  'into',
+  'is',
+  'it',
+  'its',
+  'just',
+  'keep',
+  'know',
+  'let',
+  'like',
+  'likely',
+  'look',
+  'looking',
+  'made',
+  'make',
+  'may',
+  'might',
+  'more',
+  'most',
+  'much',
+  'must',
+  'my',
+  'need',
+  'needed',
+  'never',
+  'not',
+  'now',
+  'only',
+  'otherwise',
+  'our',
+  'rather',
+  'really',
+  'since',
+  'so',
+  'some',
+  'someone',
+  'something',
+  'still',
+  'such',
+  'sure',
+  'take',
+  'tell',
+  'than',
+  'thats',
+  'their',
+  'theirs',
+  'them',
+  'then',
+  'there',
+  'therefore',
+  'these',
+  'they',
+  'think',
+  'this',
+  'those',
+  'though',
+  'thus',
+  'too',
+  'trying',
+  'until',
+  'upon',
+  'use',
+  'used',
+  'using',
+  'very',
+  'want',
+  'was',
+  'were',
+  'what',
+  'whats',
+  'when',
+  'where',
+  'whether',
+  'which',
+  'while',
+  'who',
+  'whom',
+  'whose',
+  'why',
+  'will',
+  'with',
+  'within',
+  'without',
+  'wont',
+  'work',
+  'works',
+  'working',
+  'would',
+  'yet',
+  'you',
+  'your',
+  'yours',
+  'submitted',
+  'directory',
+  'folder',
+  'location',
+  'install',
+  'installed',
+  'exe',
+  'executable',
 ]);
 
 /** Segments that are files rather than folders never belong in an install path. */
@@ -359,7 +517,6 @@ export function extractMatchesFromText(
         notes: 'Reddit post contains the simulated Steam manifest quest template.',
       };
     }
-
   }
 
   // 1. Look for a full path ending in .exe, e.g. C:\\Games\\Foo\\Bar.exe or
@@ -371,7 +528,7 @@ export function extractMatchesFromText(
   //    NOTE: the class must not contain whitespace - otherwise the regex
   //    captures the words preceding the file name ("run setup.exe") and the
   //    banned-executable check below no longer matches.
-  const exeRegex = /\b([A-Za-z0-9_.\-]+\.exe)\b/i;
+  const exeRegex = /\b([A-Za-z0-9_.-]+\.exe)\b/i;
   const exeMatch = text.match(exeRegex);
 
   // 3. Look for directory or folder hint
@@ -392,19 +549,15 @@ export function extractMatchesFromText(
   }
 
   // Clean trailing punctuation
-  executableName = executableName.replace(/^[(\["']+|[)\]"',.:;]+$/g, '').trim();
+  executableName = executableName.replace(/^[(["']+|[)\]"',.:;]+$/g, '').trim();
 
   // Validate executable: it must look like a real file name (not a sentence
   // fragment) and must not be a banned installer/system binary.
-  if (
-    !isPlausibleExecutableName(executableName) ||
-    BANNED_EXECUTABLES.has(executableName.toLowerCase())
-  ) {
+  if (!isPlausibleExecutableName(executableName) || BANNED_EXECUTABLES.has(executableName.toLowerCase())) {
     return null;
   }
 
-  const hasFolder =
-    Boolean(folderPath.trim()) && !folderPath.toLowerCase().startsWith('not found');
+  const hasFolder = Boolean(folderPath.trim()) && !folderPath.toLowerCase().startsWith('not found');
 
   return {
     title: title.trim(),

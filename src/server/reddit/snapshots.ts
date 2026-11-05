@@ -11,15 +11,10 @@
  * older one, so a corrected entry (corrections.ts) never changes under it.
  */
 
-import fs from 'fs';
-import path from 'path';
+import fs from 'node:fs';
+import path from 'node:path';
 import { redditPostId } from './corrections.ts';
-import {
-  dedupeEntries,
-  redditPostToEntries,
-  type RedditCacheEntry,
-  type RedditPostLike,
-} from './dataset.ts';
+import { dedupeEntries, redditPostToEntries, type RedditCacheEntry, type RedditPostLike } from './dataset.ts';
 
 export const DATASET_FILE_PATTERN = /^dataset_reddit-.*\.json$/;
 /** Folder of the r/DiscordQuests snapshots, relative to the repository root. */
@@ -57,9 +52,11 @@ function isoOrUndefined(value: unknown): string | undefined {
 
 /** Newest of a list of ISO timestamps ('' when there is none). */
 export function newestTimestamp(values: Array<string | undefined>): string {
-  return values
-    .filter((value): value is string => Boolean(value) && !Number.isNaN(Date.parse(value as string)))
-    .sort((a, b) => Date.parse(b) - Date.parse(a))[0] ?? '';
+  return (
+    values
+      .filter((value): value is string => Boolean(value) && !Number.isNaN(Date.parse(value as string)))
+      .sort((a, b) => Date.parse(b) - Date.parse(a))[0] ?? ''
+  );
 }
 
 function newestCreatedAt(posts: DatasetPost[]): string | undefined {

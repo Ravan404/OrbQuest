@@ -71,7 +71,7 @@ function text(value: unknown): string {
 }
 
 function permalinkOf(id: string, url: string, permalink?: string): string {
-  if (permalink && permalink.startsWith('/r/')) return `https://www.reddit.com${permalink}`;
+  if (permalink?.startsWith('/r/')) return `https://www.reddit.com${permalink}`;
   if (/^https:\/\/(?:www\.|old\.)?reddit\.com\/r\/[^/]+\/comments\//i.test(url)) {
     return url.replace(/^https:\/\/(?:www\.|old\.)?reddit\.com/i, 'https://www.reddit.com');
   }
@@ -95,6 +95,7 @@ function toPost(row: Record<string, unknown>): SubredditPost | null {
   };
 }
 
+// biome-ignore lint/suspicious/noExplicitAny: Reddit and Arctic Shift answers are checked field by field where they are read.
 async function readJson(response: Response | null): Promise<any> {
   if (!response) return null;
   try {
@@ -105,8 +106,19 @@ async function readJson(response: Response | null): Promise<any> {
 }
 
 /** Reddit: /r/DiscordQuests/new.json, newest first, paged with `after`. */
-async function fromReddit(options: Required<Pick<FetchNewPostsOptions, 'maxPages'>> & FetchNewPostsOptions, sinceMs: number): Promise<SourceOutcome> {
-  const outcome: SourceOutcome = { posts: [], newestMs: 0, complete: false, rateLimited: false, failed: false, retryAfterMs: 0, requests: 0 };
+async function fromReddit(
+  options: Required<Pick<FetchNewPostsOptions, 'maxPages'>> & FetchNewPostsOptions,
+  sinceMs: number
+): Promise<SourceOutcome> {
+  const outcome: SourceOutcome = {
+    posts: [],
+    newestMs: 0,
+    complete: false,
+    rateLimited: false,
+    failed: false,
+    retryAfterMs: 0,
+    requests: 0,
+  };
   let after = '';
   for (let page = 0; page < options.maxPages; page++) {
     const url = `https://www.reddit.com/r/${SUBREDDIT}/new.json?limit=${PAGE_SIZE}&raw_json=1${after ? `&after=${after}` : ''}`;
@@ -120,7 +132,9 @@ async function fromReddit(options: Required<Pick<FetchNewPostsOptions, 'maxPages
     if (answer.failed || !answer.response) return { ...outcome, failed: true };
 
     const json = await readJson(answer.response);
-    const children: any[] = Array.isArray(json?.data?.children) ? json.data.children : [];
+    const children: Array<{ data?: Record<string, unknown> } | null> = Array.isArray(json?.data?.children)
+      ? json.data.children
+      : [];
     let reachedChecked = false;
     for (const child of children) {
       const row = child?.data;
@@ -145,8 +159,19 @@ async function fromReddit(options: Required<Pick<FetchNewPostsOptions, 'maxPages
 }
 
 /** Arctic Shift: posts created after `since`, oldest first, paged by creation time. */
-async function fromArcticShift(options: Required<Pick<FetchNewPostsOptions, 'maxPages'>> & FetchNewPostsOptions, sinceMs: number): Promise<SourceOutcome> {
-  const outcome: SourceOutcome = { posts: [], newestMs: 0, complete: false, rateLimited: false, failed: false, retryAfterMs: 0, requests: 0 };
+async function fromArcticShift(
+  options: Required<Pick<FetchNewPostsOptions, 'maxPages'>> & FetchNewPostsOptions,
+  sinceMs: number
+): Promise<SourceOutcome> {
+  const outcome: SourceOutcome = {
+    posts: [],
+    newestMs: 0,
+    complete: false,
+    rateLimited: false,
+    failed: false,
+    retryAfterMs: 0,
+    requests: 0,
+  };
   let afterSeconds = Math.floor(sinceMs / 1000);
   for (let page = 0; page < options.maxPages; page++) {
     const url =
@@ -162,7 +187,7 @@ async function fromArcticShift(options: Required<Pick<FetchNewPostsOptions, 'max
     const json = await readJson(answer.response);
     if (answer.failed || !Array.isArray(json?.data)) return { ...outcome, failed: true };
 
-    const rows: any[] = json.data;
+    const rows: Array<Record<string, unknown> | null> = json.data;
     for (const row of rows) {
       if (!row || typeof row !== 'object') continue;
       const createdMs = Number(row.created_utc) * 1000;
@@ -201,7 +226,8 @@ export async function fetchNewSubredditPosts(options: FetchNewPostsOptions): Pro
   };
 
   for (const source of sources) {
-    const outcome = source === 'reddit' ? await fromReddit(settings, sinceMs) : await fromArcticShift(settings, sinceMs);
+    const outcome =
+      source === 'reddit' ? await fromReddit(settings, sinceMs) : await fromArcticShift(settings, sinceMs);
     result.requests += outcome.requests;
     if (outcome.rateLimited || outcome.failed) {
       if (source === 'reddit') {
@@ -213,7 +239,11 @@ export async function fetchNewSubredditPosts(options: FetchNewPostsOptions): Pro
     }
     const seen = new Set<string>();
     result.posts = outcome.posts
-      .filter((post) => (seen.has(post.id) ? false : (seen.add(post.id), true)))
+      .filter((post) => {
+        if (seen.has(post.id)) return false;
+        seen.add(post.id);
+        return true;
+      })
       .sort((a, b) => Date.parse(a.createdAt) - Date.parse(b.createdAt));
     result.source = source;
     result.newestCreatedAt = outcome.newestMs ? new Date(outcome.newestMs).toISOString() : '';

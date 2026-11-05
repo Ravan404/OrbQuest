@@ -95,7 +95,11 @@ const strings = {
   fromReddit: 'r/DiscordQuests',
   fromRedditTitle: "Discord's list has no executable for this; this one comes from r/DiscordQuests posts.",
   needsSteam: 'Steam',
-  needsSteamTitle: 'Discord only detects this through Steam. Steam must be installed; the stand-in goes into its steamapps folder.',
+  steamConfirm:
+    "This writes a stand-in and a small manifest into Steam's folder. Removing the game takes them out again.",
+  confirm: 'Confirm',
+  needsSteamTitle:
+    'Discord only detects this through Steam. Steam must be installed; the stand-in goes into its steamapps folder.',
   inLibrary: 'In library',
   add: 'Add',
   adding: 'Adding…',
@@ -118,7 +122,8 @@ const strings = {
 
   // Script dialog
   scriptTitle: 'Start script',
-  scriptHelp: "Asks for the real game's .exe and starts it. With Stop at the end on, it closes the game when the same timer is up.",
+  scriptHelp:
+    "Asks for the real game's .exe and starts it. With Stop at the end on, it closes the game when the same timer is up.",
   copy: 'Copy',
   copied: 'Copied',
   copyFailed: 'Copy failed. Select the text and copy it.',
@@ -172,14 +177,25 @@ const strings = {
     "If you'd rather run the real game, the start script button on a card saves a .bat, .ps1 or .py that starts it and closes it when the same timer is up.",
   aboutFilesTitle: 'Where things are',
   aboutFiles:
-    "The library is in %LOCALAPPDATA%\\OrbQuest\\Games, so OrbQuest.exe can sit anywhere and a newer copy finds the same games. Each game has its own folder; Steam quests are in Steam's own folder instead. Games\\.state.json keeps the times and timer settings, Games\\.settings.json keeps sound and theme, and saved icons are in icon-cache next to Games. Closing the app stops any running timer and remembers where it was.",
+    "The library is in %LOCALAPPDATA%\\OrbQuest\\Games, so the installed app, the portable exe and every update find the same games. Each game has its own folder; Steam quests are in Steam's own folder instead. Games\\.state.json keeps the times and timer settings, Games\\.settings.json keeps sound and theme, and saved icons are in icon-cache next to Games. Closing the app stops any running timer and remembers where it was.",
   aboutLog:
     "If the app won't start, %LOCALAPPDATA%\\OrbQuest\\startup.log says why. Server messages go to backend.log next to it.",
   aboutRemoveTitle: 'Removing a game',
   aboutRemove:
     "Remove deletes the game's folder under Games. For a Steam quest it deletes the stand-in and the manifest the app wrote. A real Steam install is never deleted; it only comes off the list.",
   updateAvailable: 'Update {version}',
-  updateTitle: 'OrbQuest {version} is out. Opens the release page, where the new OrbQuest.exe can be downloaded.',
+  updateTitle: 'OrbQuest {version} is out. Opens the release page, where it can be downloaded.',
+  updateInstallTitle: 'OrbQuest {version} is out. Install it from here.',
+  updateDialogTitle: 'OrbQuest {version}',
+  updateDialogText:
+    'OrbQuest downloads the new version from GitHub, checks it against the SHA-256 the release lists, closes and opens again with the new version. Running timers stop; their time is kept. Your games stay as they are.',
+  updateWhatsNew: "What's new",
+  updateLater: 'Later',
+  updateInstall: 'Install and restart',
+  updateDownloading: 'Downloading... {percent}%',
+  updateRestarting: 'Installing and restarting...',
+  updateFailedDownload: 'The update could not be downloaded. Try again later, or get it from the release page.',
+  updateNoDesktop: 'Only the OrbQuest window can install updates. Get it from the release page.',
   openFolder: 'Open folder',
   aboutFacts: 'On this PC',
   aboutVersion: 'Version',

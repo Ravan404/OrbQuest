@@ -6,7 +6,8 @@ let audioCtx: AudioContext | null = null;
 function getAudioContext(): AudioContext | null {
   if (typeof window === 'undefined') return null;
   if (!audioCtx) {
-    const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+    const AudioContextClass =
+      window.AudioContext || (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
     if (AudioContextClass) {
       audioCtx = new AudioContextClass();
     }
@@ -35,7 +36,7 @@ export function playClickSound(): void {
     gain.connect(ctx.destination);
     osc.start();
     osc.stop(ctx.currentTime + 0.05);
-  } catch (e) {
+  } catch {
     // Non-fatal
   }
 }
@@ -58,7 +59,7 @@ export function playLaunchSound(): void {
     gain.connect(ctx.destination);
     osc.start();
     osc.stop(ctx.currentTime + 0.18);
-  } catch (e) {
+  } catch {
     // Non-fatal
   }
 }
@@ -81,7 +82,7 @@ export function playStopSound(): void {
     gain.connect(ctx.destination);
     osc.start();
     osc.stop(ctx.currentTime + 0.18);
-  } catch (e) {
+  } catch {
     // Non-fatal
   }
 }
@@ -107,7 +108,7 @@ export function playMilestoneSound(): void {
       osc.start(now + idx * 0.08);
       osc.stop(now + idx * 0.08 + 0.35);
     });
-  } catch (e) {
+  } catch {
     // Non-fatal
   }
 }

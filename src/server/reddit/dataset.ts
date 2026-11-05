@@ -12,12 +12,7 @@ import {
   type UnifiedMatch,
 } from './extract.ts';
 import { cleanDisplayName, normalizeGameKey } from '../gameKey.ts';
-import {
-  applyRedditEntryFix,
-  REDDIT_ENTRY_FIXES,
-  REDDIT_POST_SUPPLEMENTS,
-  redditPostId,
-} from './corrections.ts';
+import { applyRedditEntryFix, REDDIT_ENTRY_FIXES, REDDIT_POST_SUPPLEMENTS, redditPostId } from './corrections.ts';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -71,7 +66,7 @@ export interface RedditPostLike {
 // ---------------------------------------------------------------------------
 
 /** ASCII punctuation: the only characters a markdown backslash escapes. */
-const MARKDOWN_ESCAPABLE = /[!-\/:-@\[-`{-~]/;
+const MARKDOWN_ESCAPABLE = /[!-/:-@[-`{-~]/;
 
 /** One markdown line: escapes resolved, inline code spans kept literally. */
 function unescapeMarkdownLine(line: string): string {
@@ -111,7 +106,9 @@ export function redditMarkdownToText(markdown: string): string {
   return text(markdown)
     .replace(/\r\n?/g, '\n')
     .split('\n')
-    .map((line) => (/^(?: {4}|\t)/.test(line) ? line : unescapeMarkdownLine(line).replace(/\*\*(?=\S)(.+?)\*\*/g, '$1')))
+    .map((line) =>
+      /^(?: {4}|\t)/.test(line) ? line : unescapeMarkdownLine(line).replace(/\*\*(?=\S)(.+?)\*\*/g, '$1')
+    )
     .join('\n')
     .replace(/&lt;/g, '<')
     .replace(/&gt;/g, '>')
@@ -234,10 +231,31 @@ export function cleanGameName(rawTitle: string): string {
 
 /** Generic engine folders that never identify a game. */
 const GENERIC_FOLDER_NAMES = new Set([
-  '.', '..', 'bin', 'binaries', 'win64', 'win32', 'x64', 'x86', 'game', 'games',
-  'engine', 'client', 'content', 'shippergame', 'shipping', 'windowsnoeditor',
-  'program files', 'program files (x86)', 'steam', 'steamapps', 'common',
-  'users', 'desktop', 'documents', 'programdata',
+  '.',
+  '..',
+  'bin',
+  'binaries',
+  'win64',
+  'win32',
+  'x64',
+  'x86',
+  'game',
+  'games',
+  'engine',
+  'client',
+  'content',
+  'shippergame',
+  'shipping',
+  'windowsnoeditor',
+  'program files',
+  'program files (x86)',
+  'steam',
+  'steamapps',
+  'common',
+  'users',
+  'desktop',
+  'documents',
+  'programdata',
 ]);
 
 function isDriveSegment(segment: string): boolean {
@@ -405,16 +423,13 @@ function postToEntry(post: RedditPostLike, fallbackName?: string): RedditCacheEn
  * hand-checked extra games of posts that document more than one
  * (corrections.ts).
  */
-export function redditPostToEntries(
-  post: RedditPostLike,
-  options: { fallbackName?: string } = {}
-): RedditCacheEntry[] {
+export function redditPostToEntries(post: RedditPostLike, options: { fallbackName?: string } = {}): RedditCacheEntry[] {
   const entry = postToEntry(post, options.fallbackName);
   if (!post || typeof post !== 'object') return entry ? [entry] : [];
 
   const url = sanitizeSourceUrl(text(post.url || post.permalink).trim());
   const id = redditPostId(url);
-  const supplements = id ? REDDIT_POST_SUPPLEMENTS[id] ?? [] : [];
+  const supplements = id ? (REDDIT_POST_SUPPLEMENTS[id] ?? []) : [];
   const postTitle = text(post.title).replace(/\s+/g, ' ').trim().slice(0, 200);
   const extra = supplements.map((supplement) =>
     finalizeEntryName(
@@ -458,4 +473,3 @@ export function dedupeEntries(entries: RedditCacheEntry[]): RedditCacheEntry[] {
 
   return deduped.sort((a, b) => a.gameName.localeCompare(b.gameName));
 }
-

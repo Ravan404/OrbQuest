@@ -41,7 +41,10 @@ function steamQuestOf(entry: RedditCacheEntry): { steam: SteamQuest; executable:
   const fromManifest = /"installdir"\s+"([^"]+)"/i.exec(entry.manifestContent || '')?.[1];
   const installDir = safeInstallDir(fromManifest ?? extractInstallDir(entry.folderPath));
   if (!installDir) return undefined;
-  const segments = entry.folderPath.split(/[\\/]+/).map((segment) => segment.trim()).filter(Boolean);
+  const segments = entry.folderPath
+    .split(/[\\/]+/)
+    .map((segment) => segment.trim())
+    .filter(Boolean);
   const at = segments.findIndex((segment) => segment.toLowerCase() === installDir.toLowerCase());
   const inside = at >= 0 ? segments.slice(at + 1) : [];
   const executable = normalizeExecutablePath([...inside, executableFileName(entry.executableName)].join('/'));
@@ -75,11 +78,14 @@ export function buildRedditSupplement(
   for (const raw of discordList) {
     const app = (raw ?? {}) as DiscordApp;
     if (typeof app.id !== 'string' || typeof app.name !== 'string') continue;
-    const names = [app.name, ...(Array.isArray(app.aliases) ? app.aliases : [])].filter((n): n is string => typeof n === 'string');
+    const names = [app.name, ...(Array.isArray(app.aliases) ? app.aliases : [])].filter(
+      (n): n is string => typeof n === 'string'
+    );
     const icon = typeof app.icon_hash === 'string' && /^[a-f0-9]{32}$/.test(app.icon_hash) ? app.icon_hash : undefined;
     for (const name of names) {
       const key = normalizeGameKey(name);
-      if (key && !knownNames.has(key) && !nameless.has(key)) nameless.set(key, { id: app.id, ...(icon ? { icon } : {}) });
+      if (key && !knownNames.has(key) && !nameless.has(key))
+        nameless.set(key, { id: app.id, ...(icon ? { icon } : {}) });
     }
   }
 

@@ -15,12 +15,14 @@ npm run dev        # http://127.0.0.1:3000
 
 ```bash
 npm run typecheck
+npm run lint        # npm run format fixes the format
 npm test
 npm run build
 npm run verify:dist
+npm run test:e2e    # Windows: clicks through the built app
 ```
 
-CI runs the same four commands on Windows and Ubuntu.
+CI runs them on Windows and Ubuntu, builds both Windows packages and installs, starts and uninstalls them (`scripts/smoke-test-package.ps1`).
 
 - Keep a change to one topic, and add a test in `tests/` when you fix a bug.
 - Every text the window shows lives in `src/strings.ts`.
@@ -39,10 +41,12 @@ The executable chosen by default when Discord lists several is decided by `src/u
 
 ## The placeholder executable
 
-`placeholder_runtime.exe` is committed so a fresh clone works without a C compiler. If you change `placeholder_runtime.c`, rebuild it with `scripts\build-placeholder.bat` (MinGW-w64) and add the old file's SHA-256 to `LEGACY_SHA256_HASHES` in `src/server/placeholderUpgrade.ts`, so copies in users' `Games` folders are upgraded.
+`placeholder_runtime.exe` is committed so a fresh clone works without a C compiler. Its build is reproducible with the pinned toolchain, WinLibs GCC 16.2.0 UCRT r3: CI rebuilds it and fails when it differs from the committed file, so the binary always matches the source. `scripts\build-placeholder.bat --check` does the same locally.
+
+If you change `placeholder_runtime.c`, rebuild it with `scripts\build-placeholder.bat` and add the old file's SHA-256 (the script prints it) to `LEGACY_SHA256_HASHES` in `src/server/placeholderUpgrade.ts`: OrbQuest recognises its placeholders by their SHA-256, and copies in users' `Games` folders are then upgraded.
 
 ## Releases
 
-1. `npm run bump-version -- 1.4.1`. It writes the version everywhere and turns the `[Unreleased]` heading of `CHANGELOG.md` into `[1.4.1]`.
-2. Commit and push, then `git tag v1.4.1` and `git push origin v1.4.1`.
-3. The Release workflow builds `OrbQuest.exe` on Windows, with the newest database from the `database` branch, and attaches it with its SHA-256 to a draft release. Check it and publish.
+1. `npm run bump-version -- 1.6.1`. It writes the version everywhere and turns the `[Unreleased]` heading of `CHANGELOG.md` into `[1.6.1]`.
+2. Commit and push, then `git tag v1.6.1` and `git push origin v1.6.1`.
+3. The Release workflow builds `OrbQuest-Setup-1.6.1.exe` and the portable `OrbQuest-1.6.1.exe` on Windows, with the newest database from the `database` branch, installs and starts them, and attaches them with `SHA256SUMS.txt` to a draft release. Check it and publish: installed copies then offer the update.
