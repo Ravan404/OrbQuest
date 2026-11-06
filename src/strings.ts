@@ -158,12 +158,19 @@ const strings = {
   noticeFinishedRunning: '{name} ran {mins} minutes and is still open.',
   updateFailed: 'Could not save the change.',
 
+  // Risk notice
+  riskTitle: 'Before you use OrbQuest',
+  riskText:
+    "Discord may treat a stand-in program instead of the real game as breaking its rules. Users have reported quest access suspended for about two weeks, reportedly with a violation on the account's standing, and renamed executables were among what they reported caught. OrbQuest works in a similar way, and not touching your token does not protect your account. Use it only at your own risk.",
+  riskDetails: 'What users have reported',
+  riskAccept: 'I understand',
+
   // About
   aboutTitle: 'About OrbQuest',
   aboutIntro:
     "Discord quests ask you to play a game for a while. OrbQuest lets that happen without the game: it puts a small stand-in program under the game's .exe name in a folder of its own, starts it, and closes it when your time is up. Discord sees a program with the right name and treats it as the game.",
   aboutSafe:
-    "It never logs in to Discord, never reads your token and doesn't change the Discord app. All it does is start and stop that one program on your PC.",
+    "It never logs in to Discord, never reads your token and doesn't change the Discord app. All it does is start and stop that one program on your PC. That does not protect your account: Discord may still treat a stand-in program as breaking its rules.",
   aboutLimitsTitle: "What it can't see",
   aboutLimits:
     "Whether the quest actually counted. When a timer finishes here, it only means the stand-in ran that long. Check the quest in Discord itself. Discord also only notices games while it's open, so keep it running during a timer.",
@@ -177,7 +184,7 @@ const strings = {
     "If you'd rather run the real game, the start script button on a card saves a .bat, .ps1 or .py that starts it and closes it when the same timer is up.",
   aboutFilesTitle: 'Where things are',
   aboutFiles:
-    "The library is in %LOCALAPPDATA%\\OrbQuest\\Games, so the installed app, the portable exe and every update find the same games. Each game has its own folder; Steam quests are in Steam's own folder instead. Games\\.state.json keeps the times and timer settings, Games\\.settings.json keeps sound and theme, and saved icons are in icon-cache next to Games. Closing the app stops any running timer and remembers where it was.",
+    "The library is in %LOCALAPPDATA%\\OrbQuest\\Games, so the installed app, the portable exe and every update find the same games. Each game has its own folder; Steam quests are in Steam's own folder instead. Games\\.state.json keeps the times and timer settings, Games\\.settings.json keeps sound, theme and whether you accepted the risk notice, and saved icons are in icon-cache next to Games. Closing the app stops any running timer and remembers where it was.",
   aboutLog:
     "If the app won't start, %LOCALAPPDATA%\\OrbQuest\\startup.log says why. Server messages go to backend.log next to it.",
   aboutRemoveTitle: 'Removing a game',

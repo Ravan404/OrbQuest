@@ -152,6 +152,22 @@ try {
   await page.goto(BASE, { waitUntil: 'domcontentloaded' });
   await sleep(2500);
 
+  await step('the risk notice shows until it is accepted', async () => {
+    ok('the risk notice shows on the first start', (await bodyText()).includes('Before you use OrbQuest'));
+    await page.keyboard.press('Escape');
+    await sleep(300);
+    ok('Escape hides the risk notice', !(await bodyText()).includes('Before you use OrbQuest'));
+    ok('hiding it does not accept it', (await api('/api/settings')).riskNoticeAccepted === false);
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    await sleep(1500);
+    ok('the risk notice comes back on the next start', (await bodyText()).includes('Before you use OrbQuest'));
+    await click('I understand');
+    ok('accepting it is saved', (await api('/api/settings')).riskNoticeAccepted === true);
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    await sleep(1500);
+    ok('an accepted notice stays away', !(await bodyText()).includes('Before you use OrbQuest'));
+  });
+
   await step('theme toggle switches, is saved and survives a reload', async () => {
     const darkOnScreen = () =>
       page.evaluate(() => getComputedStyle(document.body).backgroundColor !== 'rgb(250, 250, 250)');

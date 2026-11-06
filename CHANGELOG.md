@@ -4,6 +4,18 @@ Notable changes to OrbQuest. The format follows [Keep a Changelog](https://keepa
 
 ## [Unreleased]
 
+## [1.6.2] - 2026-11-06
+
+### Added
+
+- A risk notice when the app starts, until it is accepted. Updating from an older version shows it once too.
+- `docs/alternatives.md`: other ways to do a quest, and what users have reported about Discord's enforcement.
+
+### Changed
+
+- The README warning now describes the suspensions reported in August 2026 and says that OrbQuest works in a similar way to what was reported caught.
+- Releases get VirusTotal report links in their notes.
+
 ## [1.6.1] - 2026-11-05
 
 ### Added
@@ -301,7 +313,8 @@ Notable changes to OrbQuest. The format follows [Keep a Changelog](https://keepa
 
 - First release: library, placeholder process, quest timer, catalog, Reddit search, Windows shell.
 
-[Unreleased]: https://github.com/Ravan404/OrbQuest/compare/v1.6.1...HEAD
+[Unreleased]: https://github.com/Ravan404/OrbQuest/compare/v1.6.2...HEAD
+[1.6.2]: https://github.com/Ravan404/OrbQuest/compare/v1.6.1...v1.6.2
 [1.6.1]: https://github.com/Ravan404/OrbQuest/compare/v1.6.0...v1.6.1
 [1.6.0]: https://github.com/Ravan404/OrbQuest/compare/v1.5.1...v1.6.0
 [1.5.1]: https://github.com/Ravan404/OrbQuest/compare/v1.5.0...v1.5.1

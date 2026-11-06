@@ -317,6 +317,12 @@ test('sound and theme settings are saved next to the library', async () => {
   resetSettingsCache();
   assert.equal((await call('GET', '/api/settings')).json.theme, 'dark');
   assert.equal((await call('GET', '/api/settings')).json.soundEnabled, false);
+
+  assert.equal((await call('GET', '/api/settings')).json.riskNoticeAccepted, false);
+  assert.equal((await call('PUT', '/api/settings', { riskNoticeAccepted: 'yes' })).status, 400);
+  assert.equal((await call('PUT', '/api/settings', { riskNoticeAccepted: true })).status, 200);
+  resetSettingsCache();
+  assert.equal((await call('GET', '/api/settings')).json.riskNoticeAccepted, true);
 });
 
 test('a Steam quest from the catalog is written into the Steam library with its manifest', async () => {

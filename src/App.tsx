@@ -12,6 +12,7 @@ import { LibraryView } from './views/LibraryView';
 import { CatalogView } from './views/CatalogView';
 import { AboutView } from './views/AboutView';
 import { GameDialog } from './dialogs/GameDialog';
+import { RiskDialog } from './dialogs/RiskDialog';
 import { ScriptDialog } from './dialogs/ScriptDialog';
 import { UpdateDialog } from './dialogs/UpdateDialog';
 
@@ -57,6 +58,8 @@ export default function App() {
     const saved = document.documentElement.dataset.theme;
     return saved === 'light' || saved === 'dark' ? saved : 'system';
   });
+
+  const [showRiskNotice, setShowRiskNotice] = useState(false);
 
   const [notice, setNotice] = useState<ToastNotification | null>(null);
   const [dialog, setDialog] = useState<{ kind: 'add' | 'update' } | { kind: 'edit' | 'script'; game: Game } | null>(
@@ -127,6 +130,7 @@ export default function App() {
       if (!cancelled && settings) {
         if (typeof settings.soundEnabled === 'boolean') setSoundEnabled(settings.soundEnabled);
         if (settings.theme) setTheme(settings.theme);
+        if (settings.riskNoticeAccepted === false) setShowRiskNotice(true);
       }
       if (!cancelled) await loadGames();
     })();
@@ -405,6 +409,15 @@ export default function App() {
       )}
       {dialog?.kind === 'update' && updateStatus?.update && (
         <UpdateDialog update={updateStatus.update} onClose={() => setDialog(null)} />
+      )}
+      {showRiskNotice && (
+        <RiskDialog
+          onClose={() => setShowRiskNotice(false)}
+          onAccept={() => {
+            setShowRiskNotice(false);
+            saveSettings({ riskNoticeAccepted: true });
+          }}
+        />
       )}
     </div>
   );

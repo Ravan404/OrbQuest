@@ -5,6 +5,7 @@ export type ThemeSetting = 'system' | 'light' | 'dark';
 export interface AppSettings {
   soundEnabled: boolean;
   theme: ThemeSetting;
+  riskNoticeAccepted: boolean;
 }
 
 export interface TimerSettings {
