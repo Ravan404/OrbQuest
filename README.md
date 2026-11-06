@@ -25,11 +25,11 @@
 ![The OrbQuest library with six games, VALORANT running](docs/screenshot.png)
 
 > [!WARNING]
-> OrbQuest is not made by, endorsed by or affiliated with Discord Inc. Discord, Quests and Orbs are Discord's names for its own products. Running a stand-in program instead of the real game may break the rules of a quest or of Discord's Terms of Service. Since April 2026 users have reported Discord restricting quest access for "Inauthentic Quest Completion", with a warning on the account's standing. Use it only at your own risk.
+> OrbQuest is not made by, endorsed by or affiliated with Discord Inc. Discord, Quests and Orbs are Discord's names for its own products. Running a stand-in program instead of the real game may break the rules of a quest or of Discord's Terms of Service. Discord has acted against quest automation since April 2026. In late August 2026 users reported quest access suspended for about two weeks for "Inauthentic Quest Completion", reportedly with a violation on the account's standing. According to those reports, renamed executables were caught, and closing a game exactly when the quest time ends may be flagged. **OrbQuest works in a similar way**, so not touching your token does not protect your account. Use it only at your own risk. See [the sources](docs/alternatives.md#what-users-have-reported).
 
 ## What it does
 
-OrbQuest starts a small placeholder program under a game's `.exe` name, counts the time, and stops it when the timer ends. It never logs in to Discord, never reads your token and does not change the Discord client. A finished timer here is not proof that Discord counted the quest.
+OrbQuest is for Discord's play-a-game quests when you do not want to install the game. It starts a small placeholder program under the game's `.exe` name, counts the time, and stops it when the timer ends. It never logs in to Discord, never reads your token and does not change the Discord client. A finished timer here is not proof that Discord counted the quest.
 
 - The catalog is Discord's own list of about 10,400 games, so the placeholder gets exactly the name and folder Discord looks for. Quest programs the list has no executable for, such as Firefox or new quest games, come from r/DiscordQuests.
 - Set a timer from 1 to 1440 minutes, or no limit. An interrupted run resumes, and the settings are kept.
@@ -99,6 +99,7 @@ The library is in `%LOCALAPPDATA%\OrbQuest`; **Open folder** on the About page o
 ## Documentation
 
 - [How it works](docs/how-it-works.md): the game database, files on disk and security
+- [Alternatives and risks](docs/alternatives.md): other ways to do a quest, and what users have reported
 - [Configuration](docs/configuration.md): settings for running it your own way
 - [Development](docs/development.md): running from source, tests and building the packages
 - [Changelog](CHANGELOG.md) · [Privacy](PRIVACY.md) · [Security](SECURITY.md)

@@ -49,4 +49,4 @@ If you change `placeholder/placeholder_runtime.c`, rebuild it with `scripts\buil
 
 1. `npm run bump-version -- 1.7.0`. It writes the version everywhere and turns the `[Unreleased]` heading of `CHANGELOG.md` into `[1.7.0]`.
 2. Commit and push, then `git tag v1.7.0` and `git push origin v1.7.0`.
-3. The Release workflow builds `OrbQuest-Setup-1.7.0.exe` and the portable `OrbQuest-1.7.0.exe` on Windows, with the newest database from the `database` branch, installs and starts them, and attaches them with `SHA256SUMS.txt` to a draft release, with its notes from `CHANGELOG.md`. Check it and publish: installed copies then offer the update.
+3. The Release workflow builds `OrbQuest-Setup-1.7.0.exe` and the portable `OrbQuest-1.7.0.exe` on Windows, with the newest database from the `database` branch, installs and starts them, and attaches them with `SHA256SUMS.txt` to a draft release, with its notes from `CHANGELOG.md`. Check it, scan both `.exe` files on [VirusTotal](https://www.virustotal.com/) and add the report links to the notes, whatever they say, then publish: installed copies then offer the update.
