@@ -5,7 +5,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const { removeSandbox, sandboxRoot } = await import('./helpers.ts');
-const { checkForUpdate } = await import('../src/server/updateCheck.ts');
+const { checkForUpdate, parseReleaseRedirect } = await import('../src/server/updateCheck.ts');
 const {
   canInstall,
   downloadState,
@@ -51,6 +51,35 @@ beforeEach(() => {
   fs.rmSync(path.join(sandboxRoot, 'update'), { recursive: true, force: true });
   delete process.env.ORBQUEST_INSTALL_KIND;
   delete process.env.ORBQUEST_APP_EXE;
+});
+
+test('when the API limit is used up, the release page finds the update and it can be installed', async () => {
+  const page = 'https://github.com/Ravan404/OrbQuest/releases/tag/v99.1.0';
+  const fetchImpl = (async (input: string | URL | Request) =>
+    String(input).includes('api.github.com')
+      ? new Response('rate limit exceeded', { status: 403 })
+      : new Response(null, { status: 302, headers: { location: page } })) as typeof fetch;
+  assert.equal(await checkForUpdate(fetchImpl), true);
+  assert.equal(availableUpdate()?.version, '99.1.0');
+  assert.equal(availableUpdate()?.url, page);
+  process.env.ORBQUEST_INSTALL_KIND = 'installed';
+  assert.equal(canInstall(availableUpdate()), true);
+  assert.equal(
+    availableUpdate()?.assets?.['OrbQuest-Setup-99.1.0.exe'],
+    'https://github.com/Ravan404/OrbQuest/releases/download/v99.1.0/OrbQuest-Setup-99.1.0.exe'
+  );
+});
+
+test('a redirect anywhere but a release of this repository is ignored', () => {
+  for (const location of [
+    null,
+    'https://evil.example/Ravan404/OrbQuest/releases/tag/v99.0.0',
+    'https://github.com/someone/OrbQuest/releases/tag/v99.0.0',
+    'https://github.com/Ravan404/OrbQuest/releases',
+    'https://github.com/Ravan404/OrbQuest/releases/tag/v99.0.0/../evil',
+  ]) {
+    assert.equal(parseReleaseRedirect(location), null, String(location));
+  }
 });
 
 test('checksum files in sha256sum and certutil style are read', () => {

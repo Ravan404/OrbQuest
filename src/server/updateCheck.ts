@@ -1,8 +1,11 @@
 /**
  * Tells the window when a newer OrbQuest release is out. GitHub's API is
  * asked for the latest published release (drafts and pre-releases are not
- * returned) right at the start and then every six hours; a failed check is
- * tried again after ten minutes. Installing it is updateInstall.ts.
+ * returned) right at the start and then every six hours. The API allows 60
+ * requests an hour per IP address, which people behind one address can use
+ * up, so when it does not answer the release page's redirect is read instead.
+ * A failed check is tried again after ten minutes. Installing it is
+ * updateInstall.ts.
  *
  *   ORBQUEST_UPDATE_CHECK=0   never ask (ORBQUEST_OFFLINE=1 also turns it off)
  */
@@ -11,6 +14,8 @@ import { OFFLINE } from './config.ts';
 import { APP_VERSION } from '../version.ts';
 
 export const LATEST_RELEASE_URL = 'https://api.github.com/repos/Ravan404/OrbQuest/releases/latest';
+/** Redirects to the latest published release, without the API's limit. */
+export const LATEST_RELEASE_PAGE = 'https://github.com/Ravan404/OrbQuest/releases/latest';
 /** Release files are only ever downloaded from here. */
 export const RELEASE_DOWNLOAD_PREFIX = 'https://github.com/Ravan404/OrbQuest/releases/download/';
 
@@ -19,6 +24,7 @@ const RETRY_INTERVAL_MS = 10 * 60 * 1000;
 /** How long GET /api/update waits for a check that is still running. */
 const ANSWER_WAIT_MS = 8_000;
 const TIMEOUT_MS = 15_000;
+const USER_AGENT = `OrbQuest/${APP_VERSION} (update check)`;
 
 export interface UpdateInfo {
   version: string;
@@ -71,18 +77,43 @@ export function parseLatestRelease(body: unknown): UpdateInfo | null {
   return { version: tag.replace(/^v/, ''), url, ...(Object.keys(assets).length ? { assets } : {}) };
 }
 
+/** The release a redirect to `.../releases/tag/v1.2.3` points at, or null. */
+export function parseReleaseRedirect(location: string | null): UpdateInfo | null {
+  const match = /^https:\/\/github\.com\/Ravan404\/OrbQuest\/releases\/tag\/(v(\d+\.\d+\.\d+))$/.exec(location ?? '');
+  if (!match) return null;
+  const [url, tag, version] = match;
+  const files = [`OrbQuest-Setup-${version}.exe`, `OrbQuest-${version}.exe`, 'SHA256SUMS.txt'];
+  return {
+    version,
+    url,
+    assets: Object.fromEntries(files.map((name) => [name, `${RELEASE_DOWNLOAD_PREFIX}${tag}/${name}`])),
+  };
+}
+
+async function askApi(fetchImpl: typeof fetch): Promise<UpdateInfo | null> {
+  const response = await fetchImpl(LATEST_RELEASE_URL, {
+    headers: { 'User-Agent': USER_AGENT, Accept: 'application/vnd.github+json' },
+    signal: AbortSignal.timeout(TIMEOUT_MS),
+  });
+  return response.ok ? parseLatestRelease(await response.json()) : null;
+}
+
+async function askReleasePage(fetchImpl: typeof fetch): Promise<UpdateInfo | null> {
+  const response = await fetchImpl(LATEST_RELEASE_PAGE, {
+    headers: { 'User-Agent': USER_AGENT },
+    redirect: 'manual',
+    signal: AbortSignal.timeout(TIMEOUT_MS),
+  });
+  return parseReleaseRedirect(response.headers.get('location'));
+}
+
 /** Asks GitHub once; true when it answered. A failure keeps what the last check found. */
 export function checkForUpdate(fetchImpl: typeof fetch = fetch): Promise<boolean> {
   running = (async () => {
     try {
-      const response = await fetchImpl(LATEST_RELEASE_URL, {
-        headers: { 'User-Agent': `OrbQuest/${APP_VERSION} (update check)`, Accept: 'application/vnd.github+json' },
-        signal: AbortSignal.timeout(TIMEOUT_MS),
-      });
-      if (!response.ok) return false;
-      const release = parseLatestRelease(await response.json());
+      const release = (await askApi(fetchImpl).catch(() => null)) ?? (await askReleasePage(fetchImpl));
       if (release) latest = release;
-      return true;
+      return release !== null;
     } catch {
       // Offline or GitHub unreachable: tried again later.
       return false;

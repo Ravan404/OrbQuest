@@ -31,7 +31,7 @@ UPDATE_TO_RUN = None
 WINDOW = None
 
 APP_NAME = "OrbQuest"
-APP_VERSION = "1.6.2"
+APP_VERSION = "1.6.3"
 # The window title starts with this; single_instance.focus_existing_window
 # looks for it.
 WINDOW_TITLE_PREFIX = f"{APP_NAME} v"

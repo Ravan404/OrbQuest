@@ -1,6 +1,6 @@
 @echo off
 title Build OrbQuest
-echo Building OrbQuest, Version: 1.6.2
+echo Building OrbQuest, Version: 1.6.3
 echo.
 
 for %%i in ("%~dp0..") do set "ROOT=%%~fi\"
