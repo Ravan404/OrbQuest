@@ -17,9 +17,11 @@ export interface AppSettings {
   soundEnabled: boolean;
   /** `system` follows the Windows light/dark setting. */
   theme: ThemeSetting;
+  /** The risk notice was accepted, so it is not shown again. */
+  riskNoticeAccepted: boolean;
 }
 
-const DEFAULT_SETTINGS: AppSettings = { soundEnabled: true, theme: 'system' };
+const DEFAULT_SETTINGS: AppSettings = { soundEnabled: true, theme: 'system', riskNoticeAccepted: false };
 
 const isTheme = (value: unknown): value is ThemeSetting =>
   typeof value === 'string' && (THEMES as string[]).includes(value);
@@ -37,6 +39,7 @@ export function getSettings(): AppSettings {
       const parsed = JSON.parse(fs.readFileSync(file, 'utf8')) as Partial<AppSettings>;
       if (typeof parsed.soundEnabled === 'boolean') current.soundEnabled = parsed.soundEnabled;
       if (isTheme(parsed.theme)) current.theme = parsed.theme;
+      if (typeof parsed.riskNoticeAccepted === 'boolean') current.riskNoticeAccepted = parsed.riskNoticeAccepted;
     }
   } catch (error) {
     console.warn('Could not read app settings:', error);
@@ -54,6 +57,10 @@ export function updateSettings(body: Record<string, unknown>): AppSettings | str
   if (body.theme !== undefined) {
     if (!isTheme(body.theme)) return 'theme must be system, light or dark.';
     next.theme = body.theme;
+  }
+  if (body.riskNoticeAccepted !== undefined) {
+    if (typeof body.riskNoticeAccepted !== 'boolean') return 'riskNoticeAccepted must be true or false.';
+    next.riskNoticeAccepted = body.riskNoticeAccepted;
   }
   try {
     writeJsonAtomic(SETTINGS_FILE(), next);

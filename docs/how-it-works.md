@@ -11,7 +11,7 @@ The desktop app keeps everything in `%LOCALAPPDATA%\OrbQuest`. Each library entr
 | `.game-meta.json` | Where the entry came from (`custom`, `catalog` or `scanned`), its executable path, its Discord application id and when it was added |
 | `.game-icon.ico` | The game's icon for the placeholder window |
 | `Games/.state.json` | Elapsed time and timer settings |
-| `Games/.settings.json` | App settings: sound on/off, theme (`system`, `light` or `dark`) |
+| `Games/.settings.json` | App settings: sound on/off, theme (`system`, `light` or `dark`), whether the risk notice was accepted |
 | `Games/.game-database.json` | The last downloaded game database, when it is newer than the one in the build |
 | `Games/.special-games.json` | Steam quests, which live in the Steam library instead of `Games/` |
 | `icon-cache/` | Saved game icons, next to `Games/` |
