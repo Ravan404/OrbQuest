@@ -4,6 +4,15 @@ Notable changes to OrbQuest. The format follows [Keep a Changelog](https://keepa
 
 ## [Unreleased]
 
+### Added
+
+- `docs/alternatives.md`: other ways to do a quest, and what users have reported about Discord's enforcement.
+
+### Changed
+
+- The README warning now describes the suspensions reported in August 2026 and says that OrbQuest works in a similar way to what was reported caught.
+- Releases get VirusTotal report links in their notes.
+
 ## [1.6.1] - 2026-11-05
 
 ### Added
