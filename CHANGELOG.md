@@ -4,6 +4,12 @@ Notable changes to OrbQuest. The format follows [Keep a Changelog](https://keepa
 
 ## [Unreleased]
 
+## [1.6.3] - 2026-11-06
+
+### Fixed
+
+- A new release is still found when GitHub's API limit of 60 requests an hour is used up on your IP address. Before, the update button stayed away until the limit reset.
+
 ## [1.6.2] - 2026-11-06
 
 ### Added
@@ -313,7 +319,8 @@ Notable changes to OrbQuest. The format follows [Keep a Changelog](https://keepa
 
 - First release: library, placeholder process, quest timer, catalog, Reddit search, Windows shell.
 
-[Unreleased]: https://github.com/Ravan404/OrbQuest/compare/v1.6.2...HEAD
+[Unreleased]: https://github.com/Ravan404/OrbQuest/compare/v1.6.3...HEAD
+[1.6.3]: https://github.com/Ravan404/OrbQuest/compare/v1.6.2...v1.6.3
 [1.6.2]: https://github.com/Ravan404/OrbQuest/compare/v1.6.1...v1.6.2
 [1.6.1]: https://github.com/Ravan404/OrbQuest/compare/v1.6.0...v1.6.1
 [1.6.0]: https://github.com/Ravan404/OrbQuest/compare/v1.5.1...v1.6.0

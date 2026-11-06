@@ -14,7 +14,7 @@ The app only downloads public files. These requests carry no personal data, but 
 |---|---|---|
 | Game database | `raw.githubusercontent.com`, `cdn.jsdelivr.net`; `discord.com` only if both fail for a day | Every six hours |
 | Game icons | `cdn.discordapp.com`; `www.google.com/s2/favicons` for the few programs Discord has no icon for | When a game is shown or added |
-| New release check | `api.github.com` | At the start and every six hours |
+| New release check | `api.github.com`; `github.com` when that does not answer | At the start and every six hours |
 | An update | `github.com` (the file itself comes from `objects.githubusercontent.com`) | Only when you click Install and restart |
 
 Those services have their own privacy policies: [GitHub](https://docs.github.com/site-policy/privacy-policies/github-general-privacy-statement), [jsDelivr](https://www.jsdelivr.com/terms/privacy-policy-jsdelivr-net), [Discord](https://discord.com/privacy) and [Google](https://policies.google.com/privacy).
