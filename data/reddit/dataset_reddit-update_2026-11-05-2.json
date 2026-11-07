@@ -1,0 +1,17 @@
+{
+  "source": "arctic-shift",
+  "subreddit": "DiscordQuests",
+  "fetchedAt": "2026-11-05T20:00:28.676Z",
+  "checkedThrough": "2026-11-05T18:16:03.000Z",
+  "textFormat": "markdown",
+  "note": "Written by scripts/update-game-database.ts: the r/DiscordQuests posts created after the previous snapshots.",
+  "posts": [
+    {
+      "id": "1xopxwq",
+      "title": "4200 for 3 days of nitro?",
+      "selfText": "https://i.redd.it/l53vvlju4uzh1.png\n\n3 times more than before. Did discord really do that or is it some kind of anti-automation method?",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1xopxwq/4200_for_3_days_of_nitro/",
+      "createdAt": "2026-11-05T18:16:03.000Z"
+    }
+  ]
+}

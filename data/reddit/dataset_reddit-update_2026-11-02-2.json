@@ -1,0 +1,24 @@
+{
+  "source": "arctic-shift",
+  "subreddit": "DiscordQuests",
+  "fetchedAt": "2026-11-02T16:16:40.909Z",
+  "checkedThrough": "2026-11-02T14:53:50.000Z",
+  "textFormat": "markdown",
+  "note": "Written by scripts/update-game-database.ts: the r/DiscordQuests posts created after the previous snapshots.",
+  "posts": [
+    {
+      "id": "1xlv9dx",
+      "title": "Resident Evil sale",
+      "selfText": " anyone have discord quest share please.",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1xlv9dx/resident_evil_sale/",
+      "createdAt": "2026-11-02T11:59:09.000Z"
+    },
+    {
+      "id": "1xlzauj",
+      "title": "RESIDENT EVIL QUEST 700 orbs",
+      "selfText": "..../RESIDENT EVIL 7 biohazard/re7.exe",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1xlzauj/resident_evil_quest_700_orbs/",
+      "createdAt": "2026-11-02T14:53:50.000Z"
+    }
+  ]
+}

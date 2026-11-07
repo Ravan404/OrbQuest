@@ -1,0 +1,17 @@
+{
+  "source": "arctic-shift",
+  "subreddit": "DiscordQuests",
+  "fetchedAt": "2026-10-29T22:48:40.056Z",
+  "checkedThrough": "2026-10-29T18:20:20.000Z",
+  "textFormat": "markdown",
+  "note": "Written by scripts/update-quest-database.ts: the r/DiscordQuests posts created after the previous snapshots.",
+  "posts": [
+    {
+      "id": "1xirtk6",
+      "title": "Wild Horse Nine Quest Solution",
+      "selfText": "",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1xirtk6/",
+      "createdAt": "2026-10-29T18:20:20.000Z"
+    }
+  ]
+}

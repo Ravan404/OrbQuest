@@ -1,0 +1,45 @@
+{
+  "source": "arctic-shift",
+  "subreddit": "DiscordQuests",
+  "fetchedAt": "2026-11-04T19:50:17.815Z",
+  "checkedThrough": "2026-11-04T18:43:54.000Z",
+  "textFormat": "markdown",
+  "note": "Written by scripts/update-game-database.ts: the r/DiscordQuests posts created after the previous snapshots.",
+  "posts": [
+    {
+      "id": "1xn95nt",
+      "title": "How to rob a bank quest titles",
+      "selfText": "https://i.redd.it/z7wcmm20jhzh1.png\n\n",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1xn95nt/how_to_rob_a_bank_quest_titles/",
+      "createdAt": "2026-11-03T23:49:53.000Z"
+    },
+    {
+      "id": "1xnh8d9",
+      "title": "[Magic the Gathering x Star Trek] Quest - Kobayashi Maru Scenario",
+      "selfText": "Just follow along with the video and enjoy your reward!\n\nПросто повторяйте всё, что на видео, и наслаждайтесь наградой!",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1xnh8d9/",
+      "createdAt": "2026-11-04T06:37:33.000Z"
+    },
+    {
+      "id": "1xnhd9y",
+      "title": "[MTG x Star Trek] Discord Quest - Kobayashi Maru Scenario",
+      "selfText": "Просто повторяйте всё, что на видео, и наслаждайтесь наградой!\n\nJust follow along with the video and enjoy your reward!\n\nhttps://reddit.com/link/1xnhd9y/video/qwo57bp4ljzh1/player\n\n",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1xnhd9y/mtg_x_star_trek_discord_quest_kobayashi_maru/",
+      "createdAt": "2026-11-04T06:45:46.000Z"
+    },
+    {
+      "id": "1xnrdsd",
+      "title": "Is it just me or does anyone get zero quests at all?",
+      "selfText": "I haven't been recieving Orbs quests for some time. Nitro ended today which marked me not getting a quest for 2 weeks or so. There was no notification from Discord, my account standing was still all good. (I switched locations, tried different versions on Android, used the browser and PC ver to see if there were any changes, nothing.)",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1xnrdsd/is_it_just_me_or_does_anyone_get_zero_quests_at/",
+      "createdAt": "2026-11-04T15:39:45.000Z"
+    },
+    {
+      "id": "1xnw94l",
+      "title": "MapleStory Classic World Quest",
+      "selfText": "..\\\\MapleStory\\\\MapleStory.exe",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1xnw94l/maplestory_classic_world_quest/",
+      "createdAt": "2026-11-04T18:43:54.000Z"
+    }
+  ]
+}
