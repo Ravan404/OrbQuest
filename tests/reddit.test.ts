@@ -2,6 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
 const { buildRedditSupplement } = await import('../src/server/reddit/supplement.ts');
+const { dedupeEntries, redditPostToEntries } = await import('../src/server/reddit/dataset.ts');
 const { buildGameDatabase } = await import('../src/server/gameDatabaseSource.ts');
 
 const discordList = [
@@ -88,6 +89,35 @@ test('r/DiscordQuests entries survive the file format and the published download
   });
   assert.equal(foreignUrl?.url, undefined, 'only reddit.com links are kept');
   assert.equal(toDatabaseGame({ id: 'r-../x', name: 'X', executables: [{ os: 'win32', name: 'x.exe' }] }), null);
+});
+
+test('a Steam quest is kept when Discord lists its executable for another game', () => {
+  const list = [
+    {
+      id: '1124351901702570034',
+      name: 'Asphalt Legends Unite',
+      aliases: [],
+      icon_hash: '5ef6801f10b038424d2541b89463df2f',
+      executables: [{ os: 'win32', name: 'asphalt 9 legends/asphalt9_steam_x64_rtl.exe', is_launcher: false }],
+    },
+    { id: '1440142141027520583', name: 'Asphalt Legends', aliases: [], icon_hash: null, executables: [] },
+  ];
+  const post = {
+    title: 'Asphalt Legends Quest (explained metadata and paths)',
+    url: 'https://www.reddit.com/r/DiscordQuests/comments/1xvp5el/asphalt_legends_quest_explained_metadata_and_paths/',
+    selfText: '"LauncherPath""C:\\\\Program Files (x86)\\\\Steam\\\\steam.exe" and appmanifest_(game ID).acf',
+  };
+  const entries = dedupeEntries([entry('Asphalt legends', 'Asphalt9_Steam_x64_rtl.exe'), ...redditPostToEntries(post)]);
+  assert.deepEqual(
+    entries.map((e) => e.questMethod),
+    ['steam-manifest'],
+    'the post with the Steam setup wins over the plain post with the same executable'
+  );
+  const games = buildRedditSupplement(entries, list, buildGameDatabase(list, '2026-01-01T00:00:00.000Z').games);
+  assert.equal(games.length, 1, JSON.stringify(games));
+  assert.equal(games[0].id, '1440142141027520583', "the quest's own Discord application");
+  assert.deepEqual(games[0].steam, { appId: 1815780, installDir: 'Asphalt 9 Legends' });
+  assert.deepEqual(games[0].executables, ['binaries/win64/asphalt9_steam_x64_rtl.exe']);
 });
 
 test('a Steam-manifest quest keeps its Steam app id, folder and the executable inside it', () => {
