@@ -4,6 +4,10 @@ Notable changes to OrbQuest. The format follows [Keep a Changelog](https://keepa
 
 ## [Unreleased]
 
+### Fixed
+
+- The Asphalt Legends quest is in the catalog as a Steam quest. Its r/DiscordQuests post could not be read, and a Steam quest whose executable Discord lists for another game (Asphalt Legends Unite) was dropped as a duplicate.
+
 ## [1.6.3] - 2026-11-06
 
 ### Fixed

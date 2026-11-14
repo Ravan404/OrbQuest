@@ -399,20 +399,26 @@ function executableKey(entry: RedditEntry): string {
 }
 
 /**
- * Removes duplicates (same executable) and sorts alphabetically.
+ * Removes duplicates (same executable; one with the Steam setup wins) and sorts
+ * alphabetically.
  *
- * The first occurrence wins, so callers pass the most trusted source first.
+ * Otherwise the first occurrence wins, so callers pass the most trusted source first.
  */
 export function dedupeEntries(entries: RedditEntry[]): RedditEntry[] {
-  const seen = new Set<string>();
+  const seen = new Map<string, number>();
   const deduped: RedditEntry[] = [];
 
   for (const entry of entries) {
     if (!entry.executableName || !entry.gameName) continue;
     const key = executableKey(entry);
-    if (seen.has(key)) continue;
-    seen.add(key);
-    deduped.push(entry);
+    const at = seen.get(key);
+    if (at === undefined) {
+      seen.set(key, deduped.length);
+      deduped.push(entry);
+    } else if (entry.questMethod === 'steam-manifest' && deduped[at].questMethod !== 'steam-manifest') {
+      // A post with the Steam setup wins over one with the same executable without it.
+      deduped[at] = entry;
+    }
   }
 
   return deduped.sort((a, b) => a.gameName.localeCompare(b.gameName));

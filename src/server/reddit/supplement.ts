@@ -101,7 +101,11 @@ export function buildRedditSupplement(
     const steamQuest = steamQuestOf(entry);
     const executable = steamQuest?.executable ?? normalizeExecutablePath(executableFileName(entry.executableName));
     const key = normalizeGameKey(entry.gameName);
-    if (!executable || !key || knownFiles.has(executableFileName(executable)) || knownNames.has(key)) continue;
+    // A Steam quest is detected through its Steam app id, so an executable
+    // Discord already lists for another game (Asphalt Legends Unite and the
+    // Asphalt Legends quest share one) does not make it a duplicate.
+    if (!executable || !key || knownNames.has(key)) continue;
+    if (!steamQuest && knownFiles.has(executableFileName(executable))) continue;
     // A post the extractor misread names the file instead of the game.
     if (/\.exe$/i.test(entry.gameName.trim())) continue;
     const existing = byName.get(key);

@@ -203,6 +203,22 @@ export const REDDIT_POST_SUPPLEMENTS: Record<string, Array<Omit<RedditEntry, 'ur
         'For the March of Giants Playtest quest. If it does not work right away, close Discord completely and restart it before starting the executable.',
     },
   ],
+  // "Asphalt Legends Quest (explained metadata and paths)": the manifest is
+  // written as `appmanifest_(game ID).acf` with the id in prose, and the first
+  // .exe in the post is steam.exe from LauncherPath, so the extractor finds
+  // nothing. 1815780 is Asphalt Legends on Steam.
+  '1xvp5el': [
+    {
+      gameName: 'Asphalt Legends',
+      executableName: 'Asphalt9_Steam_x64_rtl.exe',
+      folderPath: 'steamapps\\common\\Asphalt 9 Legends\\Binaries\\Win64',
+      confidence: 'medium',
+      questMethod: 'steam-manifest',
+      steamAppId: 1815780,
+      notes:
+        'Steam-only quest. If it does not count, close Discord and your browser, start Discord again, then launch. Discord may not show that you are playing, but the quest progress should still move.',
+    },
+  ],
   // "Method for completing the quests for "Marathon" and "Toxic Commando""
   '1rhvwn9': [
     {
