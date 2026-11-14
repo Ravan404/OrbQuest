@@ -1,0 +1,31 @@
+{
+  "source": "arctic-shift",
+  "subreddit": "DiscordQuests",
+  "fetchedAt": "2026-11-05T06:54:26.798Z",
+  "checkedThrough": "2026-11-05T05:07:06.000Z",
+  "textFormat": "markdown",
+  "note": "Written by scripts/update-game-database.ts: the r/DiscordQuests posts created after the previous snapshots.",
+  "posts": [
+    {
+      "id": "1xo4ez9",
+      "title": "World of Warcraft: Forever Quest",
+      "selfText": "..World of Warcraft\\\\\\_forever\\_\\\\Wow.exe\n\nthis one works fine for me",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1xo4ez9/world_of_warcraft_forever_quest/",
+      "createdAt": "2026-11-05T00:15:44.000Z"
+    },
+    {
+      "id": "1xo4q21",
+      "title": "[Forge the Ring Quest] tutorial.",
+      "selfText": "This is very easy, its like 3 things you have to do\n\n1. Click the chains on the left and afk, the game should do the rest \n\n2. Pick up the ring\n\n3. Watch the trailer that pops up (I was able to skip to the end). ",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1xo4q21/",
+      "createdAt": "2026-11-05T00:30:00.000Z"
+    },
+    {
+      "id": "1xoa92e",
+      "title": "Did they just changed the price for Nitro!?",
+      "selfText": "https://i.redd.it/19abtbig8qzh1.png\n\n1400 -> 4200 is crazy",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1xoa92e/did_they_just_changed_the_price_for_nitro/",
+      "createdAt": "2026-11-05T05:07:06.000Z"
+    }
+  ]
+}

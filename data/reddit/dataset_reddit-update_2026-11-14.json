@@ -1,0 +1,31 @@
+{
+  "source": "arctic-shift",
+  "subreddit": "DiscordQuests",
+  "fetchedAt": "2026-11-14T06:33:02.874Z",
+  "checkedThrough": "2026-11-14T01:22:21.000Z",
+  "textFormat": "markdown",
+  "note": "Written by scripts/update-game-database.ts: the r/DiscordQuests posts created after the previous snapshots.",
+  "posts": [
+    {
+      "id": "1xvoz49",
+      "title": "OrbsHacker program timer",
+      "selfText": "Is there a way to slightly extend the timer on the spoofed programs orbhacker makes? i think theres a few second delay on when discord starts registering my progress so the program timer runs out a few seconds before its done and i need to relaunch it to finish it, is there a way to extend the timer maybe or make it so i manually close it instead of it automatically doing it?",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1xvoz49/orbshacker_program_timer/",
+      "createdAt": "2026-11-14T00:51:45.000Z"
+    },
+    {
+      "id": "1xvp5el",
+      "title": "Asphalt Legends Quest (explained metadata and paths)",
+      "selfText": "Create the .acf file named`'appmanifest_(game ID).acf'`(in this case, **1815780**)—by first setting it up as a .txt file containing the metadata (**appid**, **name**, **installdir**). For Asphalt, it would look like this:\n\n    \"AppState\"\n    {\n    \"appid\"\"1815780\"\n    \"universe\"\"1\"\n    \"LauncherPath\"\"C:\\\\Program Files (x86)\\\\Steam\\\\steam.exe\"\n    \"name\"\"Asphalt Legends\"\n    \"StateFlags\"\"6\"\n    \"installdir\"\"Asphalt 9 Legends\"\n    }\n\nThen rename it to '.acf' and move it to:`'C:\\Program Files (x86)\\Steam\\steamapps'`  \n  \nThe executable file is named`'Asphalt9_Steam_x64_rtl.exe'`and is located at:`'C:\\Program Files (x86)\\Steam\\steamapps\\common\\Asphalt 9 Legends\\Binaries\\Win64'`, alongside the other 'dummy' files required to run the .exe.\n\nNOTE: If you are testing this and the quest isn't tracking or starting while Discord is open, try the following: once everything is properly configured, close both Discord and your web browser (I personally close everything, then open Discord, and finally launch the .exe). It is very likely that Discord won't show that you are playing Asphalt, but the quest page (the progress bar) should still track your activity.",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1xvp5el/asphalt_legends_quest_explained_metadata_and_paths/",
+      "createdAt": "2026-11-14T01:00:10.000Z"
+    },
+    {
+      "id": "1xvpm6q",
+      "title": "[Audible's Exoplanet Quest] Full walkthrough - gold badge and all 10 titles.",
+      "selfText": "This one definitely feels more sophisicated than the other discord games we've had, thankfully the titles are kinda easy except the two speedrun ones, really. I'll put a list of every title in the comment for quick reference, and label where you can do them with \\[Becca\\], \\[Logan\\], \\[Jeff\\], or \\[Final\\] for the part after you have done all 3. \n\nYou only need to do the Becca one for the quest, I've done it first here. \n\nTimestamps:  \n0:10 Becca",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1xvpm6q/",
+      "createdAt": "2026-11-14T01:22:21.000Z"
+    }
+  ]
+}

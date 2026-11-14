@@ -1,0 +1,179 @@
+{
+  "source": "arctic-shift",
+  "sourceUrl": "https://arctic-shift.photon-reddit.com/api/posts/search?subreddit=DiscordQuests",
+  "subreddit": "DiscordQuests",
+  "fetchedAt": "2026-10-14T19:05:00.000Z",
+  "checkedThrough": "2026-10-14T15:39:25.000Z",
+  "textFormat": "markdown",
+  "note": "All ~450 r/DiscordQuests posts were listed (2024-04 to 2026-10-14). Only posts that are not in the older snapshot and add an executable or a search name are copied; questions, image-only posts, tool announcements and repeats of executables the database already has are not. selfText is the Reddit markdown source (backslash escapes included), exactly as returned.",
+  "posts": [
+    {
+      "id": "1qer5b4",
+      "title": "blue pro and torchlight inf",
+      "createdAt": "2026-01-16T20:25:21.000Z",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1qer5b4/blue_pro_and_torchlight_inf/",
+      "selfText": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\UE_game\\Binaries\\Win64\\Torchlight_Infinite.exe\nbpsr\\BPSR_STEAM.exe"
+    },
+    {
+      "id": "1qrlxgf",
+      "title": "Summoners War",
+      "createdAt": "2026-01-30T23:35:57.000Z",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1qrlxgf/summoners_war/",
+      "selfText": "steamapps\\\\common\\\\Summoners War\\\\SummonersWar.exe"
+    },
+    {
+      "id": "1rjd8bv",
+      "title": "World of Warcraft: Midnight Quest",
+      "createdAt": "2026-03-03T02:31:30.000Z",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1rjd8bv/world_of_warcraft_midnight_quest/",
+      "selfText": "    World of Warcraft/_retail_/Wow.exe \n\nSince World of Warcraft is not a Steam game, there is no need to add anything else."
+    },
+    {
+      "id": "1szuf4r",
+      "title": "exe paths for yall questers :]",
+      "createdAt": "2026-04-30T12:17:27.000Z",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1szuf4r/exe_paths_for_yall_questers/",
+      "selfText": "**Fortnite**  \nWin64\\\\FortniteClient-Win64-Shipping.exe\n\n**Marvel Rivals**  \nWin64\\\\Marvel-Win64-Shipping.exe  \n**PUBG**  \nWin64\\\\TslGame.exe  \n**Terminull Brigade**  \nWin64\\\\Rouge-Win64-Shipping.exe  \n**Where Winds Meet**  \nWin64\\\\wwm.exe  \n**Wuthering Waves**  \nWin64\\\\Wuthering Waves.exe  \n**Comet AI Browser**  \nPerplexity\\\\Comet\\\\Application\\\\comet.exe  \n**Destiny 2**  \nDestiny 2\\\\destiny2.exe  \n**Risk of Rain 2**  \nRisk of Rain 2\\\\Risk of Rain 2.exe  \n**Storm Lancers Demo**  \nStorm Lancers Demo\\\\StormLancersDemo.exe  \n**Pragmata**  \nPRAGMATA SKETCHBOOK\\\\PRAGMATA\\_SKETCHBOOK.exe  \n**Path of Exile 2**  \nGrinding Gear Games\\\\Path of Exile 2\\\\pathofexile.exe  \n**Arc Raiders**  \nArc Raiders\\\\PioneerGame.exe  \n**Hunt: Showdown 1896**  \nwin\\_x64\\\\HuntGame.exe  \n**Delta Force**  \nWin64\\\\DeltaForceClient-Win64-Shipping.exe  \n**Fallout 4**  \nFallout4\\\\Fallout4.exe  \n**Fallout 76**  \nFallout76\\\\Fallout76.ex  \n**Arena Breakout: Infinite**  \nWin64\\\\UAGame.exe  \n**Valorant**  \nWin64\\\\Valorant-Win64-Shipping.exe  \n**RAID: Shadow Legends**  \nbuild\\\\Raid.exe  \n**Torchlight: Infinite**  \nWin64\\\\torchlight\\_infinite.exe  \n**Blue Protocol: Star Resonance**  \nWin64\\\\bpsr.exe  \n**Once Human**  \nOnce Human\\\\Once\\_Human.exe  \n**Arknights: Endfield**  \nGame\\\\Endfield.exe  \n**2XKO**  \n2XKO\\\\Live\\\\Lion\\\\Binaries\\\\Win64\\\\Lion-Win64-Shipping.exe  \n**Highguard**  \nWin64\\\\HighguardClient-Win64-Shipping.exe  \n**Skate**  \nSteam\\\\steamapps\\\\common\\\\skate\\\\skate.exe  \n**Summoners War**  \nSummoners War\\\\SummonersWar.exe  \n**World of Warcraft: Midnight**  \nWorld of Warcraft\\\\\\_retail\\_\\\\Wow.exe  \n**Grounded 2**  \nWinGRTS\\\\Grounded2-WinGRTS-Shipping.exe  \n**Vindictus**  \nVindictus\\\\Vindictus.exe  \n**Opera**  \nOpera GX\\\\opera.exe  \n**Torchnight: Infinite**  \nWin64\\\\torchlight\\_infinite.exe  \n**GODDESS OF VICTORY: NIKKE**  \nNIKKE/NIKKE/Game/nikke.exe  \n**NTE LAUNCH DRIFT**  \nWin64\\\\HTGame.exe  \n**Genshin Impact: SONG OF THE WELKIN MOON \"LUNA VI\"**  \nGenshin Impact\\\\Genshin Impact game\\\\GenshinImpact.exe  \n  \n"
+    },
+    {
+      "id": "1tr93af",
+      "title": "World of Tanks: HEAT quest",
+      "createdAt": "2026-05-29T17:27:14.000Z",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1tr93af/world_of_tanks_heat_quest/",
+      "selfText": "`..\\WoT HEAT\\wgcs_api.exe`\n\nur welcome"
+    },
+    {
+      "id": "1trbavz",
+      "title": "Path of Exile 2 Quest",
+      "createdAt": "2026-05-29T18:37:29.000Z",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1trbavz/path_of_exile_2_quest/",
+      "selfText": "...\\\\Path of Exile 2\\\\PathOfExile\\_x64Steam.exe"
+    },
+    {
+      "id": "1tsc57y",
+      "title": "Path of Exile 2 Quest",
+      "createdAt": "2026-05-30T21:31:24.000Z",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1tsc57y/path_of_exile_2_quest/",
+      "selfText": "\"Grinding Gear Games\\\\Path of Exile 2\\\\pathofexile.exe\" worked for me for the recent POE2 avatar decoration quest.   \n  \nYou might be able to just do \"Path of Exile 2\\\\pathofexile.exe\" but I haven't checked."
+    },
+    {
+      "id": "1tyryd9",
+      "title": "Roblox: Frontlines Quest",
+      "createdAt": "2026-06-06T20:28:48.000Z",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1tyryd9/roblox_frontlines_quest/",
+      "selfText": "...\\\\Roblox\\\\RobloxPlayerBeta.exe"
+    },
+    {
+      "id": "1u1hfja",
+      "title": "Wuthering Waves",
+      "createdAt": "2026-06-09T20:50:40.000Z",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1u1hfja/wuthering_waves/",
+      "selfText": "Game name : Wuthering Waves.exe\n\nAddress : \\\\SteamLibrary\\\\steamapps\\\\common\\\\Wuthering Waves\\\\Wuthering Waves.exe\n\nTime : 950"
+    },
+    {
+      "id": "1u1nufn",
+      "title": "Wuthering Waves File Directory",
+      "createdAt": "2026-06-10T01:14:59.000Z",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1u1nufn/",
+      "selfText": "Wuthering Waves.exe\n\nyes it's that easy"
+    },
+    {
+      "id": "1u293gt",
+      "title": "Wuthering Waves Quest",
+      "createdAt": "2026-06-10T17:36:03.000Z",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1u293gt/wuthering_waves_quest/",
+      "selfText": "Exe location : Wuthering Waves\\\\Wuthering Waves Game\\\\Client\\\\Binaries\\\\Win64\\\\Client-Win64-Shipping.exe\n\nYou're Welcome 😄"
+    },
+    {
+      "id": "1u8p99x",
+      "title": "Basketball Zero Quest",
+      "createdAt": "2026-06-17T22:50:19.000Z",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1u8p99x/",
+      "selfText": "\\\\RobloxPlayerBeta.exe"
+    },
+    {
+      "id": "1uzocvk",
+      "title": "Tennis Zero on Roblox Discord Quest",
+      "createdAt": "2026-07-18T06:36:33.000Z",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1uzocvk/tennis_zero_on_roblox_discord_quest/",
+      "selfText": "Just take any random `.exe` file, rename it to `RobloxPlayerBeta.exe`, and put it right on your **Desktop**.\n\nRun it from your desktop, keep it open for 15 minutes, and Discord will track the quest perfectly."
+    },
+    {
+      "id": "1wa252x",
+      "title": "Capcom TGS Deals Quest",
+      "createdAt": "2026-09-07T19:38:25.000Z",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1wa252x/capcom_tgs_deals_quest/",
+      "selfText": "As always, use at your own discretion.\n\n../Street Fighter 6/StreetFighter6.exe\n\nOR\n\n../Monster Hunter Stories/MHST.exe"
+    },
+    {
+      "id": "1wa7p56",
+      "title": "Capcom TGS Deals Quest",
+      "createdAt": "2026-09-07T23:18:00.000Z",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1wa7p56/capcom_tgs_deals_quest/",
+      "selfText": "FOLDER:   \n**Monster Hunter Stories**  \n  \nEXECUTABLE:   \n**MHST.exe**"
+    },
+    {
+      "id": "1wd0j3v",
+      "title": "Resident Evil Village Quest",
+      "createdAt": "2026-09-11T00:15:35.000Z",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1wd0j3v/resident_evil_village_quest/",
+      "selfText": "`C:\\Program Files (x86)\\Steam\\steamapps\\common\\Resident Evil Village BIOHAZARD VILLAGE\\re8.exe`\n\n`..\\Resident Evil Village BIOHAZARD VILLAGE\\re8.exe`  Also worked for me "
+    },
+    {
+      "id": "1wno05q",
+      "title": "APEX LEGENDS QUEST",
+      "createdAt": "2026-09-22T22:24:36.000Z",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1wno05q/apex_legends_quest/",
+      "selfText": "`C:\\Program Files (x86)\\Steam\\steamapps\\common\\Apex Legends\\r5apex.exe`"
+    },
+    {
+      "id": "1wpsznl",
+      "title": "Apex Legends - Kung Fu Coach tracker set quest",
+      "createdAt": "2026-09-25T10:41:46.000Z",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1wpsznl/apex_legends_kung_fu_coach_tracker_set_quest/",
+      "selfText": "Desktop\\\\EA SPORTS\\\\Apex\\\\r5apex\\\\r5apex.exe"
+    },
+    {
+      "id": "1wu9005",
+      "title": "Dragonstride: Legacy Reborn Quest",
+      "createdAt": "2026-09-30T16:09:25.000Z",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1wu9005/dragonstride_legacy_reborn_quest/",
+      "selfText": "`..\\Dragonheir Silent Gods\\Dragonheir.exe`"
+    },
+    {
+      "id": "1x02eas",
+      "title": "March of Giants Playtest",
+      "createdAt": "2026-10-07T17:17:36.000Z",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1x02eas/march_of_giants_playtest/",
+      "selfText": "    ..\\win64\\thelineclient-win64-shipping\n    \n    Note: If it doesn't work right away, make sure to completely close and restart Discord before launching the .exe file."
+    },
+    {
+      "id": "1x03q7o",
+      "title": "March of Giants Quest",
+      "createdAt": "2026-10-07T18:07:28.000Z",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1x03q7o/march_of_giants_quest/",
+      "selfText": "..\\\\March of Giants\\\\TheLineClient.exe"
+    },
+    {
+      "id": "1x0wsuu",
+      "title": "ROR2 Hallowed Concepts Quest",
+      "createdAt": "2026-10-08T17:17:57.000Z",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1x0wsuu/ror2_hallowed_concepts_quest/",
+      "selfText": "    .../risk of rain 2/risk of rain 2.exe"
+    },
+    {
+      "id": "1x1r4b1",
+      "title": "Deadzone Rogue 2 Quest",
+      "createdAt": "2026-10-09T17:15:14.000Z",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1x1r4b1/deadzone_rogue_2_quest/",
+      "selfText": "    .../Win64/deadzone2steam.exe"
+    },
+    {
+      "id": "1x1r5wc",
+      "title": "Dark Arisen Arrives Quest",
+      "createdAt": "2026-10-09T17:16:59.000Z",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1x1r5wc/dark_arisen_arrives_quest/",
+      "selfText": "    .../dragons dogma 2/dd2.exe"
+    }
+  ]
+}

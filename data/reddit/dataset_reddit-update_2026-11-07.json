@@ -1,0 +1,17 @@
+{
+  "source": "arctic-shift",
+  "subreddit": "DiscordQuests",
+  "fetchedAt": "2026-11-07T06:04:50.973Z",
+  "checkedThrough": "2026-11-06T19:52:00.000Z",
+  "textFormat": "markdown",
+  "note": "Written by scripts/update-game-database.ts: the r/DiscordQuests posts created after the previous snapshots.",
+  "posts": [
+    {
+      "id": "1xpmd8x",
+      "title": "MapleStory Classic World Quest Not Being Detected",
+      "selfText": "I installed the game from Nexon launcher and when I launch the Classic World game, Discord only detects it as \"MapleStory\". So the quest doesn't progress. Any fix for this?",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1xpmd8x/maplestory_classic_world_quest_not_being_detected/",
+      "createdAt": "2026-11-06T19:52:00.000Z"
+    }
+  ]
+}

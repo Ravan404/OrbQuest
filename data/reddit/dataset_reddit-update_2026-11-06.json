@@ -1,0 +1,24 @@
+{
+  "source": "arctic-shift",
+  "subreddit": "DiscordQuests",
+  "fetchedAt": "2026-11-06T06:54:05.346Z",
+  "checkedThrough": "2026-11-05T23:07:27.000Z",
+  "textFormat": "markdown",
+  "note": "Written by scripts/update-game-database.ts: the r/DiscordQuests posts created after the previous snapshots.",
+  "posts": [
+    {
+      "id": "1xotvjg",
+      "title": "Godzilla Minus Zero Quest not showing up",
+      "selfText": "Hello, the Godzilla minus zero quest for some reason hasn’t been popping up on my discord quest list and I don’t know why. I’m apart of the 18+ age group and in the US so it can’t be one of those. Any way I can find it?",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1xotvjg/godzilla_minus_zero_quest_not_showing_up/",
+      "createdAt": "2026-11-05T20:49:24.000Z"
+    },
+    {
+      "id": "1xox6wr",
+      "title": "Got a quest limitation warning for no reason",
+      "selfText": "I was doing the anno 117 video quest on my phone. I didn’t do anything wrong, I did the quest exactly how I do every other quest by simply letting the video play out and then claiming my reward. I don’t know why I’m getting this warning? ",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1xox6wr/",
+      "createdAt": "2026-11-05T23:07:27.000Z"
+    }
+  ]
+}

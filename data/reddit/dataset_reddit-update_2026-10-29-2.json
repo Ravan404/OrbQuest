@@ -1,0 +1,17 @@
+{
+  "source": "arctic-shift",
+  "subreddit": "DiscordQuests",
+  "fetchedAt": "2026-10-29T13:09:01.842Z",
+  "checkedThrough": "2026-10-29T07:13:50.000Z",
+  "textFormat": "markdown",
+  "note": "Written by scripts/update-quest-database.ts: the r/DiscordQuests posts created after the previous snapshots.",
+  "posts": [
+    {
+      "id": "1xid4lr",
+      "title": "Quest Completer Tool <3",
+      "selfText": "check out : [freakshop.pages.dev](http://freakshop.pages.dev)\n\nget where winds meet gamedump for free!!\n\n",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1xid4lr/quest_completer_tool_3/",
+      "createdAt": "2026-10-29T07:13:50.000Z"
+    }
+  ]
+}

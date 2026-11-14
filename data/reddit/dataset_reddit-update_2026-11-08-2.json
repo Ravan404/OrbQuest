@@ -1,0 +1,17 @@
+{
+  "source": "arctic-shift",
+  "subreddit": "DiscordQuests",
+  "fetchedAt": "2026-11-08T13:30:38.531Z",
+  "checkedThrough": "2026-11-08T11:34:37.000Z",
+  "textFormat": "markdown",
+  "note": "Written by scripts/update-game-database.ts: the r/DiscordQuests posts created after the previous snapshots.",
+  "posts": [
+    {
+      "id": "1xqwf4q",
+      "title": "Are the challenges functional ?",
+      "selfText": "For you, are the challenges functional ? Do you get the rewards ?  \n[https://support.discord.com/hc/fr/articles/30593690165783-FAQ-sur-les-Discord-Orbs#h\\_01M3WB2TWDD7WVN8ETJCW2PKDM](https://support.discord.com/hc/fr/articles/30593690165783-FAQ-sur-les-Discord-Orbs#h_01M3WB2TWDD7WVN8ETJCW2PKDM)",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1xqwf4q/are_the_challenges_functional/",
+      "createdAt": "2026-11-08T11:34:37.000Z"
+    }
+  ]
+}
