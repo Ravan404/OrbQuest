@@ -439,6 +439,29 @@ const QUOTED_VALUE = (key: string): RegExp =>
   new RegExp(`["']${key}["']\\s*["']([^"']*(?:'(?=[A-Za-z])[^"']*)*)["']`, 'i');
 
 /**
+ * `steamapps\common\<installDir>`, with the subfolders the post puts the
+ * executable in when it names them (`...\Asphalt 9 Legends\Binaries\Win64`).
+ */
+function steamFolderPath(text: string, installDir: string): string {
+  const base = `steamapps\\common\\${installDir}`;
+  const dir = installDir.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const match = new RegExp(`common[\\\\/]+${dir}((?:[\\\\/]+[^\\\\/\\r\\n"'\`<>|*?:]+)+)`, 'i').exec(text);
+  if (!match) return base;
+  const segments: string[] = [];
+  for (const raw of match[1].split(/[\\/]+/)) {
+    const segment = raw.trim();
+    if (!segment) continue;
+    // The executable ends the path; whatever follows it is prose.
+    if (/\.exe\b/i.test(segment)) break;
+    segments.push(segment);
+  }
+  const usable =
+    segments.length <= 6 &&
+    segments.every((s) => s !== '.' && s !== '..' && s.length <= 60 && s.split(/\s+/).length <= 4);
+  return usable && segments.length > 0 ? trimProseSegments([base, ...segments].join('\\')) : base;
+}
+
+/**
  * The executable and folder in a post's text, or null.
  */
 export function extractMatchesFromText(text: string, url: string): ExtractedMatch | null {
@@ -449,21 +472,23 @@ export function extractMatchesFromText(text: string, url: string): ExtractedMatc
     .replace(/&quot;/gi, '"')
     .replace(/&#34;/gi, '"')
     .replace(/&amp;/gi, '&');
+  // The app id is in the manifest's file name, or only in its "appid" line
+  // when the post writes the name as `appmanifest_(game ID).acf`.
   const manifestMatch = normalizedText.match(/appmanifest_(\d+)\.acf/i);
+  const appIdMatch = normalizedText.match(/["']appid["']\s*["'](\d+)["']/i);
+  const appId = Number(manifestMatch?.[1] ?? appIdMatch?.[1]);
   const installDirMatch = normalizedText.match(QUOTED_VALUE('installdir'));
   const hasManifestTemplate =
-    manifestMatch && installDirMatch && /appstate|steamapps\s*[\\/]\s*common|stateflags/i.test(normalizedText);
+    appId > 0 && installDirMatch && /appstate|steamapps\s*[\\/]\s*common|stateflags/i.test(normalizedText);
   if (hasManifestTemplate) {
-    const exeMatchFromManifest = normalizedText.match(/\b([A-Za-z0-9_.-]+\.exe)\b/i);
-    const executableName = exeMatchFromManifest?.[1];
+    // The manifest's LauncherPath names steam.exe, so the first .exe in the
+    // post is not necessarily the game's.
+    const executableName = [...normalizedText.matchAll(/\b([A-Za-z0-9_.-]+\.exe)\b/gi)]
+      .map((match) => match[1])
+      .find((name) => isPlausibleExecutableName(name) && !BANNED_EXECUTABLES.has(name.toLowerCase()));
     const installDir = installDirMatch[1].trim();
-    if (
-      executableName &&
-      isPlausibleExecutableName(executableName) &&
-      !BANNED_EXECUTABLES.has(executableName.toLowerCase())
-    ) {
+    if (executableName) {
       const nameMatch = normalizedText.match(QUOTED_VALUE('name'));
-      const appId = Number(manifestMatch[1]);
       const manifestContent = `"AppState"
 {
     "appid"     "${appId}"
@@ -474,7 +499,7 @@ export function extractMatchesFromText(text: string, url: string): ExtractedMatc
       return {
         gameName: installDir,
         url: sanitizeSourceUrl(url),
-        folderPath: `steamapps\\common\\${installDir}`,
+        folderPath: steamFolderPath(normalizedText, installDir),
         executableName,
         questMethod: 'steam-manifest',
         steamAppId: appId,

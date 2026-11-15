@@ -478,12 +478,15 @@ try {
     await click('Add', { nth: 0 });
     await sleep(500);
     ok(
-      'a Steam quest asks first and writes nothing yet',
-      /into Steam's folder/.test(await bodyText()) && !fs.existsSync(path.join(STEAMAPPS, 'appmanifest_4080220.acf'))
+      'a Steam quest asks in a dialog first and writes nothing yet',
+      (await page.$('[role=dialog]')) !== null &&
+        /steamapps folder/.test(await bodyText()) &&
+        !fs.existsSync(path.join(STEAMAPPS, 'appmanifest_4080220.acf'))
     );
     await shot('catalog-steam-confirm');
-    await click('Confirm');
+    await click('Add', { within: '[role=dialog]' });
     await sleep(1500);
+    ok('adding a Steam quest says Discord may need a restart', /restart Discord/.test(await bodyText()));
     const games = await api('/api/games');
     ok(
       'a Steam quest is written into the Steam library',

@@ -4,7 +4,8 @@
  * games Discord has not added yet. Their executables come from
  * r/DiscordQuests posts (dataset.ts). An entry is only used while Discord's
  * list knows neither its executable nor the game: once Discord adds a game,
- * Discord's own entry takes over.
+ * Discord's own entry takes over. A Steam quest is the exception to the
+ * executable rule, because Discord detects it by its Steam app id.
  *
  * Some quests are only detected through Steam (EA SPORTS FC 27, Marathon):
  * the post has Steam's app id and folder, and the entry keeps them so the app
@@ -69,6 +70,15 @@ export function buildRedditSupplement(
   discordGames: readonly DatabaseGame[]
 ): DatabaseGame[] {
   const knownFiles = new Set(discordGames.flatMap((game) => game.executables.map(executableFileName)));
+  // The icon of each executable Discord lists, for a quest application without one.
+  const iconByFile = new Map<string, { app: string; icon: string }>();
+  for (const game of discordGames) {
+    if (!game.icon) continue;
+    for (const exe of game.executables) {
+      const file = executableFileName(exe);
+      if (!iconByFile.has(file)) iconByFile.set(file, { app: game.id, icon: game.icon });
+    }
+  }
   const knownNames = new Set(
     discordGames.flatMap((game) => [game.name, ...(game.aliases ?? [])].map((name) => normalizeGameKey(name)))
   );
@@ -101,7 +111,11 @@ export function buildRedditSupplement(
     const steamQuest = steamQuestOf(entry);
     const executable = steamQuest?.executable ?? normalizeExecutablePath(executableFileName(entry.executableName));
     const key = normalizeGameKey(entry.gameName);
-    if (!executable || !key || knownFiles.has(executableFileName(executable)) || knownNames.has(key)) continue;
+    // A Steam quest is detected through its Steam app id, so an executable
+    // Discord already lists for another game (Asphalt Legends Unite and the
+    // Asphalt Legends quest share one) does not make it a duplicate.
+    if (!executable || !key || knownNames.has(key)) continue;
+    if (!steamQuest && knownFiles.has(executableFileName(executable))) continue;
     // A post the extractor misread names the file instead of the game.
     if (/\.exe$/i.test(entry.gameName.trim())) continue;
     const existing = byName.get(key);
@@ -117,12 +131,14 @@ export function buildRedditSupplement(
       continue;
     }
     const discord = discordAppFor(key);
-    const site = discord?.icon ? undefined : PROGRAM_SITES[key];
+    const borrowed = discord?.icon ? undefined : iconByFile.get(executableFileName(executable));
+    const site = discord?.icon || borrowed ? undefined : PROGRAM_SITES[key];
     byName.set(key, {
       id: discord?.id ?? redditId(key),
       name: entry.gameName,
       executables: [executable],
       ...(discord?.icon ? { icon: discord.icon } : {}),
+      ...(borrowed ? { icon: borrowed.icon, iconApp: borrowed.app } : {}),
       source: 'reddit',
       ...(entry.url ? { url: entry.url } : {}),
       ...(steamQuest ? { steam: steamQuest.steam } : {}),

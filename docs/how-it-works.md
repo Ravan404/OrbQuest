@@ -24,7 +24,7 @@ A Steam quest is written to `steamapps\common\<game>` of the Steam installation 
 
 `src/server/gameDatabase.json` is Discord's list of detectable games (`discord.com/api/v9/applications/detectable`) in compact form: every game with a Windows executable, the executables with the folder part Discord matches, its other names and its icon id.
 
-Discord also lists quest programs without any executable (Firefox, the Comet browser) and adds new quest games to its list late. For those the database takes the executable from r/DiscordQuests posts, marked `"source": "reddit"` and shown with an r/DiscordQuests label in the catalog. Such an entry is only used while Discord's list knows neither its executable nor the game; once Discord adds it, Discord's entry takes over. It keeps Discord's id and icon when Discord knows the program by name; a program Discord has no icon for (Firefox, Opera GX) gets its website in `"site"`, and the app shows that site's icon. A quest the post sets up through Steam keeps Steam's app id and folder in `"steam"`.
+Discord also lists quest programs without any executable (Firefox, the Comet browser) and adds new quest games to its list late. For those the database takes the executable from r/DiscordQuests posts, marked `"source": "reddit"` and shown with an r/DiscordQuests label in the catalog. Such an entry is only used while Discord's list knows neither its executable nor the game; once Discord adds it, Discord's entry takes over. A Steam quest is kept even when Discord lists its executable for another game, because Discord detects it by its Steam app id. It keeps Discord's id and icon when Discord knows the program by name; when that application has no icon, it uses the icon of the game Discord lists with the same executable (`"iconApp"` names that game), and a Steam quest with neither gets its icon from Steam (`"steamIcon"`); a program Discord has no icon for (Firefox, Opera GX) gets its website in `"site"`, and the app shows that site's icon. A quest the post sets up through Steam keeps Steam's app id and folder in `"steam"`.
 
 `src/server/featuredGames.json` names the games shown on the catalog page before anything is searched: the ones that have had Discord quests, plus every r/DiscordQuests entry.
 
@@ -53,7 +53,7 @@ The server asks GitHub for the latest release at its start and every six hours. 
 - Production builds send a Content-Security-Policy. The dev server does not, so the Vite client can connect.
 - `dist/server.cjs`, its sourcemap and the database JSON files are not served as static files.
 - File writes stay inside `Games/` and `icon-cache/`, for a Steam quest inside that game's folder and manifest in Steam's `steamapps`, and a start script only as `<Game> - OrbQuest.<bat|ps1|py>` in Downloads. An executable path from a request or from Discord's list must stay inside its game folder (no `..`, drive letters or absolute paths).
-- Images are only loaded from the app itself and `cdn.discordapp.com`. A website icon is downloaded by the server and served from `icon-cache/`, and only real PNG, JPEG, WebP, GIF or ICO files are saved.
+- Images are only loaded from the app itself and `cdn.discordapp.com`. A Steam or website icon is downloaded by the server and served from `icon-cache/`, and only real PNG, JPEG, WebP, GIF or ICO files are saved.
 - An update is only downloaded from this repository's releases, must match the SHA-256 in the release's `SHA256SUMS.txt`, and is checked again by the desktop app before it runs.
 
 To report a problem, see [SECURITY.md](../SECURITY.md).

@@ -28,7 +28,7 @@ It never logs in to Discord, never reads your token and never changes the Discor
 | Purpose | Hosts |
 |---|---|
 | Game database updates (every six hours) | `raw.githubusercontent.com/Ravan404/OrbQuest`, `cdn.jsdelivr.net/gh/Ravan404/OrbQuest` (the published database). Only if both fail for a day: `discord.com` (Discord's public list of detectable games) |
-| Game icons | `cdn.discordapp.com`; for the few programs Discord has no icon for, `www.google.com/s2/favicons` (their website's icon) |
+| Game icons | `cdn.discordapp.com`; for the few programs Discord has no icon for, `shared.fastly.steamstatic.com` (a Steam quest's icon) or `www.google.com/s2/favicons` (their website's icon) |
 | New release check (at the start and every six hours) | `api.github.com`, or `github.com` when that does not answer (the latest OrbQuest release; `ORBQUEST_UPDATE_CHECK=0` turns it off) |
 | Installing an update, only when you click Install | `github.com/Ravan404/OrbQuest/releases/download/` (GitHub serves the file from `objects.githubusercontent.com`) |
 

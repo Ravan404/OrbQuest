@@ -32,7 +32,10 @@ function toCatalogGame(game: DatabaseGame, inLibrary: Set<string>): CatalogGame 
   return {
     id: game.id,
     name: game.name,
-    icon: localGameIcon(game) ?? discordIconUrl(game, 64) ?? (game.site ? `/api/catalog/icons/${game.id}` : undefined),
+    icon:
+      localGameIcon(game) ??
+      discordIconUrl(game, 64) ??
+      (game.site || game.steamIcon ? `/api/catalog/icons/${game.id}` : undefined),
     executables: game.executables,
     inLibrary: inLibrary.has(game.id),
     ...(game.source ? { source: game.source } : {}),
@@ -54,7 +57,7 @@ router.get('/featured', (_req: Request, res: Response) => {
 
 router.get('/icons/:id', async (req: Request<{ id: string }>, res: Response) => {
   const game = getGameById(req.params.id);
-  if (!game?.site) return res.sendStatus(404);
+  if (!game?.site && !game?.steamIcon) return res.sendStatus(404);
   const local = await cacheGameIcon(game);
   return local ? res.redirect(local) : res.sendStatus(404);
 });

@@ -36,6 +36,7 @@ import {
 } from '../src/server/reddit/snapshots.ts';
 import { fetchNewSubredditPosts } from '../src/server/reddit/posts.ts';
 import { buildRedditSupplement } from '../src/server/reddit/supplement.ts';
+import { fetchSteamIcons } from '../src/server/steamStore.ts';
 
 const ROOT = process.cwd();
 const FILE = path.join(ROOT, 'src', 'server', 'gameDatabase.json');
@@ -98,17 +99,32 @@ async function run(): Promise<void> {
   const snapshots = await updateRedditSnapshots(dryRun);
   const entries = buildDatabaseEntries(loadDataset(snapshots).posts);
   const supplement = buildRedditSupplement(entries, discordList, discord.games);
+  const current: GameDatabase | null = fs.existsSync(FILE) ? JSON.parse(fs.readFileSync(FILE, 'utf8')) : null;
+
+  // A Steam quest without any Discord icon shows Steam's. When Steam does not
+  // answer, it keeps the one the published database has.
+  const withoutIcon = supplement.filter((game) => game.steam && !game.icon);
+  const steamIcons = await fetchSteamIcons(
+    withoutIcon.map((game) => game.steam?.appId ?? 0),
+    `OrbQuest/${APP_VERSION} (game database update)`
+  );
+  for (const game of withoutIcon) {
+    const appId = game.steam?.appId ?? 0;
+    const published = current?.games.find((g) => g.steam?.appId === appId)?.steamIcon;
+    const steamIcon = steamIcons.get(appId) ?? published;
+    if (steamIcon) game.steamIcon = steamIcon;
+  }
+
   console.log(`r/DiscordQuests adds ${supplement.length} program(s) Discord gives no executable for:`);
   for (const game of supplement) {
     const notes = [
       game.steam ? `Steam app ${game.steam.appId}, steamapps/common/${game.steam.installDir}` : '',
-      game.icon ? '' : game.site ? `icon from ${game.site}` : 'no icon',
+      game.icon ? '' : game.steamIcon ? 'icon from Steam' : game.site ? `icon from ${game.site}` : 'no icon',
     ].filter(Boolean);
     console.log(`  ${game.name} [${game.executables.join(', ')}]${notes.length ? ` (${notes.join('; ')})` : ''}`);
   }
 
   const next: GameDatabase = { ...discord, games: sortGames([...discord.games, ...supplement]) };
-  const current: GameDatabase | null = fs.existsSync(FILE) ? JSON.parse(fs.readFileSync(FILE, 'utf8')) : null;
   if (current && sameGames(current, next)) {
     console.log(`The database is up to date (last change ${current.generatedAt}).`);
     return;

@@ -95,9 +95,9 @@ const strings = {
   fromReddit: 'r/DiscordQuests',
   fromRedditTitle: "Discord's list has no executable for this; this one comes from r/DiscordQuests posts.",
   needsSteam: 'Steam',
-  steamConfirm:
-    "This writes a stand-in and a small manifest into Steam's folder. Removing the game takes them out again.",
-  confirm: 'Confirm',
+  steamDialogTitle: 'Add {name}',
+  steamDialogText:
+    "Discord detects this game through Steam, so the stand-in and a small manifest file go into Steam's steamapps folder. Removing the game deletes them again.",
   needsSteamTitle:
     'Discord only detects this through Steam. Steam must be installed; the stand-in goes into its steamapps folder.',
   inLibrary: 'In library',
@@ -134,6 +134,7 @@ const strings = {
   noticeError: 'Something went wrong',
   noticeStarted: 'Started',
   noticeStartedText: '{name} is running.',
+  noticeStartedSteamText: '{name} is running. If the quest does not move, restart Discord.',
   noticeStopped: 'Stopped',
   noticeStoppedText: '{name} stopped.',
   noticeStoppedAll: '{n} games stopped.',
@@ -144,6 +145,7 @@ const strings = {
   noticeResetText: '{name} is back at 00:00.',
   noticeAdded: 'Added',
   noticeAddedText: '{name} is in your library.',
+  noticeAddedSteamText: '{name} is in your library. You may need to restart Discord before the quest notices it.',
   noticeSaved: 'Saved',
   noticeSavedText: '{name} was updated.',
   noticeRemoved: 'Removed',

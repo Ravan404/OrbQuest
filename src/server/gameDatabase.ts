@@ -97,9 +97,11 @@ function validDatabase(value: unknown): GameDatabase | null {
         name: g?.name,
         aliases: g?.aliases,
         icon_hash: g?.icon,
+        icon_app: g?.iconApp,
         source: g?.source,
         url: g?.url,
         steam: g?.steam,
+        steam_icon: g?.steamIcon,
         site: g?.site,
         executables: Array.isArray(g?.executables) ? g.executables.map((name) => ({ name, os: 'win32' })) : [],
       });

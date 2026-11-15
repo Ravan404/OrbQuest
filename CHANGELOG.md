@@ -4,6 +4,21 @@ Notable changes to OrbQuest. The format follows [Keep a Changelog](https://keepa
 
 ## [Unreleased]
 
+## [1.6.4] - 2026-11-15
+
+### Changed
+
+- OrbQuest opens faster: the window no longer waits for the local server, and both start at the same time. On a warm start the window shows in about 0.7 s instead of 1.5 s; right after Windows starts the gain is larger.
+- Adding a Steam quest asks in a short dialog instead of turning the Add button into Confirm.
+- Adding or starting a Steam quest says that Discord may need a restart before the quest notices it.
+
+### Fixed
+
+- The Asphalt Legends quest is in the catalog as a Steam quest. Its r/DiscordQuests post could not be read, and a Steam quest whose executable Discord lists for another game (Asphalt Legends Unite) was dropped as a duplicate.
+- A quest game whose Discord application has no icon shows the icon of the game Discord lists with the same executable, so Asphalt Legends shows its logo. A Steam quest with no Discord icon at all shows its icon from Steam.
+- Steam quest posts that write the manifest as `appmanifest_(game ID).acf`, list `steam.exe` in the manifest or put the executable in a subfolder are read without a hand-written correction.
+- A Steam quest's executable goes into the subfolder its post names: MARVEL Tōkon: Fighting Souls into `MTFS\Binaries\Win64`, as its post says, instead of `MTFS`.
+
 ## [1.6.3] - 2026-11-06
 
 ### Fixed
@@ -319,7 +334,8 @@ Notable changes to OrbQuest. The format follows [Keep a Changelog](https://keepa
 
 - First release: library, placeholder process, quest timer, catalog, Reddit search, Windows shell.
 
-[Unreleased]: https://github.com/Ravan404/OrbQuest/compare/v1.6.3...HEAD
+[Unreleased]: https://github.com/Ravan404/OrbQuest/compare/v1.6.4...HEAD
+[1.6.4]: https://github.com/Ravan404/OrbQuest/compare/v1.6.3...v1.6.4
 [1.6.3]: https://github.com/Ravan404/OrbQuest/compare/v1.6.2...v1.6.3
 [1.6.2]: https://github.com/Ravan404/OrbQuest/compare/v1.6.1...v1.6.2
 [1.6.1]: https://github.com/Ravan404/OrbQuest/compare/v1.6.0...v1.6.1

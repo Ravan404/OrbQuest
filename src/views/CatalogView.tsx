@@ -7,11 +7,12 @@ import { t } from '../strings';
 import { preferredExecutable } from '../utils/executables';
 import { Button, Chip, SearchInput, SectionLabel } from '../components/ui';
 import { GameIcon } from '../components/GameIcon';
+import { SteamQuestDialog } from '../dialogs/SteamQuestDialog';
 
 interface CatalogViewProps {
   /** Number of games in Discord's list, for the hint under the search. */
   databaseSize?: number;
-  onAdded: (name: string) => void;
+  onAdded: (game: CatalogGame) => void;
   onError: (message: string) => void;
   onAddCustom: () => void;
 }
@@ -27,8 +28,8 @@ const CatalogTile: React.FC<{
 }> = ({ game, onAdd }) => {
   const [executable, setExecutable] = useState(() => preferredExecutable(game));
   const [busy, setBusy] = useState(false);
-  // A Steam quest writes into Steam's folder, so the first click says so.
-  const [confirmSteam, setConfirmSteam] = useState(false);
+  // A Steam quest writes into Steam's folder, so it asks first.
+  const [askSteam, setAskSteam] = useState(false);
   const exeId = `exe-${game.id}`;
 
   return (
@@ -83,21 +84,29 @@ const CatalogTile: React.FC<{
             icon={busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Plus className="h-3.5 w-3.5" />}
             disabled={busy}
             onClick={async () => {
-              if (game.steam && !confirmSteam) {
-                setConfirmSteam(true);
+              if (game.steam) {
+                setAskSteam(true);
                 return;
               }
               setBusy(true);
               await onAdd(game, executable);
               setBusy(false);
-              setConfirmSteam(false);
             }}
           >
-            {busy ? t('adding') : confirmSteam ? t('confirm') : t('add')}
+            {busy ? t('adding') : t('add')}
           </Button>
         )}
       </div>
-      {confirmSteam && <p className="mt-2 text-[12px] text-muted">{t('steamConfirm')}</p>}
+      {askSteam && (
+        <SteamQuestDialog
+          name={game.name}
+          onClose={() => setAskSteam(false)}
+          onAdd={async () => {
+            await onAdd(game, executable);
+            setAskSteam(false);
+          }}
+        />
+      )}
     </div>
   );
 };
@@ -149,7 +158,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({ databaseSize, onAdded,
   const add = async (game: CatalogGame, executable: string) => {
     try {
       await api.addFromCatalog(game, executable);
-      onAdded(game.name);
+      onAdded(game);
       setRefresh((n) => n + 1);
     } catch (error) {
       onError((error as Error)?.message || t('addFailed'));

@@ -29,9 +29,11 @@ DATA_ROOT = None
 # The checked update to start once the window is closed (apply_update).
 UPDATE_TO_RUN = None
 WINDOW = None
+# Why the backend did not start, raised once the window is closed.
+STARTUP_ERROR = None
 
 APP_NAME = "OrbQuest"
-APP_VERSION = "1.6.3"
+APP_VERSION = "1.6.4"
 # The window title starts with this; single_instance.focus_existing_window
 # looks for it.
 WINDOW_TITLE_PREFIX = f"{APP_NAME} v"
@@ -413,7 +415,7 @@ def wait_for_server(timeout: float = 30.0) -> None:
 
 
 def start_backend_server() -> None:
-    """Start the bundled backend on loopback."""
+    """Start the bundled backend on loopback; wait_for_server() waits for it."""
     global SERVER_PROCESS, PORT, SERVER_SHUTDOWN_TOKEN, API_TOKEN, SERVER_LOG
     PORT = choose_port()
     SERVER_SHUTDOWN_TOKEN = secrets.token_urlsafe(32)
@@ -461,8 +463,6 @@ def start_backend_server() -> None:
         raise FileNotFoundError(f"Failed to start Node.js backend: {e}. Ensure Node.js is installed and accessible.") from e
     except OSError as e:
         raise RuntimeError(f"Failed to launch backend process: {e}") from e
-
-    wait_for_server()
 
 
 def stop_backend_server() -> None:
@@ -515,12 +515,26 @@ atexit.register(stop_backend_server)
 atexit.register(close_backend_log)
 
 
+def open_app() -> None:
+    """Runs once the window is up: loads the app as soon as the backend answers."""
+    global STARTUP_ERROR
+    try:
+        wait_for_server()
+        WINDOW.load_url(f"http://127.0.0.1:{PORT}/session?token={API_TOKEN}")
+    except Exception as error:
+        STARTUP_ERROR = error
+        WINDOW.destroy()
+
+
 def main() -> None:
     global DATA_ROOT, WINDOW
     # Runs under the instance lock: only one copy moves an old library.
     DATA_ROOT = data_root()
     # An update that was installed (or given up) leaves its download behind.
     shutil.rmtree(DATA_ROOT / "update", ignore_errors=True)
+    # Node and the window (.NET, WebView2) both load slowly right after
+    # Windows starts, so they start at the same time instead of one after the other.
+    start_backend_server()
     # Imported after the instance lock is acquired. The second launch must
     # never unpack assets or spawn a second Node backend.
     try:
@@ -539,24 +553,27 @@ def main() -> None:
         # installation without the system-wide WebView2 Evergreen runtime.
         webview.settings["WEBVIEW2_RUNTIME_PATH"] = str(runtime_dir)
 
-    start_backend_server()
+    background = window_background()
     try:
         WINDOW = webview.create_window(
             title=f"{WINDOW_TITLE_PREFIX}{APP_VERSION}",
-            url=f"http://127.0.0.1:{PORT}/session?token={API_TOKEN}",
+            # An empty page in the app's background colour until open_app() loads the app.
+            html=f'<!doctype html><html><body style="margin:0;background:{background}"></body></html>',
             width=1180,
             height=760,
             min_size=(900, 600),
-            background_color=window_background(),
+            background_color=background,
             js_api=DesktopApi(),
         )
         if has_fixed_runtime:
-            webview.start(gui="edgechromium", debug=False)
+            webview.start(open_app, gui="edgechromium", debug=False)
         else:
-            webview.start(debug=False)
+            webview.start(open_app, debug=False)
     except Exception as e:
         stop_backend_server()
         raise RuntimeError(f"Failed to start desktop window: {e}") from e
+    if STARTUP_ERROR is not None:
+        raise STARTUP_ERROR
 
 
 def run_desktop() -> None:

@@ -186,3 +186,43 @@ test('a broken, oversized or unreachable download is not used', async () => {
   }) as typeof fetch;
   assert.equal((await fetchPublishedDatabase('', urls, down)).status, 'failed');
 });
+
+test("a Steam quest without any Discord icon uses Steam's icon", async () => {
+  const { fetchSteamIcons } = await import('../src/server/steamStore.ts');
+  const { toDatabaseGame } = await import('../src/server/gameDatabaseSource.ts');
+  const { remoteIconUrl } = await import('../src/server/iconStore.ts');
+  const hash = '95f2da4df91bdd314588fd10cc3e145e63e78d5d';
+  const store = (async (input: string | URL | Request) => {
+    assert.match(String(input), /^https:\/\/api\.steampowered\.com\/IStoreBrowseService\/GetItems\/v1\//);
+    return Response.json({
+      response: {
+        store_items: [
+          { appid: 1815780, assets: { community_icon: hash } },
+          { appid: 5, assets: { community_icon: '../../evil' } },
+        ],
+      },
+    });
+  }) as typeof fetch;
+  assert.deepEqual([...(await fetchSteamIcons([1815780, 5], 'test', store))], [[1815780, hash]]);
+  const offline = (async () => {
+    throw new Error('offline');
+  }) as typeof fetch;
+  assert.equal((await fetchSteamIcons([1815780], 'test', offline)).size, 0, 'Steam unreachable is not an error');
+
+  const quest = {
+    id: '1440142141027520583',
+    name: 'Asphalt Legends',
+    source: 'reddit',
+    steam: { appId: 1815780, installDir: 'Asphalt 9 Legends' },
+    steam_icon: hash,
+    executables: [{ name: 'binaries/win64/asphalt9_steam_x64_rtl.exe', os: 'win32' }],
+  };
+  const game = toDatabaseGame(quest);
+  assert.equal(game?.steamIcon, hash);
+  assert.equal(
+    game && remoteIconUrl(game),
+    `https://shared.fastly.steamstatic.com/community_assets/images/apps/1815780/${hash}.jpg`
+  );
+  assert.equal(toDatabaseGame({ ...quest, icon_hash: 'a'.repeat(32) })?.steamIcon, undefined, 'a Discord icon wins');
+  assert.equal(toDatabaseGame({ ...quest, steam_icon: 'not-a-hash' })?.steamIcon, undefined);
+});

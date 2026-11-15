@@ -2,7 +2,8 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
 const { buildRedditSupplement } = await import('../src/server/reddit/supplement.ts');
-const { buildGameDatabase } = await import('../src/server/gameDatabaseSource.ts');
+const { dedupeEntries, redditPostToEntries } = await import('../src/server/reddit/dataset.ts');
+const { buildGameDatabase, toDatabaseGame } = await import('../src/server/gameDatabaseSource.ts');
 
 const discordList = [
   {
@@ -88,6 +89,62 @@ test('r/DiscordQuests entries survive the file format and the published download
   });
   assert.equal(foreignUrl?.url, undefined, 'only reddit.com links are kept');
   assert.equal(toDatabaseGame({ id: 'r-../x', name: 'X', executables: [{ os: 'win32', name: 'x.exe' }] }), null);
+});
+
+test('a Steam quest post without the app id in the file name is read, and its icon is borrowed', () => {
+  const list = [
+    {
+      id: '1124351901702570034',
+      name: 'Asphalt Legends Unite',
+      aliases: [],
+      icon_hash: '5ef6801f10b038424d2541b89463df2f',
+      executables: [{ os: 'win32', name: 'asphalt 9 legends/asphalt9_steam_x64_rtl.exe', is_launcher: false }],
+    },
+    { id: '1440142141027520583', name: 'Asphalt Legends', aliases: [], icon_hash: null, executables: [] },
+  ];
+  // The shape of the post: the manifest named `appmanifest_(game ID).acf`, its
+  // lines without spaces, steam.exe in LauncherPath, the executable in a subfolder.
+  const post = {
+    title: 'Asphalt Legends Quest (explained metadata and paths)',
+    url: 'https://www.reddit.com/r/DiscordQuests/comments/1xvp5el/asphalt_legends_quest_explained_metadata_and_paths/',
+    selfText: [
+      "Make `'appmanifest_(game ID).acf'` (here **1815780**):",
+      '',
+      '    "AppState"',
+      '    {',
+      '    "appid""1815780"',
+      '    "LauncherPath""C:\\Program Files (x86)\\Steam\\steam.exe"',
+      '    "name""Asphalt Legends"',
+      '    "StateFlags""6"',
+      '    "installdir""Asphalt 9 Legends"',
+      '    }',
+      '',
+      "Put it in `'C:\\Program Files (x86)\\Steam\\steamapps'`.",
+      "The executable is `'Asphalt9_Steam_x64_rtl.exe'` in `'C:\\Program Files (x86)\\Steam\\steamapps\\common\\Asphalt 9 Legends\\Binaries\\Win64'`, with the other files.",
+    ].join('\n'),
+  };
+  const entries = dedupeEntries([entry('Asphalt legends', 'Asphalt9_Steam_x64_rtl.exe'), ...redditPostToEntries(post)]);
+  assert.deepEqual(
+    entries.map((e) => e.questMethod),
+    ['steam-manifest'],
+    'the post with the Steam setup wins over the plain post with the same executable'
+  );
+  const games = buildRedditSupplement(entries, list, buildGameDatabase(list, '2026-01-01T00:00:00.000Z').games);
+  assert.equal(games.length, 1, JSON.stringify(games));
+  assert.equal(games[0].id, '1440142141027520583', "the quest's own Discord application");
+  assert.deepEqual(games[0].steam, { appId: 1815780, installDir: 'Asphalt 9 Legends' });
+  assert.deepEqual(games[0].executables, ['binaries/win64/asphalt9_steam_x64_rtl.exe']);
+  assert.equal(games[0].icon, '5ef6801f10b038424d2541b89463df2f', 'the icon of the game with the same executable');
+  assert.equal(games[0].iconApp, '1124351901702570034');
+
+  // As the app reads the published file (gameDatabase.ts).
+  const stored = toDatabaseGame({
+    ...games[0],
+    icon_hash: games[0].icon,
+    icon_app: games[0].iconApp,
+    executables: games[0].executables.map((name) => ({ name, os: 'win32' })),
+  });
+  assert.equal(stored?.iconApp, '1124351901702570034', 'the database keeps where the icon comes from');
 });
 
 test('a Steam-manifest quest keeps its Steam app id, folder and the executable inside it', () => {

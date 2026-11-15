@@ -23,6 +23,17 @@ export interface DatabaseGame {
   executables: string[];
   /** Icon hash on cdn.discordapp.com/app-icons/<id>/<icon>.png. */
   icon?: string;
+  /**
+   * The Discord application the icon belongs to, when it is not this one: a
+   * `reddit` quest whose own application has no icon uses the icon of the
+   * game Discord lists with the same executable.
+   */
+  iconApp?: string;
+  /**
+   * Steam's icon of a Steam quest that has no Discord icon at all (hash of
+   * the file on Steam's CDN, see steamStore.ts).
+   */
+  steamIcon?: string;
   /** `reddit`: an executable Discord's list does not give, read from r/DiscordQuests. */
   source?: 'reddit';
   /** The r/DiscordQuests post a `reddit` entry comes from. */
@@ -119,6 +130,14 @@ export function toDatabaseGame(raw: unknown): DatabaseGame | null {
   const url =
     fromReddit && typeof app.url === 'string' && /^https:\/\/www\.reddit\.com\//.test(app.url) ? app.url : undefined;
   const steam = fromReddit ? toSteamQuest(app.steam) : undefined;
+  const iconApp =
+    fromReddit && icon && typeof app.icon_app === 'string' && /^\d{5,25}$/.test(app.icon_app)
+      ? app.icon_app
+      : undefined;
+  const steamIcon =
+    steam && !icon && typeof app.steam_icon === 'string' && /^[a-f0-9]{40}$/.test(app.steam_icon)
+      ? app.steam_icon
+      : undefined;
   const site = fromReddit && !icon ? toSite(app.site) : undefined;
   return {
     id,
@@ -126,9 +145,11 @@ export function toDatabaseGame(raw: unknown): DatabaseGame | null {
     ...(aliases.length ? { aliases } : {}),
     executables,
     ...(icon ? { icon } : {}),
+    ...(iconApp ? { iconApp } : {}),
     ...(fromReddit ? { source: 'reddit' as const } : {}),
     ...(url ? { url } : {}),
     ...(steam ? { steam } : {}),
+    ...(steamIcon ? { steamIcon } : {}),
     ...(site ? { site } : {}),
   };
 }

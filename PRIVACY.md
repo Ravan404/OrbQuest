@@ -13,7 +13,7 @@ The app only downloads public files. These requests carry no personal data, but 
 | What | From | When |
 |---|---|---|
 | Game database | `raw.githubusercontent.com`, `cdn.jsdelivr.net`; `discord.com` only if both fail for a day | Every six hours |
-| Game icons | `cdn.discordapp.com`; `www.google.com/s2/favicons` for the few programs Discord has no icon for | When a game is shown or added |
+| Game icons | `cdn.discordapp.com`; for the few programs Discord has no icon for, `shared.fastly.steamstatic.com` (Steam quests) or `www.google.com/s2/favicons` | When a game is shown or added |
 | New release check | `api.github.com`; `github.com` when that does not answer | At the start and every six hours |
 | An update | `github.com` (the file itself comes from `objects.githubusercontent.com`) | Only when you click Install and restart |
 

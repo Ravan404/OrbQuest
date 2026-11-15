@@ -182,8 +182,10 @@ export default function App() {
       const { game: updated } = launching ? await api.launch(game) : await api.stop(game.id);
       replaceGame(updated);
       bufferResetTriggersRef.current.add(game.id);
-      if (launching) showNotice(t('noticeStarted'), t('noticeStartedText', { name: game.name }), 'success');
-      else showNotice(t('noticeStopped'), t('noticeStoppedText', { name: game.name }));
+      if (launching) {
+        const text = game.steamAppId ? 'noticeStartedSteamText' : 'noticeStartedText';
+        showNotice(t('noticeStarted'), t(text, { name: game.name }), 'success');
+      } else showNotice(t('noticeStopped'), t('noticeStoppedText', { name: game.name }));
     } catch (error) {
       fail(error);
     }
@@ -367,8 +369,9 @@ export default function App() {
         ) : view === 'catalog' ? (
           <CatalogView
             databaseSize={profile.gameDatabase?.games}
-            onAdded={(name) => {
-              showNotice(t('noticeAdded'), t('noticeAddedText', { name }), 'success');
+            onAdded={(game) => {
+              const text = game.steam ? 'noticeAddedSteamText' : 'noticeAddedText';
+              showNotice(t('noticeAdded'), t(text, { name: game.name }), 'success');
               loadGames();
             }}
             onError={(message) => showNotice(t('noticeError'), message, 'warning')}

@@ -11,6 +11,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { OFFLINE, PROJECT_ROOT } from './config.ts';
 import type { DatabaseGame } from './gameDatabaseSource.ts';
+import { steamIconUrl } from './steamStore.ts';
 
 /** Network lookup failures are expected offline; printed only with ORBQUEST_DEBUG=1. */
 const debugLog = (...args: unknown[]): void => {
@@ -210,20 +211,23 @@ export const ICON_CACHE_DIR = path.join(PROJECT_ROOT, 'icon-cache');
 
 const store = createIconStore({ cacheDir: ICON_CACHE_DIR });
 
-type IconSource = Pick<DatabaseGame, 'id' | 'icon' | 'site'>;
+type IconSource = Pick<DatabaseGame, 'id' | 'icon' | 'iconApp' | 'steam' | 'steamIcon' | 'site'>;
 
 /** The game's icon on Discord's CDN. */
-export function discordIconUrl(game: Pick<DatabaseGame, 'id' | 'icon'>, size = 128): string | undefined {
-  return game.icon ? `https://cdn.discordapp.com/app-icons/${game.id}/${game.icon}.png?size=${size}` : undefined;
+export function discordIconUrl(game: Pick<DatabaseGame, 'id' | 'icon' | 'iconApp'>, size = 128): string | undefined {
+  const app = game.iconApp ?? game.id;
+  return game.icon ? `https://cdn.discordapp.com/app-icons/${app}/${game.icon}.png?size=${size}` : undefined;
 }
 
 /**
- * Where the game's icon is downloaded from: Discord's CDN, or for a program
- * Discord has no icon for (Firefox), its website's icon through Google's
- * favicon service, which returns the site's largest icon.
+ * Where the game's icon is downloaded from: Discord's CDN; for a Steam quest
+ * Discord has no icon for, Steam's; for a program Discord has no icon for
+ * (Firefox), its website's icon through Google's favicon service, which
+ * returns the site's largest icon.
  */
 export function remoteIconUrl(game: IconSource): string | undefined {
   if (game.icon) return discordIconUrl(game, 256);
+  if (game.steam && game.steamIcon) return steamIconUrl(game.steam.appId, game.steamIcon);
   return game.site ? `https://www.google.com/s2/favicons?domain=${encodeURIComponent(game.site)}&sz=256` : undefined;
 }
 
