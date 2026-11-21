@@ -1,0 +1,24 @@
+{
+  "source": "arctic-shift",
+  "subreddit": "DiscordQuests",
+  "fetchedAt": "2026-11-08T06:09:11.161Z",
+  "checkedThrough": "2026-11-08T02:42:20.000Z",
+  "textFormat": "markdown",
+  "note": "Written by scripts/update-game-database.ts: the r/DiscordQuests posts created after the previous snapshots.",
+  "posts": [
+    {
+      "id": "1xqlgrd",
+      "title": "For those infinite nitro guys; they doubled the price of the 3-day credit",
+      "selfText": "![img](k6aahrmcba0i1 \"used to be 1400\")\n\n",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1xqlgrd/for_those_infinite_nitro_guys_they_doubled_the/",
+      "createdAt": "2026-11-08T00:39:03.000Z"
+    },
+    {
+      "id": "1xqnu6z",
+      "title": "Discord bot for exe names",
+      "selfText": "Hello,\n\nI have made a Discord bot that lets you easily look up the detected .exe's from within Discord.  \nThere are 3 ways to look up a game:  \n\\- using Discord game ID  \n`/exe query:1437509662303059998`  \n\\- using Discord game link  \n`/exe query:https://discord.com/games/1437509662303059998`  \n\\- searching the game name  \n`/exe query:Where Winds Meet`\n\nThe easiest way to get the game link is to click the game's name in a quest and then click \"Copy Link\" in the top right corner.\n\n![img](woubkt15wa0i1 \"\\\"Where Winds Meet\\\" here is a clickable link\")\n\n![img](p9k17xi8wa0i1 \"\\\"Copy Link\\\" button\")\n\nBelow are some examples of what using the bot looks like.\n\nhttps://i.redd.it/e111t5mgwa0i1.png\n\nhttps://i.redd.it/ka1how6lwa0i1.png\n\nhttps://i.redd.it/5qek6lcmwa0i1.png\n\nIf you'd like to use this bot, here's [the link](https://discord.com/oauth2/authorize?client_id=1568782998805946378).",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1xqnu6z/discord_bot_for_exe_names/",
+      "createdAt": "2026-11-08T02:42:20.000Z"
+    }
+  ]
+}

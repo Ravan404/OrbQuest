@@ -1,0 +1,17 @@
+{
+  "source": "arctic-shift",
+  "subreddit": "DiscordQuests",
+  "fetchedAt": "2026-11-12T19:59:08.279Z",
+  "checkedThrough": "2026-11-12T19:00:33.000Z",
+  "textFormat": "markdown",
+  "note": "Written by scripts/update-game-database.ts: the r/DiscordQuests posts created after the previous snapshots.",
+  "posts": [
+    {
+      "id": "1xulf3k",
+      "title": "Asphalt legends quest",
+      "selfText": "C:\\\\Program Files (x86)\\\\Steam\\\\steamapps\\\\common\\\\Asphalt 9 Legends\\\\Asphalt9\\_Steam\\_x64\\_rtl.exe\n\ndo it on your own risk ",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1xulf3k/asphalt_legends_quest/",
+      "createdAt": "2026-11-12T19:00:33.000Z"
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "source": "arctic-shift",
+  "subreddit": "DiscordQuests",
+  "fetchedAt": "2026-11-06T19:28:46.612Z",
+  "checkedThrough": "2026-11-06T18:56:30.000Z",
+  "textFormat": "markdown",
+  "note": "Written by scripts/update-game-database.ts: the r/DiscordQuests posts created after the previous snapshots.",
+  "posts": [
+    {
+      "id": "1xpcbpz",
+      "title": "is the discord quest script no longer working?",
+      "selfText": "mine doesnt seem to be",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1xpcbpz/is_the_discord_quest_script_no_longer_working/",
+      "createdAt": "2026-11-06T13:05:43.000Z"
+    },
+    {
+      "id": "1xph2zx",
+      "title": "Can I still rely on this method or is there a better one?",
+      "selfText": "To sum it up I have heard that you can do quests and have nitro without any worries; However, I have also heard that discord has made its system ten fold stronger which worries me because if I wanted infinite nitro I would have done: \n\nDiscord PTB + [This script](https://github.com/nyxxbit/discord-quest-completer/blob/main/index.js)\n\nYet again, hearing that discord made it system a lot stronger it would worry me that this wouldn't work anymore and get my account banned. So i asked AI and it provided me with this way:\n\nDiscord Canary + [The same script but raw formatted](https://github.com/nyxxbit/discord-quest-completer/blob/main/index.js)\n\nSo would this work fine? Or, is there a better more safer method?\n\n**TL;DR**: I am asking the best and most safest way of getting Discord orbs without having to grind.\n\n**PLEASE UPVOTE THIS SO I CAN GET MORE HELP!!**",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1xph2zx/can_i_still_rely_on_this_method_or_is_there_a/",
+      "createdAt": "2026-11-06T16:26:36.000Z"
+    },
+    {
+      "id": "1xpkz6u",
+      "title": "How to complete Discord Activity Quests?",
+      "selfText": "Hi there,\n\nI have a quick question about these quests. could you please explain how to complete them and whether they are still possible to complete?\n\nI would really appreciate your help.\n\nThank you!",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1xpkz6u/",
+      "createdAt": "2026-11-06T18:56:30.000Z"
+    }
+  ]
+}

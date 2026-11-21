@@ -1,0 +1,31 @@
+{
+  "source": "arctic-shift",
+  "subreddit": "DiscordQuests",
+  "fetchedAt": "2026-11-17T20:59:25.721Z",
+  "checkedThrough": "2026-11-17T20:25:13.000Z",
+  "textFormat": "markdown",
+  "note": "Written by scripts/update-game-database.ts: the r/DiscordQuests posts created after the previous snapshots.",
+  "posts": [
+    {
+      "id": "1xyfmwx",
+      "title": "[Blade Runner 2099 quest] All titles",
+      "selfText": "https://i.redd.it/ktj1xbzpz42i1.png\n\nThe first three can be obtained by looking around the room. The toy doll is on a shelf to your left, the origami goat is on the left side of the desk (with another one inside of the top-left drawer below it), and the blaster is in the top-right drawer of the desk.\n\n\"Not On File\" is self-explanatory, you just need to check and see if the ID matches the scan and act accordingly.\n\n\"Ice Cold\" says full shift, but I'm pretty sure I got it from marking all three of a single applicant's answers as failures. Regardless, the title is self-explanatory.\n\n\"Perfect Specimen\" just requires you to find all of the hidden items listed in the first three titles then complete your shift without making any mistakes in choosing who passes and fails the tests.",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1xyfmwx/blade_runner_2099_quest_all_titles/",
+      "createdAt": "2026-11-17T09:00:04.000Z"
+    },
+    {
+      "id": "1xytxrs",
+      "title": "Fym I need to wait to do more quests?!?!",
+      "selfText": "(Translated via google translate:  \nAnd you haven't been sitting idle!\n\nYou have completed many tasks today!  \nCome back for more in 23:32:48!)",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1xytxrs/",
+      "createdAt": "2026-11-17T19:35:39.000Z"
+    },
+    {
+      "id": "1xyv7yo",
+      "title": "Will they do something if I continue?",
+      "selfText": "https://i.redd.it/a4hel1gne82i1.png\n\nIt would be sad if they did.  \n I've been using the script for about a year, and this is the first time I got a warning.  \n So, is there any safe way to complete the quests\n\n",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1xyv7yo/will_they_do_something_if_i_continue/",
+      "createdAt": "2026-11-17T20:25:13.000Z"
+    }
+  ]
+}

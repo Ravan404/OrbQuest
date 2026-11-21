@@ -1,0 +1,24 @@
+{
+  "source": "arctic-shift",
+  "subreddit": "DiscordQuests",
+  "fetchedAt": "2026-11-11T06:33:26.403Z",
+  "checkedThrough": "2026-11-10T20:08:59.000Z",
+  "textFormat": "markdown",
+  "note": "Written by scripts/update-game-database.ts: the r/DiscordQuests posts created after the previous snapshots.",
+  "posts": [
+    {
+      "id": "1xstlap",
+      "title": "[ALL] Found a method that works on Linux",
+      "selfText": "* Tools needed:  knowledge what path will work \n* wine \n* an empty exe that does nothing (just search it up on github)\n\nIf you haven't used wine before, run winecfg, let the prefix create, and as soon as you see configuration options, close the window.\n\nCd into \\~/.wine/drive\\_c/users/(INSERT YOUR USER HERE)/ , make a directory of the game you want, e.g mscw/ for MapleStory Classic World.\n\nRename your exe to the name of the game's exe, and move it to the newly made directory\n\nIf you wanted to run MapleStory Classic Worlds, you would run it with wine.   \n  \n**Do not cd into the exe directory, run wine mscw/maplestory.exe instead of just maplestory.exe.**\n\nNot sure if I explained this well so feel free to leave comments about this.",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1xstlap/all_found_a_method_that_works_on_linux/",
+      "createdAt": "2026-11-10T17:51:40.000Z"
+    },
+    {
+      "id": "1xsx8il",
+      "title": "Discord quest not showing up",
+      "selfText": "Ive been wanting to do the discord quest for the blueprint on the PPSH on COD: MW4, but for whatever reason it doesn't come out on my discord, I already verified my age and everything. Any help is appreciated!",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1xsx8il/discord_quest_not_showing_up/",
+      "createdAt": "2026-11-10T20:08:59.000Z"
+    }
+  ]
+}
