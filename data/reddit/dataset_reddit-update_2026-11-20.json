@@ -1,0 +1,17 @@
+{
+  "source": "arctic-shift",
+  "subreddit": "DiscordQuests",
+  "fetchedAt": "2026-11-20T20:27:00.873Z",
+  "checkedThrough": "2026-11-20T10:48:08.000Z",
+  "textFormat": "markdown",
+  "note": "Written by scripts/update-game-database.ts: the r/DiscordQuests posts created after the previous snapshots.",
+  "posts": [
+    {
+      "id": "1y10ezp",
+      "title": "mannn 😂💯",
+      "selfText": "🎮 Daily Quest in progress.. The thrill is real.  \nSee if you can complete yours 👉 https://vegasbuilder.com/?referral\\_code=cab5e2cca80228a7  \n\\#VegasCrew #VegasBuilder",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1y10ezp/mannn/",
+      "createdAt": "2026-11-20T10:48:08.000Z"
+    }
+  ]
+}

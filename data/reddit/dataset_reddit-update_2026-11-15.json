@@ -1,0 +1,17 @@
+{
+  "source": "arctic-shift",
+  "subreddit": "DiscordQuests",
+  "fetchedAt": "2026-11-15T18:54:58.114Z",
+  "checkedThrough": "2026-11-15T13:08:40.000Z",
+  "textFormat": "markdown",
+  "note": "Written by scripts/update-game-database.ts: the r/DiscordQuests posts created after the previous snapshots.",
+  "posts": [
+    {
+      "id": "1xwv38t",
+      "title": "QUESTORA",
+      "selfText": "\\# \\[Questora — Todas as missões em só um lugar\\](https://questoraofc.vercel.app/)\n> - \\*\\*Você realmente sabe quais missões estão disponíveis no Discord neste momento?\\*\\*\n> - O Questora nasceu para facilitar essa experiência. A plataforma reúne informações sobre todas as Discord Quests em um catálogo organizado, permitindo consultar detalhes das campanhas, recompensas, requisitos e períodos de disponibilidade.\n\n## Com uma interface pensada para facilitar a navegação, você pode:\n> - Consultar as missões disponíveis e seus detalhes.\n> - Verificar recompensas e requisitos.\n> - Acompanhar datas de início e encerramento.\n> - Explorar o catálogo sem depender de pesquisas manuais.\n> - Uma ferramenta para quem acompanha as novidades do Discord e quer ter as informações mais acessíveis.\n\n> - \\*\\*Servidor Oficial:\\*\\* https://discord.gg/vHJGRtJhnq\n> - \\*\\*Site do Questora:\\*\\* https://questoraofc.vercel.app/\n\n-# Questora | Suas quests. Sem perder nenhuma.",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1xwv38t/",
+      "createdAt": "2026-11-15T13:08:40.000Z"
+    }
+  ]
+}

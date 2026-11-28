@@ -1,0 +1,17 @@
+{
+  "source": "arctic-shift",
+  "subreddit": "DiscordQuests",
+  "fetchedAt": "2026-10-30T05:54:20.671Z",
+  "checkedThrough": "2026-10-30T01:57:28.000Z",
+  "textFormat": "markdown",
+  "note": "Written by scripts/update-quest-database.ts: the r/DiscordQuests posts created after the previous snapshots.",
+  "posts": [
+    {
+      "id": "1xj2y4h",
+      "title": "will discord ever make non-ad quests easier for mobile or they’re staying desktop only?",
+      "selfText": "asking this because i don't own a computer and saving up for the witch dust profile decoration with orbs\n\n  \nIm not sure if it's just me or they removed the daily watchable ads section that usually give out \\~50-100+ orbs.",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1xj2y4h/will_discord_ever_make_nonad_quests_easier_for/",
+      "createdAt": "2026-10-30T01:57:28.000Z"
+    }
+  ]
+}

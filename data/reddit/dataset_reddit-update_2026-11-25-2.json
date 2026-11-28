@@ -1,0 +1,17 @@
+{
+  "source": "arctic-shift",
+  "subreddit": "DiscordQuests",
+  "fetchedAt": "2026-11-25T21:45:58.588Z",
+  "checkedThrough": "2026-11-25T16:42:24.000Z",
+  "textFormat": "markdown",
+  "note": "Written by scripts/update-game-database.ts: the r/DiscordQuests posts created after the previous snapshots.",
+  "posts": [
+    {
+      "id": "1y5c2rv",
+      "title": "executable paths for roblox and eve online",
+      "selfText": "Eve Online\\\\exefile.exe\n\n  \nversion-xxxxxxxx\\\\RobloxPlayerBeta.exe",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1y5c2rv/executable_paths_for_roblox_and_eve_online/",
+      "createdAt": "2026-11-25T16:42:24.000Z"
+    }
+  ]
+}

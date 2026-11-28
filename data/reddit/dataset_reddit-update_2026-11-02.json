@@ -1,0 +1,17 @@
+{
+  "source": "arctic-shift",
+  "subreddit": "DiscordQuests",
+  "fetchedAt": "2026-11-02T06:15:50.833Z",
+  "checkedThrough": "2026-11-02T00:48:03.000Z",
+  "textFormat": "markdown",
+  "note": "Written by scripts/update-game-database.ts: the r/DiscordQuests posts created after the previous snapshots.",
+  "posts": [
+    {
+      "id": "1xljg15",
+      "title": "How much Orbs do you need to buy the full store? (or money)",
+      "selfText": "i have been thinking about this a little time so, why not ask in reddit? \n\nhttps://i.redd.it/r48u079kj3zh1.png\n\ni think abt 500k or 1 thousand dollars idk",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1xljg15/how_much_orbs_do_you_need_to_buy_the_full_store/",
+      "createdAt": "2026-11-02T00:48:03.000Z"
+    }
+  ]
+}

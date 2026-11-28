@@ -1,0 +1,17 @@
+{
+  "source": "arctic-shift",
+  "subreddit": "DiscordQuests",
+  "fetchedAt": "2026-11-22T19:45:09.022Z",
+  "checkedThrough": "2026-11-22T11:16:11.000Z",
+  "textFormat": "markdown",
+  "note": "Written by scripts/update-game-database.ts: the r/DiscordQuests posts created after the previous snapshots.",
+  "posts": [
+    {
+      "id": "1y2me9w",
+      "title": "I modified the Discord Quest script to act more human-like.Safer alternative to standard Discord Quest scripts",
+      "selfText": "Most public Discord Quest scripts floating around are super predictable—they send requests on exact metronome timers, push video progress faster than real time, and close the simulated game the exact millisecond the timer hits 15:00. If you accept 10+ quests at once, running them back-to-back like that is an obvious pattern.\n\n\n\nI put together an improved version designed to blend in with normal user behavior so you can accept your quests and leave it running safely in the background:\n\n\n\n**Randomized Breaks**: Starts your first quest right away, then waits a random interval between \\*\\*10 minutes and 2 hours\\*\\* before starting the next one.\n\n**Shuffled Order**: Picks remaining quests randomly instead of going straight down the list.\n\n**Natural Pacing**:Replaces fixed intervals with randomized jitter, keeps video progress synced to real-time playback, and lingers in the session briefly after a quest completes instead of shutting off instantly.\n\n**Clean Integration**: Preserves your actual running games and cleans up after itself once all tasks are finished.\n\n\n\nGitHub Repo & Instructions: [ BetterDiscordQuest](https://github.com/VctrLabs/BetterDiscordQuest)\n\n\\*(Note: Never blindly paste code into your Discord console—the full source is public on GitHub so you can inspect everything yourself before running it.)\\*",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1y2me9w/i_modified_the_discord_quest_script_to_act_more/",
+      "createdAt": "2026-11-22T10:36:06.000Z"
+    }
+  ]
+}

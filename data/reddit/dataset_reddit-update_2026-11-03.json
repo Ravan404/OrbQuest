@@ -1,0 +1,17 @@
+{
+  "source": "arctic-shift",
+  "subreddit": "DiscordQuests",
+  "fetchedAt": "2026-11-03T23:27:04.871Z",
+  "checkedThrough": "2026-11-03T21:55:51.000Z",
+  "textFormat": "markdown",
+  "note": "Written by scripts/update-game-database.ts: the r/DiscordQuests posts created after the previous snapshots.",
+  "posts": [
+    {
+      "id": "1xn6g7w",
+      "title": "How to Rob a Bank",
+      "selfText": "Does anyone know how to do this quest? I’ve been trying different things but I haven’t seem to be able to get it yet. I have all the other quests completed if anyone needs help with them too.",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1xn6g7w/",
+      "createdAt": "2026-11-03T21:55:51.000Z"
+    }
+  ]
+}

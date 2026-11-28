@@ -1,0 +1,17 @@
+{
+  "source": "arctic-shift",
+  "subreddit": "DiscordQuests",
+  "fetchedAt": "2026-11-23T23:58:08.803Z",
+  "checkedThrough": "2026-11-23T21:34:15.000Z",
+  "textFormat": "markdown",
+  "note": "Written by scripts/update-game-database.ts: the r/DiscordQuests posts created after the previous snapshots.",
+  "posts": [
+    {
+      "id": "1y3uws3",
+      "title": "[Violent Night 2] Quest tutorial: How to beat the Kitchen level for gold badge.",
+      "selfText": "I haven't even found all the titles yet but I just thought I would post what I found so far with this very difficult one for those looking to get the Gold badge, and this is not a perfect run I messed up plenty. The post should serve as a blueprint for more optimized run though. \n\nAs for the titles, most of them seem pretty self explanatory. I would recommend the first two stages for the defending present and maxing weapons out, as this one is very difficult from what I have seen at least. The weapon maxing cost going into 3k+ didn't help either, I tried it in an earlier run and died due to lack of trapping. \n\nThe meta here seems to be AOE traps and falling trees. The gingerbread and brubles are super useful as dealing with swarms here, the first of which comes on round 4. \n\nThe strategy at a glance:  \n\\- Upgrade knives to damage 5 and speed 5  \n\\- Spam AOE traps and heal presents if needed. Prioritize the health upgrade though, they tend to result in more values for the heal later.   \n\\- On round 9 focus on present reinforcement and knife upgrades, as round 10 you get a boss that can one/two shots a lot of those, and them just surviving one more hit can be game changing.   \n\\- After that just spam traps (I feel like I overinvested in traps here, but they're very good for non-boss rounds. The non-AOE ones are good too but not in early rounds since the enemies will just circumvent them, but maybe there's a funneling technique I'm not aware of. You get enough mone y to spam the AOEs anyways).  \n\\- I planted the trees where I know the bosses will be, since their damage assistance can be very detrimental. Spring traps cannot bounce them, but I believe they're stunnable so you can try the ice trap and the light one. I wish the game told me what each does, but its just a quest game so I get it.   \n\\- On round 19 max out your knives speed and dmg, you can ignore range, and toss down a few more traps. For bosses I feel like even the first 3 might be helpful, but idk what they do exactly though. \n\nI'm not sure if a perfect run on that one is even possible, given how difficult it is. On round 20 you get two bosses, so you're definitely losing presents. Just try to preserve as many as I can and prepare for the round - you just gotta take one down asap and the second should be easy to deal with from there. \n\nMusic used: [Paint It Blue - Ace Combat 8 Wings of Theve Soundtrack](https://www.youtube.com/watch?v=vCOd8IexY1M). I had it in the background but it made it into the recording, oh well. \n\nThe other two should be fairly ez honestly, but I'll post guides of them in the comments if I feel up to it. Feel free to post the titles and/or strategy feedback in the comments. ",
+      "url": "https://www.reddit.com/r/DiscordQuests/comments/1y3uws3/",
+      "createdAt": "2026-11-23T21:34:15.000Z"
+    }
+  ]
+}
